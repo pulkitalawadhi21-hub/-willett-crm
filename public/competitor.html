@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Competitor Analysis — Willett CRM</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.insight-box{background:#e8f5e9;border-left:4px solid #2e7d32;border-radius:6px;padding:12px 16px;margin-bottom:8px;font-size:0.9rem;color:#1b5e20;}
+.insight-box.warn{background:#fff8e1;border-left-color:#f57f17;color:#4e342e;}
+.big-num{font-size:2rem;font-weight:800;color:#1a237e;line-height:1.1;}
+.big-lbl{font-size:0.78rem;color:#666;text-transform:uppercase;letter-spacing:0.04em;margin-top:2px;}
+.metric-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:24px;}
+.metric-card{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.08);text-align:center;}
+.section-title{font-size:1rem;font-weight:700;color:#1a237e;margin:20px 0 10px;}
+table{width:100%;border-collapse:collapse;font-size:0.85rem;}
+th{background:#e8eaf6;color:#3949ab;padding:8px 10px;text-align:left;font-weight:700;}
+td{padding:7px 10px;border-bottom:1px solid #f0f0f0;}
+tr:hover td{background:#f5f5f5;}
+.bar-wrap{width:100%;background:#e8eaf6;border-radius:4px;height:8px;overflow:hidden;}
+.bar-fill{height:8px;background:#3949ab;border-radius:4px;}
+.trend-up{color:#2e7d32;font-weight:700;}
+.trend-dn{color:#c62828;font-weight:700;}
+.period-badge{display:inline-block;background:#e8eaf6;color:#3949ab;border-radius:6px;padding:2px 10px;font-size:0.78rem;font-weight:600;margin-left:8px;}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Willett Cables — CRM</h1>
+  <a href="index.html">← Back to CRM</a>
+</div>
+<div class="container">
+
+  <div style="display:flex;align-items:center;margin-bottom:18px;">
+    <h2 style="margin:0;font-size:1.3rem;">Senju Competitor Analysis</h2>
+    <span class="period-badge">Jan–Feb 2024 · 2 months</span>
+  </div>
+
+  <div id="loading" style="text-align:center;padding:40px;color:#888;">Loading analysis...</div>
+  <div id="content" style="display:none;">
+
+    <!-- METRICS ROW -->
+    <div class="metric-row" id="metrics"></div>
+
+    <!-- KEY INSIGHTS -->
+    <div class="section-title">Key Insights</div>
+    <div id="insights"></div>
+
+    <!-- INDUSTRY BREAKDOWN -->
+    <div class="section-title">Industry Breakdown</div>
+    <div class="card" style="overflow-x:auto;">
+      <table id="ind-table">
+        <thead><tr><th>Industry</th><th>Customers</th><th>Jan Revenue</th><th>Feb Revenue</th><th>Total</th><th>% Share</th><th>Trend</th><th>Annual (est.)</th></tr></thead>
+        <tbody id="ind-body"></tbody>
+      </table>
+    </div>
+
+    <!-- TOP 10 CUSTOMERS -->
+    <div class="section-title">Top 10 Customers (by Senju revenue)</div>
+    <div class="card" style="overflow-x:auto;">
+      <table id="top-table">
+        <thead><tr><th>#</th><th>Company</th><th>State</th><th>Industry</th><th>Jan</th><th>Feb</th><th>Total</th><th>Annual (est.)</th></tr></thead>
+        <tbody id="top-body"></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const INDUSTRY_LABELS = {
+  home_appliances:'Home Appliances', ev_automotive:'EV / Automotive', solar:'Solar', lighting:'Lighting',
+  electronics_ems:'Electronics / EMS', industrial_oem:'Industrial / OEM', cable_wiring:'Cable / Wiring Harness',
+  pumps:'Pumps', transformer_power:'Transformer / Power', switchgear:'Switchgear',
+  railway:'Railway', medical:'Medical Devices', trader:'Trader / Distributor', other:'Other'
+};
+
+function cr(n) { return '₹' + (n/1e7).toFixed(2) + ' Cr'; }
+function lakh(n) { return '₹' + (n/1e5).toFixed(1) + 'L'; }
+function fmt(n) { return n >= 1e7 ? cr(n) : lakh(n); }
+function pct(a, b) { return b ? Math.round((a-b)/b*100) : 0; }
+
+async function load() {
+  const d = await fetch('/api/competitor/senju').then(r => r.json());
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = 'block';
+
+  // METRICS
+  const annCr = (d.annualProjection/1e7).toFixed(2);
+  const totCr = (d.totalRev/1e7).toFixed(2);
+  const janCr = (d.totalJan/1e7).toFixed(2);
+  const febCr = (d.totalFeb/1e7).toFixed(2);
+  const febTrend = pct(d.totalFeb, d.totalJan);
+  document.getElementById('metrics').innerHTML = `
+    <div class="metric-card">
+      <div class="big-num">₹${totCr} Cr</div>
+      <div class="big-lbl">Total (2 months)</div>
+    </div>
+    <div class="metric-card">
+      <div class="big-num" style="color:#c62828;">₹${annCr} Cr</div>
+      <div class="big-lbl">Annualised (est.)</div>
+    </div>
+    <div class="metric-card">
+      <div class="big-num" style="font-size:1.4rem;">₹${janCr} Cr</div>
+      <div class="big-lbl">Jan Revenue</div>
+    </div>
+    <div class="metric-card">
+      <div class="big-num" style="font-size:1.4rem;">₹${febCr} Cr</div>
+      <div class="big-lbl">Feb Revenue <span class="${febTrend>=0?'trend-up':'trend-dn'}">${febTrend>=0?'▲':'▼'}${Math.abs(febTrend)}%</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="big-num" style="font-size:1.6rem;">${d.customerCount}</div>
+      <div class="big-lbl">Customers</div>
+    </div>
+    <div class="metric-card">
+      <div class="big-num" style="font-size:1.6rem;">${d.industryList.length}</div>
+      <div class="big-lbl">Industries</div>
+    </div>
+  `;
+
+  // INSIGHTS
+  document.getElementById('insights').innerHTML = d.insights.map((ins, i) =>
+    `<div class="insight-box ${i===5&&d.totalFeb<d.totalJan?'warn':''}">${ins}</div>`
+  ).join('');
+
+  // INDUSTRY TABLE
+  document.getElementById('ind-body').innerHTML = d.industryList.map(row => {
+    const trend = pct(row.feb, row.jan);
+    const annual = Math.round(row.total / 2 * 12);
+    return `<tr onclick="location.href='index.html?industry=${row.industry}'" style="cursor:pointer;">
+      <td><strong>${INDUSTRY_LABELS[row.industry]||row.industry}</strong></td>
+      <td>${row.count}</td>
+      <td>${fmt(row.jan)}</td>
+      <td>${fmt(row.feb)}</td>
+      <td><strong>${fmt(row.total)}</strong></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div class="bar-wrap" style="width:80px;"><div class="bar-fill" style="width:${row.pct}%;"></div></div>
+          <span>${row.pct}%</span>
+        </div>
+      </td>
+      <td class="${trend>=0?'trend-up':'trend-dn'}">${trend>=0?'▲':'▼'}${Math.abs(trend)}%</td>
+      <td style="color:#1a237e;font-weight:600;">${fmt(annual)}</td>
+    </tr>`;
+  }).join('');
+
+  // TOP 10 TABLE
+  document.getElementById('top-body').innerHTML = d.top10.map((c, i) => {
+    const annual = Math.round(c.total / 2 * 12);
+    return `<tr onclick="location.href='customer.html?id=${c.id}'" style="cursor:pointer;">
+      <td>${i+1}</td>
+      <td><strong>${c.name}</strong></td>
+      <td>${c.state||'—'}</td>
+      <td>${INDUSTRY_LABELS[c.industry]||c.industry||'—'}</td>
+      <td>${fmt(c.jan)}</td>
+      <td>${fmt(c.feb)}</td>
+      <td><strong>${fmt(c.total)}</strong></td>
+      <td style="color:#1a237e;font-weight:600;">${fmt(annual)}</td>
+    </tr>`;
+  }).join('');
+}
+
+load();
+</script>
+</body>
+</html>

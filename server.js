@@ -124,6 +124,68 @@ app.post('/api/admin/clear-prospect-payment', (req, res) => {
   res.json({ updated: r.changes });
 });
 
+// ── COMPETITOR ANALYSIS ──
+app.get('/api/competitor/senju', (req, res) => {
+  const rows = db.prepare("SELECT * FROM customers WHERE notes LIKE '[Senju prospect]%'").all();
+
+  function parseNotes(notes) {
+    const jan = notes.match(/Jan: ₹([\d,]+)/);
+    const feb = notes.match(/Feb: ₹([\d,]+)/);
+    const tot = notes.match(/Total: ₹([\d,]+)/);
+    const seg = notes.match(/\[Senju prospect\] ([^|]+) \|/);
+    return {
+      jan: jan ? parseInt(jan[1].replace(/,/g, '')) : 0,
+      feb: feb ? parseInt(feb[1].replace(/,/g, '')) : 0,
+      total: tot ? parseInt(tot[1].replace(/,/g, '')) : 0,
+      segment: seg ? seg[1].trim() : 'Other'
+    };
+  }
+
+  let totalJan = 0, totalFeb = 0, totalRev = 0;
+  const byIndustry = {};
+  const customers = [];
+
+  for (const c of rows) {
+    const p = parseNotes(c.notes || '');
+    totalJan += p.jan;
+    totalFeb += p.feb;
+    totalRev += p.total;
+
+    if (!byIndustry[c.industry]) byIndustry[c.industry] = { jan: 0, feb: 0, total: 0, count: 0 };
+    byIndustry[c.industry].jan += p.jan;
+    byIndustry[c.industry].feb += p.feb;
+    byIndustry[c.industry].total += p.total;
+    byIndustry[c.industry].count++;
+
+    customers.push({ id: c.id, name: c.name, state: c.state, industry: c.industry, jan: p.jan, feb: p.feb, total: p.total });
+  }
+
+  const months = 2;
+  const annualProjection = Math.round((totalRev / months) * 12);
+  const industryList = Object.entries(byIndustry)
+    .map(([k, v]) => ({ industry: k, ...v, pct: Math.round(v.total / totalRev * 100) }))
+    .sort((a, b) => b.total - a.total);
+
+  const top10 = customers.sort((a, b) => b.total - a.total).slice(0, 10);
+
+  // key insights
+  const topInd = industryList[0];
+  const topCust = top10[0];
+  const bothMonths = rows.filter(c => c.notes && !c.notes.includes('Jan Only') && !c.notes.includes('Feb Only')).length;
+  const janOnly = rows.filter(c => c.notes && c.notes.includes('Jan Only')).length;
+  const febOnly = rows.filter(c => c.notes && c.notes.includes('Feb Only')).length;
+  const insights = [
+    `Senju served ${rows.length} customers in Jan–Feb 2024 totalling ₹${(totalRev/1e7).toFixed(2)} Cr`,
+    `Annualised run rate: ₹${(annualProjection/1e7).toFixed(2)} Cr/year`,
+    `Largest segment: ${topInd?.industry || '—'} at ${topInd?.pct || 0}% (₹${((topInd?.total||0)/1e7).toFixed(2)} Cr)`,
+    `Biggest customer: ${topCust?.name || '—'} at ₹${((topCust?.total||0)/1e7).toFixed(2)} Cr for the period`,
+    `${bothMonths} customers bought both months, ${janOnly} Jan only, ${febOnly} Feb only`,
+    `Feb revenue ${totalFeb > totalJan ? 'grew' : 'dropped'} ${Math.abs(Math.round((totalFeb - totalJan)/totalJan*100))}% vs Jan (${totalFeb > totalJan ? 'positive trend' : 'declining trend'})`
+  ];
+
+  res.json({ totalJan, totalFeb, totalRev, months, annualProjection, industryList, top10, insights, customerCount: rows.length });
+});
+
 // ── DASHBOARD STATS ──
 app.get('/api/stats', (req, res) => {
   const total = db.prepare('SELECT COUNT(*) as n FROM customers').get().n;
