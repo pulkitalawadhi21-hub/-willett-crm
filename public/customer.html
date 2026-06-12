@@ -41,6 +41,16 @@
           <option value="ev_automotive">EV / Automotive</option>
           <option value="solar">Solar</option>
           <option value="lighting">Lighting</option>
+          <option value="electronics_ems">Electronics / EMS</option>
+          <option value="industrial_oem">Industrial / OEM</option>
+          <option value="cable_wiring">Cable / Wiring Harness</option>
+          <option value="pumps">Pumps</option>
+          <option value="transformer_power">Transformer / Power</option>
+          <option value="switchgear">Switchgear</option>
+          <option value="railway">Railway</option>
+          <option value="medical">Medical Devices</option>
+          <option value="trader">Trader / Distributor</option>
+          <option value="other">Other</option>
         </select>
       </div>
       <div class="col">
@@ -117,7 +127,12 @@
 <script>
 const APPLIANCES = ['Infrared/Induction Cooktop','Immersion Rods','Fans','Mixer Grinders','Toasters','Kettle','OTG','Rice Cookers','Washing Machine','Coolers','AC','TV'];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const INDUSTRY_LABELS = { home_appliances:'Home Appliances', ev_automotive:'EV / Automotive', solar:'Solar', lighting:'Lighting' };
+const INDUSTRY_LABELS = {
+  home_appliances:'Home Appliances', ev_automotive:'EV / Automotive', solar:'Solar', lighting:'Lighting',
+  electronics_ems:'Electronics / EMS', industrial_oem:'Industrial / OEM', cable_wiring:'Cable / Wiring Harness',
+  pumps:'Pumps', transformer_power:'Transformer / Power', switchgear:'Switchgear',
+  railway:'Railway', medical:'Medical Devices', trader:'Trader / Distributor', other:'Other'
+};
 
 let customer = null;
 let editingActivityId = null;
