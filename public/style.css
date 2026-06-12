@@ -31,6 +31,7 @@ label{font-size:0.82rem;font-weight:600;color:#555;display:block;margin-bottom:3
 .customer-card.good{border-left-color:#2e7d32;}
 .customer-card.average{border-left-color:#e65100;}
 .customer-card.bad{border-left-color:#c62828;}
+.customer-card.prospect{border-left-color:#90a4ae;}
 .customer-name{font-size:1rem;font-weight:700;margin-bottom:4px;}
 .customer-meta{font-size:0.8rem;color:#666;margin-bottom:8px;}
 .tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}

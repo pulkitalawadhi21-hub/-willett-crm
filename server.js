@@ -72,7 +72,7 @@ app.post('/api/customers', (req, res) => {
     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(
     name, city||null, state||null, contact_person||null, phone||null, email||null, website||null,
     industry||null, JSON.stringify(appliance_types||[]), size_category||'both',
-    payment_rating||'average', notes||null, JSON.stringify(dev_months||{})
+    payment_rating||null, notes||null, JSON.stringify(dev_months||{})
   );
   res.json({ id: r.lastInsertRowid });
 });
@@ -83,7 +83,7 @@ app.put('/api/customers/:id', (req, res) => {
   db.prepare(`UPDATE customers SET name=?,city=?,state=?,contact_person=?,phone=?,email=?,website=?,industry=?,appliance_types=?,size_category=?,payment_rating=?,notes=?,dev_months=? WHERE id=?`)
     .run(name, city||null, state||null, contact_person||null, phone||null, email||null, website||null,
       industry||null, JSON.stringify(appliance_types||[]), size_category||'both',
-      payment_rating||'average', notes||null, JSON.stringify(dev_months||{}), id);
+      payment_rating||null, notes||null, JSON.stringify(dev_months||{}), id);
   res.json({ ok: true });
 });
 
@@ -116,6 +116,12 @@ app.put('/api/activities/:id', (req, res) => {
 app.delete('/api/activities/:id', (req, res) => {
   db.prepare('DELETE FROM activities WHERE id=?').run(parseInt(req.params.id));
   res.json({ ok: true });
+});
+
+// one-time fix: clear payment_rating for Senju prospects
+app.post('/api/admin/clear-prospect-payment', (req, res) => {
+  const r = db.prepare("UPDATE customers SET payment_rating=NULL WHERE notes LIKE '[Senju prospect]%'").run();
+  res.json({ updated: r.changes });
 });
 
 // ── DASHBOARD STATS ──
