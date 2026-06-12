@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Willett CRM</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="header">
+  <h1>Willett Cables — CRM</h1>
+  <a href="customer.html?new=1">+ Add Customer</a>
+</div>
+
+<div class="container">
+
+  <!-- STATS -->
+  <div class="stat-grid" id="stat-grid"></div>
+
+  <!-- FOLLOW-UPS -->
+  <div id="followup-section" style="display:none;" class="card">
+    <div class="section-title" style="margin-top:0;">Upcoming Follow-ups</div>
+    <div id="followup-list"></div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="card">
+    <div class="search-bar">
+      <input type="text" id="search" placeholder="Search customer, city, contact..." oninput="applyFilters()">
+      <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Add Customer</button>
+    </div>
+    <div class="filters">
+      <div>
+        <label>Industry</label>
+        <select id="f-industry" onchange="applyFilters()">
+          <option value="">All Industries</option>
+          <option value="home_appliances">Home Appliances</option>
+          <option value="ev_automotive">EV / Automotive</option>
+          <option value="solar">Solar</option>
+          <option value="lighting">Lighting</option>
+        </select>
+      </div>
+      <div id="appliance-filter-wrap" style="display:none;">
+        <label>Appliance Type</label>
+        <select id="f-appliance" onchange="applyFilters()">
+          <option value="">All Appliances</option>
+          <option value="Infrared/Induction Cooktop">Infrared/Induction Cooktop</option>
+          <option value="Immersion Rods">Immersion Rods</option>
+          <option value="Fans">Fans</option>
+          <option value="Mixer Grinders">Mixer Grinders</option>
+          <option value="Toasters">Toasters</option>
+          <option value="Kettle">Kettle</option>
+          <option value="OTG">OTG</option>
+          <option value="Rice Cookers">Rice Cookers</option>
+          <option value="Washing Machine">Washing Machine</option>
+          <option value="Coolers">Coolers</option>
+          <option value="AC">AC</option>
+          <option value="TV">TV</option>
+        </select>
+      </div>
+      <div>
+        <label>Size</label>
+        <select id="f-size" onchange="applyFilters()">
+          <option value="">All</option>
+          <option value="small">Small Appliance</option>
+          <option value="big">Big Appliance</option>
+        </select>
+      </div>
+      <div>
+        <label>Payment</label>
+        <select id="f-payment" onchange="applyFilters()">
+          <option value="">All</option>
+          <option value="good">Good</option>
+          <option value="average">Average</option>
+          <option value="bad">Bad</option>
+        </select>
+      </div>
+      <div>
+        <label>Dev Month</label>
+        <select id="f-month" onchange="applyFilters()">
+          <option value="">All Months</option>
+          <option value="Jan">January</option>
+          <option value="Feb">February</option>
+          <option value="Mar">March</option>
+          <option value="Apr">April</option>
+          <option value="May">May</option>
+          <option value="Jun">June</option>
+          <option value="Jul">July</option>
+          <option value="Aug">August</option>
+          <option value="Sep">September</option>
+          <option value="Oct">October</option>
+          <option value="Nov">November</option>
+          <option value="Dec">December</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:flex-end;">
+        <button class="btn btn-outline btn-sm" onclick="clearFilters()">Clear</button>
+      </div>
+    </div>
+    <div id="result-count" style="font-size:0.82rem;color:#888;margin-bottom:10px;"></div>
+  </div>
+
+  <!-- CUSTOMER GRID -->
+  <div class="grid" id="customer-grid"></div>
+  <div id="empty-msg" style="display:none;text-align:center;padding:40px;color:#aaa;font-size:1rem;">No customers found.</div>
+
+</div>
+
+<!-- ADD CUSTOMER MODAL -->
+<div class="modal" id="add-modal">
+  <div class="modal-box">
+    <h2>Add Customer</h2>
+    <div class="row">
+      <div class="col">
+        <label>Company Name *</label>
+        <input type="text" id="a-name" placeholder="Company name">
+      </div>
+      <div class="col">
+        <label>Contact Person</label>
+        <input type="text" id="a-contact" placeholder="Name">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label>Phone</label>
+        <input type="text" id="a-phone" placeholder="+91...">
+      </div>
+      <div class="col">
+        <label>Email</label>
+        <input type="email" id="a-email" placeholder="email@company.com">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label>City</label>
+        <input type="text" id="a-city" placeholder="City">
+      </div>
+      <div class="col">
+        <label>State</label>
+        <input type="text" id="a-state" placeholder="State">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label>Industry *</label>
+        <select id="a-industry" onchange="toggleApplianceFields('a')">
+          <option value="">— Select —</option>
+          <option value="home_appliances">Home Appliances</option>
+          <option value="ev_automotive">EV / Automotive</option>
+          <option value="solar">Solar</option>
+          <option value="lighting">Lighting</option>
+        </select>
+      </div>
+      <div class="col">
+        <label>Size Category</label>
+        <select id="a-size">
+          <option value="both">Both</option>
+          <option value="small">Small Appliance</option>
+          <option value="big">Big Appliance</option>
+        </select>
+      </div>
+    </div>
+    <div id="a-appliance-wrap" style="display:none;">
+      <label>Appliance Types (select all that apply)</label>
+      <div id="a-appliance-checks" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+        <!-- checkboxes injected by JS -->
+      </div>
+    </div>
+    <div id="a-devmonths-wrap" style="display:none;">
+      <label>Development Start Months (per appliance)</label>
+      <div id="a-devmonths-list"></div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label>Payment Rating</label>
+        <select id="a-payment">
+          <option value="good">Good</option>
+          <option value="average">Average</option>
+          <option value="bad">Bad</option>
+        </select>
+      </div>
+      <div class="col">
+        <label>Website</label>
+        <input type="text" id="a-website" placeholder="www.company.com">
+      </div>
+    </div>
+    <label>Notes / Goodwill</label>
+    <textarea id="a-notes" rows="2" placeholder="Any notes..."></textarea>
+    <div id="add-msg" style="margin-bottom:8px;font-size:0.85rem;color:#c62828;"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-primary" onclick="saveCustomer()">Save Customer</button>
+      <button class="btn btn-outline" onclick="closeAddModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const APPLIANCES = ['Infrared/Induction Cooktop','Immersion Rods','Fans','Mixer Grinders','Toasters','Kettle','OTG','Rice Cookers','Washing Machine','Coolers','AC','TV'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const INDUSTRY_LABELS = { home_appliances:'Home Appliances', ev_automotive:'EV / Automotive', solar:'Solar', lighting:'Lighting' };
+const ACTIVITY_TYPES = { call:'type-call', meeting:'type-meeting', sampling:'type-sampling', pricing:'type-pricing', development:'type-development', other:'type-other' };
+
+let allCustomers = [];
+
+async function loadStats() {
+  const s = await fetch('/api/stats').then(r => r.json());
+  const grid = document.getElementById('stat-grid');
+  grid.innerHTML = `
+    <div class="stat-box"><div class="num">${s.total}</div><div class="lbl">Total Customers</div></div>
+    ${s.byIndustry.map(i => `<div class="stat-box"><div class="num">${i.n}</div><div class="lbl">${INDUSTRY_LABELS[i.industry]||i.industry||'Unknown'}</div></div>`).join('')}
+    ${s.byPayment.map(p => `<div class="stat-box"><div class="num" style="color:${p.payment_rating==='good'?'#2e7d32':p.payment_rating==='bad'?'#c62828':'#e65100'}">${p.n}</div><div class="lbl">${(p.payment_rating||'').toUpperCase()} Payment</div></div>`).join('')}
+  `;
+  if (s.followUps && s.followUps.length) {
+    document.getElementById('followup-section').style.display = 'block';
+    document.getElementById('followup-list').innerHTML = s.followUps.map(f => `
+      <div class="follow-up-soon">
+        <strong>${f.customer_name}</strong> — ${f.type} on <strong>${f.next_follow_up}</strong>
+        ${f.notes ? `<div style="color:#666;margin-top:2px;">${f.notes}</div>` : ''}
+      </div>`).join('');
+  }
+}
+
+async function loadCustomers(params = {}) {
+  const qs = new URLSearchParams(params).toString();
+  allCustomers = await fetch(`/api/customers?${qs}`).then(r => r.json());
+  renderGrid(allCustomers);
+}
+
+function renderGrid(customers) {
+  const grid = document.getElementById('customer-grid');
+  const empty = document.getElementById('empty-msg');
+  document.getElementById('result-count').textContent = `${customers.length} customer${customers.length!==1?'s':''}`;
+  if (!customers.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = customers.map(c => {
+    const appTags = (c.appliance_types||[]).map(a => `<span class="tag">${a}</span>`).join('');
+    const sizeTags = c.size_category !== 'both' ? `<span class="tag ${c.size_category==='small'?'tag-small':'tag-big'}">${c.size_category==='small'?'Small':'Big'}</span>` : '';
+    const payBadge = `<span class="badge badge-${c.payment_rating||'average'}">${(c.payment_rating||'average').toUpperCase()}</span>`;
+    const lastC = c.last_contact ? `Last: ${c.last_contact} (${c.last_contact_type})` : 'No contact yet';
+    const devMonths = Object.entries(c.dev_months||{}).map(([app,mon]) => `<span class="month-pill">${app}: ${mon}</span>`).join('');
+    const ind = INDUSTRY_LABELS[c.industry] || c.industry || '—';
+    return `
+      <div class="customer-card ${c.payment_rating||'average'}" onclick="location.href='customer.html?id=${c.id}'">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+          <div class="customer-name">${c.name}</div>
+          ${payBadge}
+        </div>
+        <div class="customer-meta">${ind}${c.city?` · ${c.city}`:''}${c.state?`, ${c.state}`:''}</div>
+        ${c.contact_person ? `<div style="font-size:0.82rem;color:#555;margin-bottom:6px;">👤 ${c.contact_person}${c.phone?' · '+c.phone:''}</div>` : ''}
+        <div class="tags">${sizeTags}${appTags}</div>
+        ${devMonths ? `<div style="margin-bottom:6px;">${devMonths}</div>` : ''}
+        <div class="last-contact">📞 ${lastC} · ${c.activity_count} activities</div>
+      </div>`;
+  }).join('');
+}
+
+function applyFilters() {
+  const industry = document.getElementById('f-industry').value;
+  const appliance = document.getElementById('f-appliance').value;
+  const size = document.getElementById('f-size').value;
+  const payment = document.getElementById('f-payment').value;
+  const month = document.getElementById('f-month').value;
+  const q = document.getElementById('search').value;
+  document.getElementById('appliance-filter-wrap').style.display = industry === 'home_appliances' ? 'block' : 'none';
+  if (industry !== 'home_appliances') document.getElementById('f-appliance').value = '';
+  const params = {};
+  if (industry) params.industry = industry;
+  if (appliance) params.appliance = appliance;
+  if (size) params.size = size;
+  if (payment) params.payment = payment;
+  if (month) params.month = month;
+  if (q) params.q = q;
+  loadCustomers(params);
+}
+
+function clearFilters() {
+  ['f-industry','f-appliance','f-size','f-payment','f-month'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('search').value = '';
+  document.getElementById('appliance-filter-wrap').style.display = 'none';
+  loadCustomers();
+}
+
+// ── ADD CUSTOMER MODAL ──
+function openAddModal() {
+  document.getElementById('add-modal').classList.add('open');
+}
+function closeAddModal() {
+  document.getElementById('add-modal').classList.remove('open');
+}
+
+function toggleApplianceFields(prefix) {
+  const ind = document.getElementById(`${prefix}-industry`).value;
+  const wrap = document.getElementById(`${prefix}-appliance-wrap`);
+  const devWrap = document.getElementById(`${prefix}-devmonths-wrap`);
+  if (ind === 'home_appliances') {
+    wrap.style.display = 'block';
+    document.getElementById(`${prefix}-appliance-checks`).innerHTML = APPLIANCES.map(a =>
+      `<label style="display:flex;align-items:center;gap:4px;font-size:0.82rem;font-weight:400;width:auto;margin-bottom:0;cursor:pointer;">
+        <input type="checkbox" value="${a}" onchange="updateDevMonths('${prefix}')" style="width:auto;margin-bottom:0;"> ${a}
+      </label>`
+    ).join('');
+    devWrap.style.display = 'block';
+    updateDevMonths(prefix);
+  } else {
+    wrap.style.display = 'none';
+    devWrap.style.display = 'none';
+  }
+}
+
+function updateDevMonths(prefix) {
+  const checked = [...document.querySelectorAll(`#${prefix}-appliance-checks input:checked`)].map(c => c.value);
+  const container = document.getElementById(`${prefix}-devmonths-list`);
+  container.innerHTML = checked.map(a => `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <span style="font-size:0.82rem;width:180px;flex-shrink:0;">${a}</span>
+      <select id="${prefix}-dm-${a.replace(/[^a-z0-9]/gi,'_')}" style="width:auto;margin-bottom:0;">
+        <option value="">No dev month</option>
+        ${MONTHS.map(m => `<option value="${m}">${m}</option>`).join('')}
+      </select>
+    </div>`).join('') || '<div style="font-size:0.82rem;color:#aaa;">Select appliances above</div>';
+}
+
+function getSelectedAppliances(prefix) {
+  return [...document.querySelectorAll(`#${prefix}-appliance-checks input:checked`)].map(c => c.value);
+}
+
+function getDevMonths(prefix) {
+  const checked = getSelectedAppliances(prefix);
+  const dm = {};
+  checked.forEach(a => {
+    const sel = document.getElementById(`${prefix}-dm-${a.replace(/[^a-z0-9]/gi,'_')}`);
+    if (sel && sel.value) dm[a] = sel.value;
+  });
+  return dm;
+}
+
+async function saveCustomer() {
+  const name = document.getElementById('a-name').value.trim();
+  const msgEl = document.getElementById('add-msg');
+  if (!name) { msgEl.textContent = 'Company name is required.'; return; }
+  const body = {
+    name,
+    contact_person: document.getElementById('a-contact').value.trim(),
+    phone: document.getElementById('a-phone').value.trim(),
+    email: document.getElementById('a-email').value.trim(),
+    city: document.getElementById('a-city').value.trim(),
+    state: document.getElementById('a-state').value.trim(),
+    industry: document.getElementById('a-industry').value,
+    size_category: document.getElementById('a-size').value,
+    payment_rating: document.getElementById('a-payment').value,
+    website: document.getElementById('a-website').value.trim(),
+    notes: document.getElementById('a-notes').value.trim(),
+    appliance_types: getSelectedAppliances('a'),
+    dev_months: getDevMonths('a')
+  };
+  const res = await fetch('/api/customers', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  const data = await res.json();
+  if (res.ok) {
+    closeAddModal();
+    location.href = `customer.html?id=${data.id}`;
+  } else {
+    msgEl.textContent = data.error || 'Error saving.';
+  }
+}
+
+loadStats();
+loadCustomers();
+</script>
+</body>
+</html>

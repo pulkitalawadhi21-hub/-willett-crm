@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Customer — Willett CRM</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="header">
+  <h1>Willett Cables — CRM</h1>
+  <a href="index.html">← Back to CRM</a>
+</div>
+<div class="container">
+  <div id="loading" style="text-align:center;padding:40px;color:#888;">Loading...</div>
+  <div id="content" style="display:none;"></div>
+</div>
+
+<!-- EDIT CUSTOMER MODAL -->
+<div class="modal" id="edit-modal">
+  <div class="modal-box">
+    <h2>Edit Customer</h2>
+    <div class="row">
+      <div class="col"><label>Company Name *</label><input type="text" id="e-name"></div>
+      <div class="col"><label>Contact Person</label><input type="text" id="e-contact"></div>
+    </div>
+    <div class="row">
+      <div class="col"><label>Phone</label><input type="text" id="e-phone"></div>
+      <div class="col"><label>Email</label><input type="email" id="e-email"></div>
+    </div>
+    <div class="row">
+      <div class="col"><label>City</label><input type="text" id="e-city"></div>
+      <div class="col"><label>State</label><input type="text" id="e-state"></div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label>Industry</label>
+        <select id="e-industry" onchange="toggleApplianceFields('e')">
+          <option value="">— Select —</option>
+          <option value="home_appliances">Home Appliances</option>
+          <option value="ev_automotive">EV / Automotive</option>
+          <option value="solar">Solar</option>
+          <option value="lighting">Lighting</option>
+        </select>
+      </div>
+      <div class="col">
+        <label>Size Category</label>
+        <select id="e-size">
+          <option value="both">Both</option>
+          <option value="small">Small Appliance</option>
+          <option value="big">Big Appliance</option>
+        </select>
+      </div>
+    </div>
+    <div id="e-appliance-wrap" style="display:none;">
+      <label>Appliance Types</label>
+      <div id="e-appliance-checks" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;"></div>
+    </div>
+    <div id="e-devmonths-wrap" style="display:none;">
+      <label>Development Start Months</label>
+      <div id="e-devmonths-list"></div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label>Payment Rating</label>
+        <select id="e-payment">
+          <option value="good">Good</option>
+          <option value="average">Average</option>
+          <option value="bad">Bad</option>
+        </select>
+      </div>
+      <div class="col"><label>Website</label><input type="text" id="e-website"></div>
+    </div>
+    <label>Notes / Goodwill</label>
+    <textarea id="e-notes" rows="3"></textarea>
+    <div id="edit-msg" style="margin-bottom:8px;font-size:0.85rem;color:#c62828;"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-primary" onclick="saveEdit()">Save Changes</button>
+      <button class="btn btn-outline" onclick="closeEditModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD ACTIVITY MODAL -->
+<div class="modal" id="act-modal">
+  <div class="modal-box">
+    <h2 id="act-modal-title">Log Activity</h2>
+    <div class="row">
+      <div class="col">
+        <label>Type *</label>
+        <select id="act-type">
+          <option value="call">📞 Call</option>
+          <option value="meeting">🤝 Meeting</option>
+          <option value="sampling">🧪 Sampling</option>
+          <option value="pricing">💰 Pricing</option>
+          <option value="development">🔧 Development</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="col">
+        <label>Date *</label>
+        <input type="date" id="act-date">
+      </div>
+    </div>
+    <label>Notes</label>
+    <textarea id="act-notes" rows="3" placeholder="What was discussed..."></textarea>
+    <label>Next Follow-up Date</label>
+    <input type="date" id="act-followup">
+    <div id="act-msg" style="margin-bottom:8px;font-size:0.85rem;color:#c62828;"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-primary" onclick="saveActivity()">Save</button>
+      <button class="btn btn-outline" onclick="closeActModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const APPLIANCES = ['Infrared/Induction Cooktop','Immersion Rods','Fans','Mixer Grinders','Toasters','Kettle','OTG','Rice Cookers','Washing Machine','Coolers','AC','TV'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const INDUSTRY_LABELS = { home_appliances:'Home Appliances', ev_automotive:'EV / Automotive', solar:'Solar', lighting:'Lighting' };
+
+let customer = null;
+let editingActivityId = null;
+const params = new URLSearchParams(location.search);
+const customerId = params.get('id');
+
+async function loadCustomer() {
+  if (!customerId) { document.getElementById('loading').textContent = 'No customer ID.'; return; }
+  try {
+    const res = await fetch(`/api/customers/${customerId}`);
+    if (!res.ok) { document.getElementById('loading').textContent = 'Customer not found.'; return; }
+    customer = await res.json();
+    render();
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+  } catch(e) {
+    document.getElementById('loading').textContent = 'Error loading customer.';
+  }
+}
+
+function render() {
+  const c = customer;
+  const payColor = c.payment_rating === 'good' ? '#2e7d32' : c.payment_rating === 'bad' ? '#c62828' : '#e65100';
+  const appTags = (c.appliance_types||[]).map(a => `<span class="tag">${a}</span>`).join('');
+  const sizeBadge = c.size_category !== 'both' ? `<span class="tag ${c.size_category==='small'?'tag-small':'tag-big'}">${c.size_category==='small'?'Small':'Big'} Appliance</span>` : '';
+  const devMonths = Object.entries(c.dev_months||{}).map(([app,mon]) =>
+    `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f5f5f5;font-size:0.85rem;">
+      <span>${app}</span><span class="month-pill">${mon}</span>
+    </div>`).join('');
+
+  const activitiesHtml = (c.activities||[]).length ? c.activities.map(a => `
+    <div class="activity-row">
+      <div style="flex:1;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span class="activity-type type-${a.type}">${a.type.toUpperCase()}</span>
+          <span style="font-size:0.82rem;color:#666;">${a.date}</span>
+          ${a.next_follow_up ? `<span style="font-size:0.78rem;background:#fff8e1;color:#f57f17;padding:2px 6px;border-radius:8px;">Follow-up: ${a.next_follow_up}</span>` : ''}
+        </div>
+        ${a.notes ? `<div style="font-size:0.85rem;color:#333;">${a.notes}</div>` : ''}
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+        <button class="btn btn-outline btn-sm" onclick="openEditActivity(${a.id})">Edit</button>
+        <button class="btn btn-sm" style="color:#c62828;border:1px solid #c62828;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:0.8rem;font-weight:600;background:#fff;" onclick="deleteActivity(${a.id})">Del</button>
+      </div>
+    </div>`).join('') : '<div style="color:#aaa;font-size:0.85rem;padding:10px 0;">No activities yet.</div>';
+
+  document.getElementById('content').innerHTML = `
+    <div class="card" style="border-left:5px solid ${payColor};">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-size:1.4rem;font-weight:700;margin-bottom:4px;">${c.name}</div>
+          <div style="font-size:0.9rem;color:#666;">${INDUSTRY_LABELS[c.industry]||c.industry||'—'}${c.city?' · '+c.city:''}${c.state?', '+c.state:''}</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span class="badge badge-${c.payment_rating||'average'}" style="font-size:0.85rem;padding:5px 14px;">${(c.payment_rating||'average').toUpperCase()} PAYMENT</span>
+          <button class="btn btn-outline btn-sm" onclick="openEditModal()">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteCustomer()">Delete</button>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:16px;">
+        ${c.contact_person ? `<div><div style="font-size:0.75rem;color:#888;font-weight:700;">CONTACT PERSON</div><div>${c.contact_person}</div></div>` : ''}
+        ${c.phone ? `<div><div style="font-size:0.75rem;color:#888;font-weight:700;">PHONE</div><div><a href="tel:${c.phone}" style="color:#1a237e;">${c.phone}</a></div></div>` : ''}
+        ${c.email ? `<div><div style="font-size:0.75rem;color:#888;font-weight:700;">EMAIL</div><div><a href="mailto:${c.email}" style="color:#1a237e;">${c.email}</a></div></div>` : ''}
+        ${c.website ? `<div><div style="font-size:0.75rem;color:#888;font-weight:700;">WEBSITE</div><div><a href="http://${c.website}" target="_blank" style="color:#1a237e;">${c.website}</a></div></div>` : ''}
+        <div><div style="font-size:0.75rem;color:#888;font-weight:700;">LAST CONTACT</div><div>${c.last_contact ? `${c.last_contact} (${c.last_contact_type})` : 'Never'}</div></div>
+      </div>
+
+      ${appTags || sizeBadge ? `<div class="tags" style="margin-top:14px;">${sizeBadge}${appTags}</div>` : ''}
+      ${c.notes ? `<div style="margin-top:12px;background:#f9f9f9;padding:10px;border-radius:6px;font-size:0.85rem;color:#555;">${c.notes}</div>` : ''}
+    </div>
+
+    ${devMonths ? `
+    <div class="card">
+      <div class="section-title" style="margin-top:0;">Development Calendar</div>
+      ${devMonths}
+    </div>` : ''}
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div class="section-title" style="margin:0;">Activity Log</div>
+        <button class="btn btn-primary btn-sm" onclick="openActModal()">+ Log Activity</button>
+      </div>
+      ${activitiesHtml}
+    </div>
+  `;
+}
+
+// ── EDIT CUSTOMER ──
+function openEditModal() {
+  const c = customer;
+  document.getElementById('e-name').value = c.name||'';
+  document.getElementById('e-contact').value = c.contact_person||'';
+  document.getElementById('e-phone').value = c.phone||'';
+  document.getElementById('e-email').value = c.email||'';
+  document.getElementById('e-city').value = c.city||'';
+  document.getElementById('e-state').value = c.state||'';
+  document.getElementById('e-industry').value = c.industry||'';
+  document.getElementById('e-size').value = c.size_category||'both';
+  document.getElementById('e-payment').value = c.payment_rating||'average';
+  document.getElementById('e-website').value = c.website||'';
+  document.getElementById('e-notes').value = c.notes||'';
+  toggleApplianceFields('e');
+  if (c.industry === 'home_appliances') {
+    const checks = document.querySelectorAll('#e-appliance-checks input');
+    checks.forEach(ch => { ch.checked = (c.appliance_types||[]).includes(ch.value); });
+    updateDevMonths('e');
+    Object.entries(c.dev_months||{}).forEach(([app, mon]) => {
+      const sel = document.getElementById(`e-dm-${app.replace(/[^a-z0-9]/gi,'_')}`);
+      if (sel) sel.value = mon;
+    });
+  }
+  document.getElementById('edit-modal').classList.add('open');
+}
+function closeEditModal() { document.getElementById('edit-modal').classList.remove('open'); }
+
+async function saveEdit() {
+  const name = document.getElementById('e-name').value.trim();
+  if (!name) { document.getElementById('edit-msg').textContent = 'Name required.'; return; }
+  const body = {
+    name, contact_person: document.getElementById('e-contact').value.trim(),
+    phone: document.getElementById('e-phone').value.trim(), email: document.getElementById('e-email').value.trim(),
+    city: document.getElementById('e-city').value.trim(), state: document.getElementById('e-state').value.trim(),
+    industry: document.getElementById('e-industry').value, size_category: document.getElementById('e-size').value,
+    payment_rating: document.getElementById('e-payment').value, website: document.getElementById('e-website').value.trim(),
+    notes: document.getElementById('e-notes').value.trim(),
+    appliance_types: getSelectedAppliances('e'), dev_months: getDevMonths('e')
+  };
+  await fetch(`/api/customers/${customerId}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  closeEditModal();
+  loadCustomer();
+}
+
+async function deleteCustomer() {
+  if (!confirm(`Delete ${customer.name}? This cannot be undone.`)) return;
+  await fetch(`/api/customers/${customerId}`, { method:'DELETE' });
+  location.href = 'index.html';
+}
+
+// ── ACTIVITY ──
+function openActModal() {
+  editingActivityId = null;
+  document.getElementById('act-modal-title').textContent = 'Log Activity';
+  document.getElementById('act-type').value = 'call';
+  document.getElementById('act-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('act-notes').value = '';
+  document.getElementById('act-followup').value = '';
+  document.getElementById('act-modal').classList.add('open');
+}
+function openEditActivity(id) {
+  const a = customer.activities.find(x => x.id === id);
+  if (!a) return;
+  editingActivityId = id;
+  document.getElementById('act-modal-title').textContent = 'Edit Activity';
+  document.getElementById('act-type').value = a.type;
+  document.getElementById('act-date').value = a.date;
+  document.getElementById('act-notes').value = a.notes||'';
+  document.getElementById('act-followup').value = a.next_follow_up||'';
+  document.getElementById('act-modal').classList.add('open');
+}
+function closeActModal() { document.getElementById('act-modal').classList.remove('open'); }
+
+async function saveActivity() {
+  const type = document.getElementById('act-type').value;
+  const date = document.getElementById('act-date').value;
+  const notes = document.getElementById('act-notes').value.trim();
+  const next_follow_up = document.getElementById('act-followup').value || null;
+  if (!date) { document.getElementById('act-msg').textContent = 'Date required.'; return; }
+  if (editingActivityId) {
+    await fetch(`/api/activities/${editingActivityId}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type, date, notes, next_follow_up }) });
+  } else {
+    await fetch(`/api/customers/${customerId}/activities`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type, date, notes, next_follow_up }) });
+  }
+  closeActModal();
+  loadCustomer();
+}
+
+async function deleteActivity(id) {
+  if (!confirm('Delete this activity?')) return;
+  await fetch(`/api/activities/${id}`, { method:'DELETE' });
+  loadCustomer();
+}
+
+// ── APPLIANCE HELPERS (shared with index) ──
+function toggleApplianceFields(prefix) {
+  const ind = document.getElementById(`${prefix}-industry`).value;
+  const wrap = document.getElementById(`${prefix}-appliance-wrap`);
+  const devWrap = document.getElementById(`${prefix}-devmonths-wrap`);
+  if (ind === 'home_appliances') {
+    wrap.style.display = 'block';
+    document.getElementById(`${prefix}-appliance-checks`).innerHTML = APPLIANCES.map(a =>
+      `<label style="display:flex;align-items:center;gap:4px;font-size:0.82rem;font-weight:400;width:auto;margin-bottom:0;cursor:pointer;">
+        <input type="checkbox" value="${a}" onchange="updateDevMonths('${prefix}')" style="width:auto;margin-bottom:0;"> ${a}
+      </label>`).join('');
+    devWrap.style.display = 'block';
+    updateDevMonths(prefix);
+  } else {
+    wrap.style.display = 'none';
+    devWrap.style.display = 'none';
+  }
+}
+function updateDevMonths(prefix) {
+  const checked = [...document.querySelectorAll(`#${prefix}-appliance-checks input:checked`)].map(c => c.value);
+  const container = document.getElementById(`${prefix}-devmonths-list`);
+  container.innerHTML = checked.map(a => `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <span style="font-size:0.82rem;width:180px;flex-shrink:0;">${a}</span>
+      <select id="${prefix}-dm-${a.replace(/[^a-z0-9]/gi,'_')}" style="width:auto;margin-bottom:0;">
+        <option value="">No dev month</option>
+        ${MONTHS.map(m => `<option value="${m}">${m}</option>`).join('')}
+      </select>
+    </div>`).join('') || '<div style="font-size:0.82rem;color:#aaa;">Select appliances above</div>';
+}
+function getSelectedAppliances(prefix) {
+  return [...document.querySelectorAll(`#${prefix}-appliance-checks input:checked`)].map(c => c.value);
+}
+function getDevMonths(prefix) {
+  const checked = getSelectedAppliances(prefix);
+  const dm = {};
+  checked.forEach(a => {
+    const sel = document.getElementById(`${prefix}-dm-${a.replace(/[^a-z0-9]/gi,'_')}`);
+    if (sel && sel.value) dm[a] = sel.value;
+  });
+  return dm;
+}
+
+loadCustomer();
+</script>
+</body>
+</html>

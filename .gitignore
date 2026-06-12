@@ -1,0 +1,4 @@
+node_modules/
+willett-crm.db
+*.db-shm
+*.db-wal

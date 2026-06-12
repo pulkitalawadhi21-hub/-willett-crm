@@ -1,0 +1,13 @@
+{
+  "name": "willett-crm",
+  "version": "1.0.0",
+  "description": "Willett Cables CRM",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.3",
+    "express": "^4.18.2"
+  }
+}
