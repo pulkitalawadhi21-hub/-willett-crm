@@ -29,7 +29,7 @@ db.exec(`
     industry TEXT,
     appliance_types TEXT DEFAULT '[]',
     size_category TEXT DEFAULT 'both',
-    payment_rating TEXT DEFAULT 'average',
+    payment_rating TEXT,
     notes TEXT,
     dev_months TEXT DEFAULT '{}',
     created_at TEXT DEFAULT (date('now'))
