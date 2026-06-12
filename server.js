@@ -186,6 +186,64 @@ app.get('/api/competitor/senju', (req, res) => {
   res.json({ totalJan, totalFeb, totalRev, months, annualProjection, industryList, top10, insights, customerCount: rows.length });
 });
 
+// ── UKB COMPETITOR ANALYSIS ──
+app.get('/api/competitor/ukb', (req, res) => {
+  const rows = db.prepare("SELECT * FROM customers WHERE notes LIKE '[UKB competitor]%'").all();
+
+  function parseUKB(notes) {
+    const total5m = notes.match(/5M: ₹([\d.]+) Cr/);
+    const annual  = notes.match(/Annual: ₹([\d.]+) Cr/);
+    const status  = notes.match(/Willett: (\w+)/);
+    const priority= notes.match(/Priority: (\w+)/);
+    const cat     = notes.match(/\[UKB competitor\] ([^|]+) \|/);
+    const notePart= notes.match(/Priority: \w+ \| (.+)$/s);
+    return {
+      total5m: total5m ? parseFloat(total5m[1]) : 0,
+      annual:  annual  ? parseFloat(annual[1])  : 0,
+      status:  status  ? status[1]  : '—',
+      priority:priority ? priority[1]: '—',
+      category:cat     ? cat[1].trim(): '—',
+      strategic: notePart ? notePart[1].trim() : ''
+    };
+  }
+
+  let grandTotal5m = 0, grandAnnual = 0;
+  const byIndustry = {};
+  const byStatus = { Active: 0, Target: 0, Note: 0 };
+  const byPriority = { HIGH: 0, MEDIUM: 0, LOW: 0, Info: 0 };
+  const customers = [];
+
+  for (const c of rows) {
+    const p = parseUKB(c.notes || '');
+    grandTotal5m += p.total5m;
+    grandAnnual  += p.annual;
+    if (!byIndustry[c.industry]) byIndustry[c.industry] = { total5m: 0, annual: 0, count: 0 };
+    byIndustry[c.industry].total5m += p.total5m;
+    byIndustry[c.industry].annual  += p.annual;
+    byIndustry[c.industry].count++;
+    if (byStatus[p.status] !== undefined) byStatus[p.status]++;
+    if (byPriority[p.priority] !== undefined) byPriority[p.priority]++;
+    customers.push({ id: c.id, name: c.name, state: c.state, industry: c.industry, ...p });
+  }
+
+  const industryList = Object.entries(byIndustry)
+    .map(([k, v]) => ({ industry: k, ...v, pct: grandTotal5m ? Math.round(v.total5m / grandTotal5m * 100) : 0 }))
+    .sort((a, b) => b.total5m - a.total5m);
+
+  const sorted = [...customers].sort((a, b) => b.total5m - a.total5m);
+
+  const insights = [
+    `UKB served ${rows.length} customers over 5 months — total ₹${grandTotal5m.toFixed(2)} Cr`,
+    `Annualised UKB revenue from these customers: ₹${grandAnnual.toFixed(2)} Cr/year`,
+    `${byStatus.Active} are already active Willett accounts — track closely to protect share`,
+    `${byPriority.HIGH} HIGH priority targets — focus sales effort here first`,
+    `Appliance OEM is dominant: ${industryList[0] ? industryList[0].pct + '% of UKB revenue' : '—'}`,
+    `Top opportunity: ${sorted[0]?.name || '—'} at ₹${sorted[0]?.total5m.toFixed(2) || 0} Cr / 5 months`
+  ];
+
+  res.json({ grandTotal5m, grandAnnual, months: 5, industryList, customers: sorted, byStatus, byPriority, insights, customerCount: rows.length });
+});
+
 // ── DASHBOARD STATS ──
 app.get('/api/stats', (req, res) => {
   const total = db.prepare('SELECT COUNT(*) as n FROM customers').get().n;

@@ -2,7 +2,8 @@ const https = require('https');
 
 const BASE = 'https://willett-crm-production.up.railway.app';
 
-const INDUSTRY_MAP = {
+// ── SENJU (143 customers, Jan–Feb data in ₹) ──
+const SENJU_INDUSTRY_MAP = {
   'Appliances / White Goods': 'home_appliances',
   'EV / Charging': 'ev_automotive',
   'Solar / Renewable': 'solar',
@@ -19,8 +20,7 @@ const INDUSTRY_MAP = {
   'Other': 'other'
 };
 
-// All 143 rows from senju_customers csv.csv
-const customers = [
+const SENJU = [
   ["GLEN APPLIANCES PRIVATE LIMITED","Haryana","Appliances / White Goods",5323961,6040026,11363986,"Both"],
   ["C R I PUMPS PRIVATE LIMITED","Tamil Nadu","Pumps",4226596,5705640,9932236,"Both"],
   ["CALCOM VISION LTD","Uttar Pradesh","Appliances / White Goods",4689308,4503490,9192798,"Both"],
@@ -166,6 +166,35 @@ const customers = [
   ["DUROFLEX LIMITED","Tamil Nadu","Other",0,1349,1349,"Feb Only"],
 ];
 
+// ── UKB (17 customers, 5-month data in ₹ Cr) ──
+const UKB_INDUSTRY_MAP = {
+  'Appliance OEM': 'home_appliances',
+  'EV Charger': 'ev_automotive',
+  'EMS': 'electronics_ems',
+  'Auto / EV': 'ev_automotive',
+};
+
+// [name, category, 5mTotalCr, annualisedCr, willettStatus, priority, notes]
+const UKB = [
+  ["Haier Appliances India Pvt Ltd","Appliance OEM",32.86,78.86,"Target","HIGH","UKB #1 external customer. AC / WM / Refrigerator. Power cord opportunity."],
+  ["INGAR Electronics Pvt Ltd","EV Charger",6.40,15.36,"Active","HIGH","Already in talks with Willett. UKB is incumbent. AC cord is Willett angle."],
+  ["EPACK Durable Limited","Appliance OEM",5.96,14.30,"Target","MEDIUM","Appliance OEM. ISI cord requirement."],
+  ["LG Electronics India Limited","Appliance OEM",5.84,14.02,"Target","HIGH","IS:694 power cord. NCR plant proximity advantage for Willett."],
+  ["Dixon Electro Manufacturing Pvt Ltd","EMS",5.59,13.42,"Target","MEDIUM","Dixon combined ₹7.80 Cr with UKB. Already in Willett profile."],
+  ["Napino Auto & Electronics Ltd","Auto / EV",4.61,11.06,"Note","Info","Auto/EV harness. Outside Willett core scope for now."],
+  ["Samsung India Electronics Pvt Ltd","Appliance OEM",4.51,10.82,"Target","HIGH","IS:694 cord. NCR proximity. Same logic as LG."],
+  ["Panasonic Life Solutions India","Appliance OEM",4.36,10.46,"Target","MEDIUM","Appliance brand. ISI cord requirement."],
+  ["Godrej & Boyce Manufacturing Co Ltd","Appliance OEM",2.98,7.15,"Target","MEDIUM","Large appliance OEM. Cords for appliances."],
+  ["Elin Appliances Pvt Ltd (Philips OEM)","Appliance OEM",2.97,7.13,"Target","HIGH","Philips/Versuni OEM in Baddi. IS:9968 elastomer target for Willett."],
+  ["Dixon Technologies (India) Limited","EMS",2.21,5.30,"Target","MEDIUM","Second Dixon entity. Combined ₹7.80 Cr with UKB."],
+  ["Amber Enterprises India Limited","Appliance OEM",2.10,5.04,"Target","MEDIUM","India largest AC OEM. Huge power cord volume."],
+  ["V Guard Industries Limited","Appliance OEM",1.58,3.79,"Active","LOW","Already a Willett client. Check product mix vs UKB."],
+  ["Radiant Appliances & Electronics","Appliance OEM",1.52,3.65,"Active","HIGH","Warm lead. UKB supplies ₹1.52 Cr. Willett name on HDMI cable already."],
+  ["BSH Household Appliances Mfg Pvt Ltd","Appliance OEM",1.30,3.12,"Target","MEDIUM","Bosch/Siemens OEM. Appliance power cords."],
+  ["TTE Electronics India Pvt Ltd (TCL)","Appliance OEM",1.21,2.90,"Target","MEDIUM","TCL OEM. TV/appliance cords."],
+  ["Tianyin Worldtech India Pvt Ltd","Appliance OEM",1.19,2.86,"Target","MEDIUM","Also appears in Senju customer list."],
+];
+
 function post(path, body) {
   return new Promise((resolve, reject) => {
     const data = JSON.stringify(body);
@@ -177,9 +206,7 @@ function post(path, body) {
     const req = https.request(options, res => {
       let d = '';
       res.on('data', c => d += c);
-      res.on('end', () => {
-        try { resolve(JSON.parse(d)); } catch(e) { resolve(d); }
-      });
+      res.on('end', () => { try { resolve(JSON.parse(d)); } catch(e) { resolve(d); } });
     });
     req.on('error', reject);
     req.write(data);
@@ -189,25 +216,46 @@ function post(path, body) {
 
 function fmt(n) { return n ? '₹' + n.toLocaleString('en-IN') : '₹0'; }
 
-async function run() {
+async function importSenju() {
+  console.log('\n--- Importing Senju (143 customers) ---');
   let ok = 0, fail = 0;
-  for (const [name, state, seg, jan, feb, total, presence] of customers) {
-    const industry = INDUSTRY_MAP[seg] || 'other';
+  for (const [name, state, seg, jan, feb, total, presence] of SENJU) {
+    const industry = SENJU_INDUSTRY_MAP[seg] || 'other';
     const size = total > 2000000 ? 'big' : 'small';
     const notes = `[Senju prospect] ${seg} | Jan: ${fmt(jan)} | Feb: ${fmt(feb)} | Total: ${fmt(total)} | ${presence}`;
     try {
-      await post('/api/customers', {
-        name, state, industry, size_category: size,
-        notes, payment_rating: 'average', appliance_types: []
-      });
+      await post('/api/customers', { name, state, industry, size_category: size, notes, payment_rating: null, appliance_types: [] });
       ok++;
-      process.stdout.write(`\r✓ ${ok}/${customers.length} imported`);
-    } catch(e) {
-      fail++;
-      console.log(`\n✗ Failed: ${name} — ${e.message}`);
-    }
+      process.stdout.write(`\r  ✓ ${ok}/${SENJU.length}`);
+    } catch(e) { fail++; console.log(`\n  ✗ ${name}`); }
   }
-  console.log(`\n\nDone — ${ok} imported, ${fail} failed`);
+  console.log(`\n  Done — ${ok} imported, ${fail} failed`);
+}
+
+async function importUKB() {
+  console.log('\n--- Importing UKB (17 customers) ---');
+  let ok = 0, fail = 0;
+  for (const [name, cat, total5mCr, annualisedCr, willettStatus, priority, strategic_notes] of UKB) {
+    const industry = UKB_INDUSTRY_MAP[cat] || 'other';
+    const total5m = Math.round(total5mCr * 1e7);
+    const annual = Math.round(annualisedCr * 1e7);
+    const notes = `[UKB competitor] ${cat} | 5M: ₹${total5mCr} Cr | Annual: ₹${annualisedCr} Cr | Willett: ${willettStatus} | Priority: ${priority} | ${strategic_notes}`;
+    const payment_rating = willettStatus === 'Active' ? 'good' : null;
+    try {
+      await post('/api/customers', { name, industry, size_category: total5mCr > 5 ? 'big' : 'small', notes, payment_rating, appliance_types: [] });
+      ok++;
+      process.stdout.write(`\r  ✓ ${ok}/${UKB.length}`);
+    } catch(e) { fail++; console.log(`\n  ✗ ${name}`); }
+  }
+  console.log(`\n  Done — ${ok} imported, ${fail} failed`);
+}
+
+async function run() {
+  await importSenju();
+  await importUKB();
+  // clear payment ratings on Senju entries
+  await post('/api/admin/clear-prospect-payment', {});
+  console.log('\nAll done!');
 }
 
 run();
