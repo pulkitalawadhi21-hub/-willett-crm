@@ -118,6 +118,13 @@ app.delete('/api/activities/:id', (req, res) => {
   res.json({ ok: true });
 });
 
+// clear all customers (for re-import)
+app.post('/api/admin/clear-all', (req, res) => {
+  db.prepare('DELETE FROM activities').run();
+  db.prepare('DELETE FROM customers').run();
+  res.json({ ok: true });
+});
+
 // one-time fix: clear payment_rating for Senju prospects
 app.post('/api/admin/clear-prospect-payment', (req, res) => {
   const r = db.prepare("UPDATE customers SET payment_rating=NULL WHERE notes LIKE '[Senju prospect]%'").run();
