@@ -59,26 +59,31 @@
         <label>Appliance Type</label>
         <select id="f-appliance" onchange="applyFilters()">
           <option value="">All Appliances</option>
-          <option value="Infrared/Induction Cooktop">Infrared/Induction Cooktop</option>
-          <option value="Immersion Rods">Immersion Rods</option>
+          <option value="AC">AC</option>
+          <option value="Refrigerator">Refrigerator</option>
+          <option value="Washing Machine">Washing Machine</option>
+          <option value="TV">TV</option>
+          <option value="Coolers">Coolers</option>
           <option value="Fans">Fans</option>
           <option value="Mixer Grinders">Mixer Grinders</option>
-          <option value="Toasters">Toasters</option>
+          <option value="Infrared/Induction Cooktop">Infrared/Induction Cooktop</option>
+          <option value="Immersion Rods">Immersion Rods</option>
+          <option value="Geyser / Water Heater">Geyser / Water Heater</option>
+          <option value="Chimney">Chimney</option>
           <option value="Kettle">Kettle</option>
+          <option value="Toasters">Toasters</option>
           <option value="OTG">OTG</option>
           <option value="Rice Cookers">Rice Cookers</option>
-          <option value="Washing Machine">Washing Machine</option>
-          <option value="Coolers">Coolers</option>
-          <option value="AC">AC</option>
-          <option value="TV">TV</option>
+          <option value="Water Filter / RO">Water Filter / RO</option>
+          <option value="Stabiliser">Stabiliser</option>
         </select>
       </div>
       <div>
         <label>Size</label>
         <select id="f-size" onchange="applyFilters()">
           <option value="">All</option>
-          <option value="small">Small Appliance</option>
-          <option value="big">Big Appliance</option>
+          <option value="small">SA — Small Appliance</option>
+          <option value="big">BA — Big Appliance</option>
         </select>
       </div>
       <div>
@@ -182,8 +187,8 @@
         <label>Size Category</label>
         <select id="a-size">
           <option value="both">Both</option>
-          <option value="small">Small Appliance</option>
-          <option value="big">Big Appliance</option>
+          <option value="small">SA — Small Appliance</option>
+          <option value="big">BA — Big Appliance</option>
         </select>
       </div>
     </div>
@@ -222,7 +227,7 @@
 </div>
 
 <script>
-const APPLIANCES = ['Infrared/Induction Cooktop','Immersion Rods','Fans','Mixer Grinders','Toasters','Kettle','OTG','Rice Cookers','Washing Machine','Coolers','AC','TV'];
+const APPLIANCES = ['AC','Refrigerator','Washing Machine','TV','Coolers','Fans','Mixer Grinders','Infrared/Induction Cooktop','Immersion Rods','Geyser / Water Heater','Chimney','Kettle','Toasters','OTG','Rice Cookers','Water Filter / RO','Stabiliser'];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const INDUSTRY_LABELS = {
   home_appliances:'Home Appliances', ev_automotive:'EV / Automotive', solar:'Solar', lighting:'Lighting',
