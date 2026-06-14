@@ -601,7 +601,10 @@ function renderInvConf() {
     const action = s.action !== undefined ? s.action : '';
     const edStyle = 'display:block;font-size:.8rem;outline:none;cursor:text;border-bottom:1px dashed transparent;min-width:80px';
     return `<tr>
-      <td><strong>${c.name}</strong></td>
+      <td><span contenteditable="true" style="${edStyle};color:#111;font-weight:700"
+        onfocus="this.style.borderBottomColor='#1a237e'"
+        onblur="this.style.borderBottomColor='transparent';editCell('${c.key}','name',this)"
+      >${s.name !== undefined ? s.name : c.name}</span></td>
       <td><span contenteditable="true" style="${edStyle};color:#444"
         onfocus="this.style.borderBottomColor='#1a237e'"
         onblur="this.style.borderBottomColor='transparent';editCell('${c.key}','addr',this)"
