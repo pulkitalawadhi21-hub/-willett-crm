@@ -87,6 +87,10 @@ tr:last-child td { border-bottom:none; }
 /* ── Empty state ── */
 .empty { text-align:center; padding:48px 20px; color:#ccc; font-size:.9rem; }
 
+/* ── Editable table add button ── */
+.etab-add-btn { margin:6px 0 2px; padding:5px 14px; background:#1a237e; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:.8rem; opacity:.85; }
+.etab-add-btn:hover { opacity:1; }
+
 /* ── Priority cards ── */
 .prio-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin-top:8px; }
 .prio-card { background:#fff; border-radius:10px; padding:14px 16px; box-shadow:0 1px 4px rgba(0,0,0,.07); display:flex; gap:10px; align-items:flex-start; }
@@ -258,89 +262,26 @@ tr:last-child td { border-bottom:none; }
 <!-- ═══════════════ FAN ═══════════════ -->
 <div id="tab-fan" class="tab-panel">
 <div class="content">
-  <div class="sec-label confirmed">Confirmed — ₹2,15,000 / month <span style="font-weight:400;font-size:.68rem;opacity:.7">(Ramp Jan onwards, season starts Oct)</span></div>
-  <div class="tbl-wrap">
-    <table>
-      <thead><tr><th>Customer</th><th class="num">Monthly</th></tr></thead>
-      <tbody>
-        <tr><td>DYE</td><td class="num">₹1,00,000</td></tr>
-        <tr><td>ARD</td><td class="num">₹20,000</td></tr>
-        <tr><td>KWW</td><td class="num">₹20,000</td></tr>
-        <tr><td>KKG <span style="font-size:.72rem;color:#aaa">(Hyd / Noida / Haridwar)</span></td><td class="num">₹20,000</td></tr>
-        <tr><td>USK</td><td class="num">₹15,000</td></tr>
-        <tr><td>SAE</td><td class="num">₹15,000</td></tr>
-        <tr><td>DNG</td><td class="num">₹15,000</td></tr>
-        <tr><td>PMB</td><td class="num">₹10,000</td></tr>
-        <tr class="tot c"><td>Total</td><td class="num">₹2,15,000</td></tr>
-      </tbody>
-    </table>
-  </div>
+  <div class="sec-label confirmed">Confirmed <span style="font-weight:400;font-size:.68rem;opacity:.7">(Ramp Jan onwards, season starts Oct)</span></div>
+  <div class="tbl-wrap"><table><thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th><th></th></tr></thead><tbody id="etab_fan_conf"></tbody></table></div>
+  <button class="etab-add-btn" onclick="eTabAdd('fan_conf')">+ Add Customer</button>
 
-  <div class="sec-label target">Targets — ₹2,45,000 / month potential</div>
-  <div class="tbl-wrap">
-    <table>
-      <thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th></tr></thead>
-      <tbody>
-        <tr><td><span class="star">★</span><strong>Orient</strong></td><td class="num">₹1,00,000</td><td class="note p">Top priority</td></tr>
-        <tr><td>Shristhi</td><td class="num">₹50,000</td><td class="note"></td></tr>
-        <tr><td>Bhagwati</td><td class="num">₹40,000</td><td class="note"></td></tr>
-        <tr><td>Sania</td><td class="num">₹20,000</td><td class="note w">⚠ Very low rates</td></tr>
-        <tr><td>Wonder</td><td class="num">₹15,000</td><td class="note"></td></tr>
-        <tr><td>Modi Fan (CCA)</td><td class="num">₹15,000</td><td class="note"></td></tr>
-        <tr><td>Toofan</td><td class="num">₹5,000</td><td class="note">Cord entry — harness upside</td></tr>
-        <tr class="tot t"><td>Total</td><td class="num">₹2,45,000</td><td></td></tr>
-      </tbody>
-    </table>
-  </div>
+  <div class="sec-label target" style="margin-top:1.2rem">Targets</div>
+  <div class="tbl-wrap"><table><thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th><th></th></tr></thead><tbody id="etab_fan_tgt"></tbody></table></div>
+  <button class="etab-add-btn" onclick="eTabAdd('fan_tgt')">+ Add Target</button>
 </div>
 </div>
 
 <!-- ═══════════════ COOLER ═══════════════ -->
 <div id="tab-cooler" class="tab-panel">
 <div class="content">
-  <div class="sec-label confirmed">Confirmed — ₹79,000 / month</div>
-  <div class="tbl-wrap">
-    <table>
-      <thead><tr><th>Customer</th><th class="num">Monthly</th></tr></thead>
-      <tbody>
-        <tr><td>SND</td><td class="num">₹20,000</td></tr>
-        <tr><td>BNI</td><td class="num">₹10,000</td></tr>
-        <tr><td>Rocksun</td><td class="num">₹10,000</td></tr>
-        <tr><td>YET</td><td class="num">₹10,000</td></tr>
-        <tr><td>Avion</td><td class="num">₹10,000</td></tr>
-        <tr><td>Clarion</td><td class="num">₹5,000</td></tr>
-        <tr><td>Poswal</td><td class="num">₹5,000</td></tr>
-        <tr><td>BLU</td><td class="num">₹5,000</td></tr>
-        <tr><td>Vikram</td><td class="num">₹4,000</td></tr>
-        <tr class="tot c"><td>Total</td><td class="num">₹79,000</td></tr>
-      </tbody>
-    </table>
-  </div>
+  <div class="sec-label confirmed">Confirmed</div>
+  <div class="tbl-wrap"><table><thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th><th></th></tr></thead><tbody id="etab_cooler_conf"></tbody></table></div>
+  <button class="etab-add-btn" onclick="eTabAdd('cooler_conf')">+ Add Customer</button>
 
-  <div class="sec-label target">Targets — ₹1,90,000 / month potential</div>
-  <div class="tbl-wrap">
-    <table>
-      <thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th></tr></thead>
-      <tbody>
-        <tr><td>Summercool</td><td class="num">₹20,000</td><td class="note"></td></tr>
-        <tr><td>Epack</td><td class="num">₹20,000</td><td class="note"></td></tr>
-        <tr><td>PG</td><td class="num">₹20,000</td><td class="note"></td></tr>
-        <tr><td>MPPL</td><td class="num">₹15,000</td><td class="note"></td></tr>
-        <tr><td>Aroking</td><td class="num">₹15,000</td><td class="note w">⚠ Low pricing, slow entry</td></tr>
-        <tr><td>Ekkaa</td><td class="num">₹15,000</td><td class="note"></td></tr>
-        <tr><td>MR</td><td class="num">₹15,000</td><td class="note"></td></tr>
-        <tr><td>Aeromax</td><td class="num">₹10,000</td><td class="note"></td></tr>
-        <tr><td>Wybor</td><td class="num">₹10,000</td><td class="note"></td></tr>
-        <tr><td>Speedo</td><td class="num">₹10,000</td><td class="note"></td></tr>
-        <tr><td>Novamax</td><td class="num">₹10,000</td><td class="note"></td></tr>
-        <tr><td>Raj</td><td class="num">₹10,000</td><td class="note w">⚠ Slow payment</td></tr>
-        <tr><td>Supreme Industries</td><td class="num">₹10,000</td><td class="note"></td></tr>
-        <tr><td>Vijay Cooler</td><td class="num">₹5,000</td><td class="note"></td></tr>
-        <tr><td>Skyzen</td><td class="num">₹5,000</td><td class="note"></td></tr>
-        <tr class="tot t"><td>Total</td><td class="num">₹1,90,000</td><td></td></tr>
-      </tbody>
-    </table>
-  </div>
+  <div class="sec-label target" style="margin-top:1.2rem">Targets</div>
+  <div class="tbl-wrap"><table><thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th><th></th></tr></thead><tbody id="etab_cooler_tgt"></tbody></table></div>
+  <button class="etab-add-btn" onclick="eTabAdd('cooler_tgt')">+ Add Target</button>
 </div>
 </div>
 
@@ -348,50 +289,29 @@ tr:last-child td { border-bottom:none; }
 <div id="tab-ac" class="tab-panel">
 <div class="content">
   <div class="sec-label confirmed">Confirmed</div>
-  <div class="empty">No confirmed AC customers yet — this is the #1 target category</div>
+  <div class="tbl-wrap"><table><thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th><th></th></tr></thead><tbody id="etab_ac_conf"></tbody></table></div>
+  <button class="etab-add-btn" onclick="eTabAdd('ac_conf')">+ Add Customer</button>
 
-  <div class="sec-label target">Target OEMs — High Priority (Year-Round)</div>
-  <div class="tbl-wrap">
-    <table>
-      <thead><tr><th>Customer</th><th class="num">Est. Monthly</th><th>Note</th></tr></thead>
-      <tbody>
-        <tr><td><span class="star">★</span><strong>Amber</strong></td><td class="num tbd">TBD</td><td class="note p">Large OEM — #1 priority</td></tr>
-        <tr><td><span class="star">★</span><strong>PG</strong></td><td class="num tbd">TBD</td><td class="note p">Reference available — should convert</td></tr>
-        <tr><td>Wybor</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-        <tr><td>Epack</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-      </tbody>
-    </table>
-  </div>
+  <div class="sec-label target" style="margin-top:1.2rem">Target OEMs — High Priority</div>
+  <div class="tbl-wrap"><table><thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th><th></th></tr></thead><tbody id="etab_ac_oem"></tbody></table></div>
+  <button class="etab-add-btn" onclick="eTabAdd('ac_oem')">+ Add OEM</button>
 
   <div class="sec-label target" style="margin-top:1.2rem">AC Brands — Pipeline</div>
-  <div class="tbl-wrap">
-    <table>
-      <thead><tr><th>Brand</th><th class="num">Est. Monthly</th><th>Note</th></tr></thead>
-      <tbody>
-        <tr><td>Blue Star</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-        <tr><td>Carrier</td><td class="num tbd">TBD</td><td class="note">Manesar plant</td></tr>
-        <tr><td>Daikin</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-        <tr><td>Godrej</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-        <tr><td>Haier</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-        <tr><td>Hitachi</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-        <tr><td>LG</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-        <tr><td>Micromax</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-        <tr><td>Napoleon</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-        <tr><td>Voltas</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-        <tr><td>Whirlpool</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-      </tbody>
-    </table>
-  </div>
+  <div class="tbl-wrap"><table><thead><tr><th>Brand</th><th class="num">Monthly</th><th>Note</th><th></th></tr></thead><tbody id="etab_ac_brand"></tbody></table></div>
+  <button class="etab-add-btn" onclick="eTabAdd('ac_brand')">+ Add Brand</button>
 </div>
 </div>
 
 <!-- ═══════════════ WASHING ═══════════════ -->
 <div id="tab-washing" class="tab-panel">
 <div class="content">
-  <div class="empty" style="padding-top:80px;">
-    No targets added yet for Washing Machine.<br>
-    <span style="font-size:.8rem;color:#ddd;">Add customers here as pipeline develops.</span>
-  </div>
+  <div class="sec-label confirmed">Confirmed</div>
+  <div class="tbl-wrap"><table><thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th><th></th></tr></thead><tbody id="etab_washing_conf"></tbody></table></div>
+  <button class="etab-add-btn" onclick="eTabAdd('washing_conf')">+ Add Customer</button>
+
+  <div class="sec-label target" style="margin-top:1.2rem">Targets</div>
+  <div class="tbl-wrap"><table><thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th><th></th></tr></thead><tbody id="etab_washing_tgt"></tbody></table></div>
+  <button class="etab-add-btn" onclick="eTabAdd('washing_tgt')">+ Add Target</button>
 </div>
 </div>
 
@@ -399,21 +319,12 @@ tr:last-child td { border-bottom:none; }
 <div id="tab-fridge" class="tab-panel">
 <div class="content">
   <div class="sec-label confirmed">Confirmed</div>
-  <div class="empty">No confirmed fridge customers yet</div>
+  <div class="tbl-wrap"><table><thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th><th></th></tr></thead><tbody id="etab_fridge_conf"></tbody></table></div>
+  <button class="etab-add-btn" onclick="eTabAdd('fridge_conf')">+ Add Customer</button>
 
-  <div class="sec-label target">Targets — ₹42,000 / month potential</div>
-  <div class="tbl-wrap">
-    <table>
-      <thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th></tr></thead>
-      <tbody>
-        <tr><td><span class="star">★</span><strong>Rockwell</strong></td><td class="num">₹6,000</td><td class="note p">Higher ticket size — priority</td></tr>
-        <tr><td><span class="star">★</span><strong>Frigoglass</strong></td><td class="num">₹6,000</td><td class="note p">Higher ticket size — priority</td></tr>
-        <tr><td>Westan</td><td class="num">₹15,000</td><td class="note"></td></tr>
-        <tr><td>Blue Star</td><td class="num">₹15,000</td><td class="note"></td></tr>
-        <tr class="tot t"><td>Total</td><td class="num">₹42,000</td><td></td></tr>
-      </tbody>
-    </table>
-  </div>
+  <div class="sec-label target" style="margin-top:1.2rem">Targets</div>
+  <div class="tbl-wrap"><table><thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th><th></th></tr></thead><tbody id="etab_fridge_tgt"></tbody></table></div>
+  <button class="etab-add-btn" onclick="eTabAdd('fridge_tgt')">+ Add Target</button>
 </div>
 </div>
 
@@ -421,27 +332,25 @@ tr:last-child td { border-bottom:none; }
 <div id="tab-water" class="tab-panel">
 <div class="content">
   <div class="sec-label confirmed">Confirmed</div>
-  <div class="empty">No confirmed water dispenser customers yet</div>
+  <div class="tbl-wrap"><table><thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th><th></th></tr></thead><tbody id="etab_water_conf"></tbody></table></div>
+  <button class="etab-add-btn" onclick="eTabAdd('water_conf')">+ Add Customer</button>
 
-  <div class="sec-label target">Targets</div>
-  <div class="tbl-wrap">
-    <table>
-      <thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th></tr></thead>
-      <tbody>
-        <tr><td>Veeline</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-      </tbody>
-    </table>
-  </div>
+  <div class="sec-label target" style="margin-top:1.2rem">Targets</div>
+  <div class="tbl-wrap"><table><thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th><th></th></tr></thead><tbody id="etab_water_tgt"></tbody></table></div>
+  <button class="etab-add-btn" onclick="eTabAdd('water_tgt')">+ Add Target</button>
 </div>
 </div>
 
 <!-- ═══════════════ TOOLS ═══════════════ -->
 <div id="tab-tools" class="tab-panel">
 <div class="content">
-  <div class="empty" style="padding-top:80px;">
-    No targets added yet for Tools.<br>
-    <span style="font-size:.8rem;color:#ddd;">Add customers here as pipeline develops.</span>
-  </div>
+  <div class="sec-label confirmed">Confirmed</div>
+  <div class="tbl-wrap"><table><thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th><th></th></tr></thead><tbody id="etab_tools_conf"></tbody></table></div>
+  <button class="etab-add-btn" onclick="eTabAdd('tools_conf')">+ Add Customer</button>
+
+  <div class="sec-label target" style="margin-top:1.2rem">Targets</div>
+  <div class="tbl-wrap"><table><thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th><th></th></tr></thead><tbody id="etab_tools_tgt"></tbody></table></div>
+  <button class="etab-add-btn" onclick="eTabAdd('tools_tgt')">+ Add Target</button>
 </div>
 </div>
 
@@ -583,6 +492,166 @@ function renderBrands() {
 }
 
 renderBrands();
+
+// ══════════════════════════════════════════════
+// GENERIC EDITABLE TABLE SYSTEM
+// ══════════════════════════════════════════════
+const ETAB_DEFAULTS = {
+  fan_conf: [
+    { key:'dye',  name:'DYE',                     monthly:'1,00,000', note:'' },
+    { key:'ard',  name:'ARD',                     monthly:'20,000',   note:'' },
+    { key:'kww',  name:'KWW',                     monthly:'20,000',   note:'' },
+    { key:'kkg',  name:'KKG (Hyd/Noida/Haridwar)',monthly:'20,000',   note:'' },
+    { key:'usk',  name:'USK',                     monthly:'15,000',   note:'' },
+    { key:'sae',  name:'SAE',                     monthly:'15,000',   note:'' },
+    { key:'dng',  name:'DNG',                     monthly:'15,000',   note:'' },
+    { key:'pmb',  name:'PMB',                     monthly:'10,000',   note:'' },
+  ],
+  fan_tgt: [
+    { key:'orient',   name:'Orient',       monthly:'1,00,000', note:'Top priority', star:true },
+    { key:'shristhi', name:'Shristhi',     monthly:'50,000',   note:'' },
+    { key:'bhagwati', name:'Bhagwati',     monthly:'40,000',   note:'' },
+    { key:'sania',    name:'Sania',        monthly:'20,000',   note:'⚠ Very low rates' },
+    { key:'wonder',   name:'Wonder',       monthly:'15,000',   note:'' },
+    { key:'modi',     name:'Modi Fan (CCA)',monthly:'15,000',  note:'' },
+    { key:'toofan',   name:'Toofan',       monthly:'5,000',    note:'Cord entry — harness upside' },
+  ],
+  cooler_conf: [
+    { key:'snd',     name:'SND',     monthly:'20,000', note:'' },
+    { key:'bni',     name:'BNI',     monthly:'10,000', note:'' },
+    { key:'rocksun', name:'Rocksun', monthly:'10,000', note:'' },
+    { key:'yet',     name:'YET',     monthly:'10,000', note:'' },
+    { key:'avion',   name:'Avion',   monthly:'10,000', note:'' },
+    { key:'clarion', name:'Clarion', monthly:'5,000',  note:'' },
+    { key:'poswal',  name:'Poswal',  monthly:'5,000',  note:'' },
+    { key:'blu',     name:'BLU',     monthly:'5,000',  note:'' },
+    { key:'vikram',  name:'Vikram',  monthly:'4,000',  note:'' },
+  ],
+  cooler_tgt: [
+    { key:'summercool', name:'Summercool',        monthly:'20,000', note:'' },
+    { key:'epack_c',    name:'Epack',             monthly:'20,000', note:'' },
+    { key:'pg_c',       name:'PG',                monthly:'20,000', note:'' },
+    { key:'mppl',       name:'MPPL',              monthly:'15,000', note:'' },
+    { key:'aroking',    name:'Aroking',           monthly:'15,000', note:'⚠ Low pricing, slow entry' },
+    { key:'ekkaa',      name:'Ekkaa',             monthly:'15,000', note:'' },
+    { key:'mr',         name:'MR',                monthly:'15,000', note:'' },
+    { key:'aeromax',    name:'Aeromax',           monthly:'10,000', note:'' },
+    { key:'wybor_c',    name:'Wybor',             monthly:'10,000', note:'' },
+    { key:'speedo',     name:'Speedo',            monthly:'10,000', note:'' },
+    { key:'novamax',    name:'Novamax',           monthly:'10,000', note:'' },
+    { key:'raj',        name:'Raj',               monthly:'10,000', note:'⚠ Slow payment' },
+    { key:'supreme',    name:'Supreme Industries',monthly:'10,000', note:'' },
+    { key:'vijay',      name:'Vijay Cooler',      monthly:'5,000',  note:'' },
+    { key:'skyzen',     name:'Skyzen',            monthly:'5,000',  note:'' },
+  ],
+  ac_conf:  [],
+  ac_oem: [
+    { key:'amber',    name:'Amber', monthly:'', note:'Large OEM — #1 priority', star:true },
+    { key:'pg_ac',    name:'PG',    monthly:'', note:'Reference available — should convert', star:true },
+    { key:'wybor_ac', name:'Wybor', monthly:'', note:'' },
+    { key:'epack_ac', name:'Epack', monthly:'', note:'' },
+  ],
+  ac_brand: [
+    { key:'bluestar_ac',  name:'Blue Star',  monthly:'', note:'' },
+    { key:'carrier_ac',   name:'Carrier',    monthly:'', note:'Manesar plant' },
+    { key:'daikin',       name:'Daikin',     monthly:'', note:'' },
+    { key:'godrej_ac',    name:'Godrej',     monthly:'', note:'' },
+    { key:'haier',        name:'Haier',      monthly:'', note:'' },
+    { key:'hitachi_ac',   name:'Hitachi',    monthly:'', note:'' },
+    { key:'lg',           name:'LG',         monthly:'', note:'' },
+    { key:'micromax_ac',  name:'Micromax',   monthly:'', note:'' },
+    { key:'napoleon',     name:'Napoleon',   monthly:'', note:'' },
+    { key:'voltas',       name:'Voltas',     monthly:'', note:'' },
+    { key:'whirlpool_ac', name:'Whirlpool',  monthly:'', note:'' },
+  ],
+  washing_conf: [],
+  washing_tgt:  [],
+  fridge_conf:  [],
+  fridge_tgt: [
+    { key:'rockwell',   name:'Rockwell',   monthly:'6,000',  note:'Higher ticket size — priority', star:true },
+    { key:'frigoglass', name:'Frigoglass', monthly:'6,000',  note:'Higher ticket size — priority', star:true },
+    { key:'westan',     name:'Westan',     monthly:'15,000', note:'' },
+    { key:'bluestar_f', name:'Blue Star',  monthly:'15,000', note:'' },
+  ],
+  water_conf: [],
+  water_tgt:  [
+    { key:'veeline', name:'Veeline', monthly:'', note:'' },
+  ],
+  tools_conf: [],
+  tools_tgt:  [],
+};
+
+function eTabSave(section, key, field, el) {
+  const lsKey = 'etr_' + section + '_' + key;
+  const s = JSON.parse(localStorage.getItem(lsKey) || '{}');
+  s[field] = el.innerText.trim();
+  localStorage.setItem(lsKey, JSON.stringify(s));
+}
+
+function eTabDelete(section, key, isExtra) {
+  if (isExtra) {
+    const addKey = 'etab_add_' + section;
+    const adds = JSON.parse(localStorage.getItem(addKey) || '[]').filter(k => k !== key);
+    localStorage.setItem(addKey, JSON.stringify(adds));
+    localStorage.removeItem('etr_' + section + '_' + key);
+  } else {
+    const delKey = 'etab_del_' + section;
+    const dels = JSON.parse(localStorage.getItem(delKey) || '[]');
+    if (!dels.includes(key)) dels.push(key);
+    localStorage.setItem(delKey, JSON.stringify(dels));
+  }
+  renderETab(section);
+}
+
+function eTabAdd(section) {
+  const addKey = 'etab_add_' + section;
+  const adds = JSON.parse(localStorage.getItem(addKey) || '[]');
+  const key = 'x' + Date.now();
+  adds.push(key);
+  localStorage.setItem(addKey, JSON.stringify(adds));
+  localStorage.setItem('etr_' + section + '_' + key, JSON.stringify({ name:'', monthly:'', note:'' }));
+  renderETab(section);
+  setTimeout(() => {
+    const tbody = document.getElementById('etab_' + section);
+    if (!tbody) return;
+    const rows = tbody.querySelectorAll('tr');
+    if (rows.length) {
+      const span = rows[rows.length-1].querySelector('span[contenteditable]');
+      if (span) { span.focus(); document.execCommand('selectAll', false, null); }
+    }
+  }, 30);
+}
+
+function eTabMakeRow(section, key, defaults, isExtra) {
+  const saved = JSON.parse(localStorage.getItem('etr_' + section + '_' + key) || 'null') || {};
+  const name    = saved.name    !== undefined ? saved.name    : (defaults.name    || '');
+  const monthly = saved.monthly !== undefined ? saved.monthly : (defaults.monthly || '');
+  const note    = saved.note    !== undefined ? saved.note    : (defaults.note    || '');
+  const star    = defaults.star;
+  const ed = 'display:inline-block;outline:none;cursor:text;border-bottom:1px dashed transparent;min-width:40px;font-size:.82rem';
+  const fo = `onfocus="this.style.borderBottomColor='#1a237e'"`;
+  const bl = f => `onblur="this.style.borderBottomColor='transparent';eTabSave('${section}','${key}','${f}',this)"`;
+  return `<tr>
+    <td>${star?'<span class="star">★</span>':''}<span contenteditable="true" style="${ed};font-weight:700;color:#111" ${fo} ${bl('name')}>${name || 'New Customer'}</span></td>
+    <td class="num"><span contenteditable="true" style="${ed};color:#1a237e;font-weight:600" ${fo} ${bl('monthly')}>${monthly || '—'}</span></td>
+    <td><span contenteditable="true" style="${ed};color:#666;min-width:80px" ${fo} ${bl('note')}>${note}</span></td>
+    <td><button onclick="eTabDelete('${section}','${key}',${isExtra})" style="background:none;border:none;color:#bbb;cursor:pointer;font-size:.9rem;padding:2px 5px" title="Remove row" onmouseover="this.style.color='#e53935'" onmouseout="this.style.color='#bbb'">✕</button></td>
+  </tr>`;
+}
+
+function renderETab(section) {
+  const tbody = document.getElementById('etab_' + section);
+  if (!tbody) return;
+  const defaults = ETAB_DEFAULTS[section] || [];
+  const deleted  = JSON.parse(localStorage.getItem('etab_del_' + section) || '[]');
+  const extras   = JSON.parse(localStorage.getItem('etab_add_' + section) || '[]');
+  const baseRows  = defaults.filter(r => !deleted.includes(r.key)).map(r => eTabMakeRow(section, r.key, r, false));
+  const extraRows = extras.map(k => eTabMakeRow(section, k, {}, true));
+  tbody.innerHTML = [...baseRows, ...extraRows].join('') ||
+    `<tr><td colspan="4" style="color:#bbb;font-size:.8rem;padding:10px 0">No entries — click + Add below</td></tr>`;
+}
+
+Object.keys(ETAB_DEFAULTS).forEach(renderETab);
 
 // ── Inverter / Stabiliser confirmed ──
 const INV_INVERTER = [
