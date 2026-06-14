@@ -146,7 +146,7 @@ tr:last-child td { border-bottom:none; }
   <button class="app-tab" onclick="showTab('fridge')">Fridge</button>
   <button class="app-tab" onclick="showTab('water')">Water Dispenser</button>
   <button class="app-tab" onclick="showTab('tools')">Tools</button>
-  <button class="app-tab" onclick="showTab('inverter')">Transformer / Stabiliser</button>
+  <button class="app-tab" onclick="showTab('inverter')">Inverter / Stabiliser</button>
 </div>
 
 <!-- ═══════════════ OVERVIEW ═══════════════ -->
@@ -452,14 +452,16 @@ tr:last-child td { border-bottom:none; }
   </div>
   <button onclick="invAddCustomer()" style="margin:8px 0 4px;padding:6px 16px;background:#1a237e;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.85rem">+ Add Customer</button>
 
-  <div class="sec-label target" style="margin-top:1rem">Targets — Year-Round</div>
+  <div class="sec-label target" style="margin-top:1rem">Targets — Inverter Manufacturers</div>
   <div class="tbl-wrap">
     <table>
-      <thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th></tr></thead>
+      <thead><tr><th>Manufacturer</th><th class="num">Monthly</th><th>Note</th></tr></thead>
       <tbody>
-        <tr><td><span class="star">★</span><strong>Eapro</strong></td><td class="num tbd">TBD</td><td class="note p">Ex-employee contact available</td></tr>
-        <tr><td>Exide Industries</td><td class="num tbd">TBD</td><td class="note">Year-round, cold lead</td></tr>
-        <tr><td>UTL</td><td class="num tbd">TBD</td><td class="note">Year-round, cold lead</td></tr>
+        <tr><td><span class="star">★</span><strong>Luminous</strong></td><td class="num tbd">TBD</td><td class="note">Largest inverter brand — high priority</td></tr>
+        <tr><td><span class="star">★</span><strong>Eapro</strong></td><td class="num tbd">TBD</td><td class="note p">Ex-employee contact — warm lead</td></tr>
+        <tr><td><strong>Exide Industries</strong></td><td class="num tbd">TBD</td><td class="note">Year-round, cold lead</td></tr>
+        <tr><td><strong>UTL</strong></td><td class="num tbd">TBD</td><td class="note">Year-round, cold lead</td></tr>
+        <tr><td><strong>Genus</strong></td><td class="num tbd">TBD</td><td class="note">Inverter + meter manufacturer</td></tr>
       </tbody>
     </table>
   </div>
@@ -566,7 +568,7 @@ function renderBrands() {
 
 renderBrands();
 
-// ── Transformer / Stabiliser confirmed ──
+// ── Inverter / Stabiliser confirmed ──
 const INV_CUSTOMERS = [
   { key:'manjeet',   name:'Manjeet',            addr:'Bahadurgarh' },
   { key:'helios',    name:'Helios',              addr:'' },
@@ -577,6 +579,8 @@ const INV_CUSTOMERS = [
   { key:'donut',     name:'Donut',               addr:'' },
   { key:'dheeraj',   name:'Dheeraj Ji',          addr:'Bhalswa, Delhi' },
   { key:'bluebird',  name:'Bluebird Stabiliser', addr:'' },
+  { key:'eastman',   name:'Eastman',             addr:'Delhi' },
+  { key:'millenium', name:'Millenium',           addr:'Parwanoo', note:'Slow + mixed payment' },
 ];
 
 function invState(key) {
@@ -614,10 +618,11 @@ function invDeleteRow(key) {
   renderInvConf();
 }
 
-function invRow(key, defaultName, defaultAddr, isExtra) {
+function invRow(key, defaultName, defaultAddr, isExtra, defaultNote) {
   const s      = isExtra ? (JSON.parse(localStorage.getItem(key) || '{}')) : invState(key);
   const name   = s.name    !== undefined ? s.name    : defaultName;
   const addr   = s.addr    !== undefined ? s.addr    : defaultAddr;
+  const noteTag = defaultNote ? `<span style="font-size:.72rem;color:#e65100;margin-left:4px">(${defaultNote})</span>` : '';
   const monthly= s.monthly !== undefined ? s.monthly : '';
   const action = s.action  !== undefined ? s.action  : '';
   const edStyle = 'display:block;font-size:.8rem;outline:none;cursor:text;border-bottom:1px dashed transparent;min-width:60px';
@@ -629,7 +634,7 @@ function invRow(key, defaultName, defaultAddr, isExtra) {
     <td><span contenteditable="true" style="${edStyle};color:#111;font-weight:700"
       onfocus="this.style.borderBottomColor='#1a237e'"
       onblur="this.style.borderBottomColor='transparent';invSave('${saveKey}','name',this)"
-    >${name}</span></td>
+    >${name}</span>${noteTag}</td>
     <td><span contenteditable="true" style="${edStyle};color:#444"
       onfocus="this.style.borderBottomColor='#1a237e'"
       onblur="this.style.borderBottomColor='transparent';invSave('${saveKey}','addr',this)"
@@ -656,7 +661,7 @@ function renderInvConf() {
   const tbody = document.getElementById('invConfTbody');
   if (!tbody) return;
   const extras = JSON.parse(localStorage.getItem('inv_extras') || '[]');
-  const baseRows = INV_CUSTOMERS.map(c => invRow(c.key, c.name, c.addr, false)).join('');
+  const baseRows = INV_CUSTOMERS.map(c => invRow(c.key, c.name, c.addr, false, c.note)).join('');
   const extraRows = extras.map(k => invRow(k, 'New Customer', '', true)).join('');
   tbody.innerHTML = baseRows + extraRows;
 }
