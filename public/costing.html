@@ -156,8 +156,8 @@
         </div>
         <div class="field">
           <label>No. of Cores</label>
-          <div class="cores-row">
-            <button class="core-btn" onclick="setCore(1)">1C</button>
+          <div class="cores-row" id="tab1CoresRow">
+            <button class="core-btn" id="core1btn" onclick="setCore(1)">1C</button>
             <button class="core-btn" onclick="setCore(2)">2C</button>
             <button class="core-btn active" onclick="setCore(3)">3C</button>
             <button class="core-btn" onclick="setCore(4)">4C</button>
@@ -466,6 +466,7 @@ function loadPreset(e, key) {
   if (p.plugDefault) document.getElementById('plug'+p.plugDefault).classList.add('active');
   document.getElementById('plugCost').value  = p.plugCost;
   document.getElementById('extraCost').value = 0;
+  document.getElementById('core1btn').style.display = key === '0.5_2c_flat' ? 'none' : '';
   setCableType(p.type);
   setCore(p.cores);
 }
@@ -536,10 +537,10 @@ let aAssemblyRatePerCore = 1;
 let solderType = 'non';
 
 const APPLIANCES = {
-  kettle:    { strands:16, dia:0.202, cores:3, od:6.0, cordLen:1.0, grommets:0, plugShow:['3pin'],         plugDefault:'3pin',  plugCost:10, assemblyRate:1,            label:'Kettle — Thimble + HST ₹1/core × 3C = ₹3' },
-  eggboiler: { strands:16, dia:0.202, cores:3, od:6.0, cordLen:1.5, grommets:0, plugShow:['3pin'],         plugDefault:'3pin',  plugCost:10, assemblyFlat:7.5,          label:'Egg Boiler — Thimble ₹4 + Caps ₹1 + Glass Sleeve ₹2.50 = ₹7.50' },
-  induction: { strands:24, dia:0.202, cores:2, od:6.5, cordLen:1.5, grommets:0, plugShow:['3pin','16amp'], plugDefault:'3pin',  plugCost:10, assemblyRate:2.25,         label:'Induction — Thimble + Assembly ₹2.25/core' },
-  immersion: { strands:24, dia:0.202, cores:3, od:6.5, cordLen:1.5, grommets:0, plugShow:['3pin','16amp'], plugDefault:'3pin',  plugCost:10, assemblyFlat:4,            label:'Immersion Rod — Ghundi Soldered ₹4 total' }
+  kettle:    { strands:16, dia:0.202, cores:3, od:6.0, cordLen:1.0, grommets:0, thimbles:1, plugShow:['3pin'],         plugDefault:'3pin',  plugCost:10, assemblyRate:1,    label:'Kettle — Thimble + HST ₹1/core × 3C = ₹3' },
+  eggboiler: { strands:16, dia:0.202, cores:3, od:6.0, cordLen:1.5, grommets:0, thimbles:1, plugShow:['3pin'],         plugDefault:'3pin',  plugCost:10, assemblyFlat:7.5, label:'Egg Boiler — Thimble ₹4 + Caps ₹1 + Glass Sleeve ₹2.50 = ₹7.50' },
+  induction: { strands:24, dia:0.202, cores:2, od:6.5, cordLen:1.5, grommets:0, thimbles:1, plugShow:['3pin','16amp'], plugDefault:'3pin',  plugCost:10, assemblyRate:2.25, label:'Induction — Thimble + Assembly ₹2.25/core' },
+  immersion: { strands:24, dia:0.202, cores:3, od:6.5, cordLen:1.5, grommets:0, thimbles:0, plugShow:['3pin','16amp'], plugDefault:'3pin',  plugCost:10, assemblyFlat:4,   label:'Immersion Rod — Ghundi Soldered ₹4 total' }
 };
 
 function loadAppliance(key) {
@@ -552,7 +553,7 @@ function loadAppliance(key) {
   document.getElementById('aStrandDia').value  = a.dia;
   document.getElementById('aOd').value         = a.od;
   document.getElementById('aCordLength').value = a.cordLen || 1.5;
-  document.getElementById('aThimbles').value   = 1;
+  document.getElementById('aThimbles').value   = a.thimbles !== undefined ? a.thimbles : 1;
   document.getElementById('aGrommets').value   = a.grommets !== undefined ? a.grommets : 1;
   document.getElementById('aExtraCost').value  = 0;
   document.querySelector('input[name="aCap"][value="0"]').checked = true;
