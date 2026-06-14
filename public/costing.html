@@ -200,8 +200,12 @@
         </div>
         <div class="field">
           <label>Moulding Plug</label>
-          <input type="number" id="plugCost" value="10" min="0" oninput="calc()">
-          <div class="hint">₹ per piece (standard ₹10)</div>
+          <div class="cores-row" style="margin-bottom:8px">
+            <button class="core-btn" id="plug2pin" onclick="setPlug(2)">2-Pin  ₹7.50</button>
+            <button class="core-btn active" id="plug3pin" onclick="setPlug(3)">3-Pin  ₹10</button>
+          </div>
+          <input type="number" id="plugCost" value="10" min="0" step="0.5" oninput="calc()">
+          <div class="hint">Override ₹ if needed</div>
         </div>
       </div>
     </div>
@@ -280,12 +284,19 @@ let cores = 3;
 let cableType = 'round'; // 'round' | 'flat'
 
 const PRESETS = {
-  '0.5_3c':      { strands:16, dia:0.202, cores:3, type:'round', od:6.0,  pvcKg:null },
-  '0.5_2c_flat': { strands:16, dia:0.202, cores:2, type:'flat',  od:null, pvcKg:3.5  },
-  '0.75_2c':     { strands:24, dia:0.202, cores:2, type:'round', od:6.5,  pvcKg:null },
-  '0.75_3c':     { strands:24, dia:0.202, cores:3, type:'round', od:7.0,  pvcKg:null },
+  '0.5_3c':      { strands:16, dia:0.202, cores:3, type:'round', od:6.0,  pvcKg:null, plug:3 },
+  '0.5_2c_flat': { strands:16, dia:0.202, cores:2, type:'flat',  od:null, pvcKg:3.5,  plug:2 },
+  '0.75_2c':     { strands:24, dia:0.202, cores:2, type:'round', od:6.5,  pvcKg:null, plug:2 },
+  '0.75_3c':     { strands:24, dia:0.202, cores:3, type:'round', od:7.0,  pvcKg:null, plug:3 },
   'custom':       null
 };
+
+function setPlug(pins) {
+  document.getElementById('plug2pin').classList.toggle('active', pins === 2);
+  document.getElementById('plug3pin').classList.toggle('active', pins === 3);
+  document.getElementById('plugCost').value = pins === 2 ? 7.5 : 10;
+  calc();
+}
 
 function loadPreset(e, key) {
   document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
@@ -294,8 +305,9 @@ function loadPreset(e, key) {
   if (!p) return;
   document.getElementById('strands').value   = p.strands;
   document.getElementById('strandDia').value = p.dia;
-  if (p.od   !== null) document.getElementById('od').value    = p.od;
+  if (p.od    !== null) document.getElementById('od').value    = p.od;
   if (p.pvcKg !== null) document.getElementById('pvcKg').value = p.pvcKg;
+  setPlug(p.plug);
   setCableType(p.type);
   setCore(p.cores);
 }
@@ -373,6 +385,7 @@ function calc() {
 // Init
 setCableType('round');
 setCore(3);
+setPlug(3);
 loadPreset({ target: document.querySelector('.preset-btn') }, '0.5_3c');
 </script>
 
