@@ -16,6 +16,17 @@
   header h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: .5px; }
   header span { font-size: .85rem; opacity: .7; margin-left: auto; }
 
+  /* Tab navigation */
+  .tab-nav { background: #fff; border-bottom: 2px solid #e8eaf6; display: flex; }
+  .tab-btn {
+    padding: 14px 28px; border: none; background: none; cursor: pointer;
+    font-size: .9rem; font-weight: 700; color: #999; border-bottom: 3px solid transparent;
+    margin-bottom: -2px; transition: all .15s;
+  }
+  .tab-btn.active { color: #1a237e; border-bottom-color: #1a237e; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
   .container { max-width: 960px; margin: 28px auto; padding: 0 16px; }
 
   .presets { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
@@ -25,6 +36,19 @@
     color: #3949ab; transition: all .15s;
   }
   .preset-btn:hover, .preset-btn.active { background: #3949ab; color: #fff; border-color: #3949ab; }
+
+  /* Appliance selector for tab 2 */
+  .appliance-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+  @media(max-width:600px) { .appliance-grid { grid-template-columns: repeat(2,1fr); } }
+  .app-btn {
+    background: #fff; border: 2px solid #c5cae9; border-radius: 10px;
+    padding: 14px 8px; cursor: pointer; text-align: center; transition: all .15s;
+  }
+  .app-btn:hover, .app-btn.active { background: #e8eaf6; border-color: #3949ab; }
+  .app-btn .app-icon { font-size: 1.6rem; display: block; margin-bottom: 6px; }
+  .app-btn .app-name { font-size: .8rem; font-weight: 700; color: #3949ab; display: block; }
+  .app-btn .app-gauge { font-size: .7rem; color: #aaa; display: block; margin-top: 2px; }
+  .app-btn.active .app-name { color: #1a237e; }
 
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   @media(max-width:680px) { .grid { grid-template-columns: 1fr; } }
@@ -44,67 +68,53 @@
   .field input:focus { outline: none; border-color: #3949ab; }
   .field .hint { font-size: .72rem; color: #aaa; margin-top: 3px; }
 
-  .toggle-row { display: flex; gap: 0; border-radius: 8px; overflow: hidden; border: 2px solid #e0e0e0; margin-bottom: 18px; }
-  .toggle-btn {
-    flex: 1; padding: 9px; border: none; background: #fff; cursor: pointer;
-    font-size: .88rem; font-weight: 700; color: #777; transition: all .15s; text-align: center;
-  }
-  .toggle-btn.active { background: #3949ab; color: #fff; }
-  .toggle-btn:first-child { border-right: 1px solid #e0e0e0; }
-
   .cores-row { display: flex; gap: 10px; }
   .core-btn {
     flex: 1; padding: 8px; border: 2px solid #e0e0e0; border-radius: 7px;
-    background: #fff; cursor: pointer; font-size: .9rem; font-weight: 700;
+    background: #fff; cursor: pointer; font-size: .88rem; font-weight: 700;
     color: #555; transition: all .15s; text-align: center;
   }
   .core-btn.active { border-color: #3949ab; background: #e8eaf6; color: #3949ab; }
 
-  .flat-badge {
-    display: inline-block; background: #fff3e0; color: #e65100;
-    font-size: .72rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-left: 8px;
+  .flat-badge { display:inline-block; background:#fff3e0; color:#e65100; font-size:.72rem; font-weight:700; padding:2px 8px; border-radius:4px; margin-left:8px; }
+  .pvc-flat-note { background:#fff8e1; border-radius:7px; padding:8px 12px; font-size:.78rem; color:#f57f17; margin-top:4px; }
+
+  .assembly-box {
+    background: #e8f5e9; border-radius: 8px; padding: 12px 14px; margin-bottom: 16px;
+    font-size: .82rem; color: #2e7d32; font-weight: 600;
   }
-  .pvc-flat-note { background: #fff8e1; border-radius: 7px; padding: 8px 12px; font-size: .78rem; color: #f57f17; margin-top: 4px; }
+  .assembly-box span { color: #555; font-weight: 400; }
+
+  .solder-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .solder-btn {
+    flex: 1; padding: 8px; border: 2px solid #e0e0e0; border-radius: 7px;
+    background: #fff; cursor: pointer; font-size: .85rem; font-weight: 700;
+    color: #555; transition: all .15s; text-align: center;
+  }
+  .solder-btn.active { border-color: #2e7d32; background: #e8f5e9; color: #2e7d32; }
 
   /* Breakdown */
-  .section-label {
-    font-size: .68rem; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase;
-    color: #b0bec5; margin: 14px 0 6px;
-  }
-  .line {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 7px 0; border-bottom: 1px solid #f5f5f5; font-size: .88rem;
-  }
-  .line:last-child { border-bottom: none; }
-  .line .label { color: #666; }
-  .line .val { font-weight: 600; color: #222; font-variant-numeric: tabular-nums; }
-  .line.sub .label { color: #bbb; font-size: .8rem; padding-left: 10px; }
-  .line.sub .val { color: #bbb; font-size: .8rem; }
-  .line.bold .label { font-weight: 700; color: #333; }
-  .line.bold .val { font-weight: 700; color: #333; }
+  .section-label { font-size:.68rem; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; color:#b0bec5; margin:14px 0 6px; }
+  .line { display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid #f5f5f5; font-size:.88rem; }
+  .line:last-child { border-bottom:none; }
+  .line .label { color:#666; }
+  .line .val { font-weight:600; color:#222; font-variant-numeric:tabular-nums; }
+  .line.sub .label { color:#bbb; font-size:.8rem; padding-left:10px; }
+  .line.sub .val { color:#bbb; font-size:.8rem; }
 
-  .band {
-    border-radius: 8px; padding: 11px 14px; margin: 8px 0;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .band.blue { background: #e8eaf6; }
-  .band.blue .label { font-weight: 700; color: #1a237e; font-size: .9rem; }
-  .band.blue .val { font-weight: 800; color: #1a237e; font-size: 1rem; }
-  .band.green { background: #e8f5e9; }
-  .band.green .label { font-weight: 700; color: #2e7d32; font-size: .9rem; }
-  .band.green .val { font-weight: 800; color: #2e7d32; font-size: 1rem; }
-  .band.orange { background: #fff3e0; }
-  .band.orange .label { font-weight: 700; color: #e65100; font-size: .9rem; }
-  .band.orange .val { font-weight: 800; color: #e65100; font-size: 1rem; }
+  .band { border-radius:8px; padding:11px 14px; margin:8px 0; display:flex; justify-content:space-between; align-items:center; }
+  .band.blue { background:#e8eaf6; }
+  .band.blue .label { font-weight:700; color:#1a237e; font-size:.9rem; }
+  .band.blue .val { font-weight:800; color:#1a237e; font-size:1rem; }
+  .band.orange { background:#fff3e0; }
+  .band.orange .label { font-weight:700; color:#e65100; font-size:.9rem; }
+  .band.orange .val { font-weight:800; color:#e65100; font-size:1.1rem; }
 
-  .weight-row { background: #f3f4ff; border-radius: 8px; padding: 9px 14px; margin-bottom: 12px; font-size: .8rem; color: #3949ab; font-weight: 600; }
-  .weight-row span { color: #555; font-weight: 400; }
+  .weight-row { background:#f3f4ff; border-radius:8px; padding:9px 14px; margin-bottom:12px; font-size:.8rem; color:#3949ab; font-weight:600; }
+  .weight-row span { color:#555; font-weight:400; }
+  .divider { border:none; border-top:2px dashed #e8eaf6; margin:10px 0; }
 
-  .divider { border: none; border-top: 2px dashed #e8eaf6; margin: 10px 0; }
-
-  .margin-inline { display: flex; align-items: center; gap: 10px; padding: 10px 0 4px; }
-  .margin-inline label { font-size: .8rem; font-weight: 600; color: #555; white-space: nowrap; }
-  .margin-inline input { width: 80px; padding: 7px 10px; border: 1.5px solid #e0e0e0; border-radius: 7px; font-size: .9rem; }
+  .undergauge-note { background:#fff3e0; border-radius:7px; padding:8px 12px; font-size:.75rem; color:#e65100; margin-top:6px; }
 </style>
 </head>
 <body>
@@ -114,6 +124,14 @@
   <span>All costs based on 100m</span>
 </header>
 
+<!-- Tab nav -->
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('power')">Power Cord Costing</button>
+  <button class="tab-btn" onclick="switchTab('assembly')">Assembly Appliances Cord Costing</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ TAB 1: POWER CORD -->
+<div id="tab-power" class="tab-content active">
 <div class="container">
 
   <div class="presets">
@@ -125,12 +143,9 @@
   </div>
 
   <div class="grid">
-
-    <!-- LEFT -->
     <div>
       <div class="card" style="margin-bottom:20px">
         <h2>Wire Configuration</h2>
-
         <div class="field">
           <label>No. of Strands</label>
           <input type="number" id="strands" value="16" min="1" oninput="calc()">
@@ -148,15 +163,11 @@
             <button class="core-btn" onclick="setCore(4)">4C</button>
           </div>
         </div>
-
-        <!-- ROUND -->
         <div class="field" id="fieldOD">
           <label>Cable OD (mm)</label>
           <input type="number" id="od" value="6.0" step="0.1" min="1" oninput="calc()">
           <div class="hint">PVC weight = OD × 0.85 kg / 100m</div>
         </div>
-
-        <!-- FLAT -->
         <div class="field" id="fieldPvcKg" style="display:none">
           <label>PVC Bundle Weight (kg / 100m) <span class="flat-badge">FLAT</span></label>
           <input type="number" id="pvcKg" value="3.5" step="0.1" min="0.1" oninput="calc()">
@@ -193,7 +204,6 @@
           <input type="number" id="grommets" value="1" min="0" max="10" oninput="calc()">
           <div class="hint">₹1 per grommet</div>
         </div>
-        <!-- Plug section (hidden for induction cord) -->
         <div id="plugSection" class="field">
           <label>Moulding Plug</label>
           <div class="cores-row" style="margin-bottom:8px">
@@ -207,95 +217,208 @@
         <div class="field">
           <label>Extra Accessories (₹)</label>
           <input type="number" id="extraCost" value="0" min="0" step="0.5" oninput="calc()">
-          <div class="hint">e.g. ₹3 kettle terminal, ₹4 induction, ₹2 HST/blue cap</div>
+          <div class="hint">Terminal, HST, blue cap etc.</div>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT: Breakdown -->
+    <!-- Breakdown Tab 1 -->
     <div class="card" style="height:fit-content; position:sticky; top:20px;">
       <h2>Cost Breakdown</h2>
-
-      <div class="weight-row">
-        Copper: <span id="wCopper">—</span> &nbsp;|&nbsp; PVC: <span id="wPvc">—</span>
-      </div>
-
-      <!-- 100m section -->
+      <div class="weight-row">Copper: <span id="wCopper">—</span> &nbsp;|&nbsp; PVC: <span id="wPvc">—</span></div>
       <div class="section-label">Per 100 Metres (Raw Material)</div>
-      <div class="line">
-        <span class="label">Copper Cost</span>
-        <span class="val" id="rCopper">—</span>
-      </div>
-      <div class="line">
-        <span class="label">PVC Cost</span>
-        <span class="val" id="rPvc">—</span>
-      </div>
-      <div class="band blue" style="margin-top:4px">
-        <span class="label">Material / 100m</span>
-        <span class="val" id="rMaterial">—</span>
-      </div>
-
+      <div class="line"><span class="label">Copper Cost</span><span class="val" id="rCopper">—</span></div>
+      <div class="line"><span class="label">PVC Cost</span><span class="val" id="rPvc">—</span></div>
+      <div class="band blue" style="margin-top:4px"><span class="label">Material / 100m</span><span class="val" id="rMaterial">—</span></div>
       <hr class="divider">
-
-      <!-- Per 1m -->
       <div class="section-label">Per 1 Metre</div>
-      <div class="line sub">
-        <span class="label">Material ÷ 100</span>
-        <span class="val" id="rPer1m">—</span>
-      </div>
-      <div class="line sub">
-        <span class="label">+ Conversion 20%</span>
-        <span class="val" id="rConversion">—</span>
-      </div>
-      <div class="band blue">
-        <span class="label">Rate / Metre</span>
-        <span class="val" id="rPer1mCost">—</span>
-      </div>
-
+      <div class="line sub"><span class="label">Material ÷ 100</span><span class="val" id="rPer1m">—</span></div>
+      <div class="line sub"><span class="label">+ Conversion 20%</span><span class="val" id="rConversion">—</span></div>
+      <div class="band blue"><span class="label">Rate / Metre</span><span class="val" id="rPer1mCost">—</span></div>
       <hr class="divider">
-
-      <!-- Per piece -->
       <div class="section-label">Per Piece (<span id="labelCordLen">1.5</span>m cord)</div>
-      <div class="line sub">
-        <span class="label">Rate/m × <span class="cordLenSpan">1.5</span>m</span>
-        <span class="val" id="rPieceMaterial">—</span>
-      </div>
-      <div class="line sub">
-        <span class="label">Plug + Thimble + Grommet + Extra</span>
-        <span class="val" id="rAccessories">—</span>
-      </div>
-      <div style="font-size:.7rem;color:#b0bec5;padding:2px 0 8px 10px">Plug includes margin · Extra = terminal/HST/cap etc.</div>
+      <div class="line sub"><span class="label">Rate/m × <span class="cordLenSpan">1.5</span>m</span><span class="val" id="rPieceMaterial">—</span></div>
+      <div class="line sub"><span class="label">Plug + Thimble + Grommet + Extra</span><span class="val" id="rAccessories">—</span></div>
+      <div style="font-size:.7rem;color:#b0bec5;padding:2px 0 8px 10px">Plug includes margin</div>
+      <div class="band orange"><span class="label">Selling Price / Piece</span><span class="val" id="rPieceSell">—</span></div>
+    </div>
+  </div>
 
-      <div class="band orange">
-        <span class="label">Selling Price / Piece</span>
-        <span class="val" id="rPieceSell">—</span>
+</div>
+</div><!-- end tab-power -->
+
+<!-- ═══════════════════════════════════════════════════════ TAB 2: ASSEMBLY APPLIANCES -->
+<div id="tab-assembly" class="tab-content">
+<div class="container">
+
+  <div class="appliance-grid">
+    <button class="app-btn active" id="app-kettle" onclick="loadAppliance('kettle')">
+      <span class="app-icon">🫖</span>
+      <span class="app-name">Kettle</span>
+      <span class="app-gauge">0.5mm 2C · ₹1/core</span>
+    </button>
+    <button class="app-btn" id="app-eggboiler" onclick="loadAppliance('eggboiler')">
+      <span class="app-icon">🥚</span>
+      <span class="app-name">Egg Boiler</span>
+      <span class="app-gauge">0.5mm 2C · ₹1.5/core</span>
+    </button>
+    <button class="app-btn" id="app-induction" onclick="loadAppliance('induction')">
+      <span class="app-icon">🔥</span>
+      <span class="app-name">Induction</span>
+      <span class="app-gauge">0.75mm 2C · ₹2/core</span>
+    </button>
+    <button class="app-btn" id="app-immersion" onclick="loadAppliance('immersion')">
+      <span class="app-icon">⚡</span>
+      <span class="app-name">Immersion Rod</span>
+      <span class="app-gauge">0.75mm 2C · ₹1–2/core</span>
+    </button>
+  </div>
+
+  <!-- Soldering toggle for immersion rod -->
+  <div id="solderSection" style="display:none; margin-bottom:16px;">
+    <div style="font-size:.78rem; font-weight:700; color:#555; margin-bottom:8px;">Ghundi Type</div>
+    <div class="solder-row">
+      <button class="solder-btn active" id="solderNo"  onclick="setSolder('non')">Non-Soldered &nbsp;₹1/core</button>
+      <button class="solder-btn"        id="solderYes" onclick="setSolder('sol')">Soldered &nbsp;₹2/core</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="card" style="margin-bottom:20px">
+        <h2>Wire Configuration</h2>
+        <div class="assembly-box" id="aAssemblyInfo">
+          Assembly: <span id="aAssemblyDesc">—</span>
+        </div>
+        <div class="field">
+          <label>No. of Strands</label>
+          <input type="number" id="aStrands" value="16" min="1" oninput="acalc()">
+        </div>
+        <div class="field">
+          <label>Strand Diameter (mm)</label>
+          <input type="number" id="aStrandDia" value="0.202" step="0.001" min="0.01" oninput="acalc()">
+          <div class="undergauge-note">Change strands or diameter for undergauge</div>
+        </div>
+        <div class="field">
+          <label>No. of Cores</label>
+          <div class="cores-row" id="aCoresRow">
+            <button class="core-btn" onclick="aSetCore(1)">1C</button>
+            <button class="core-btn active" onclick="aSetCore(2)">2C</button>
+            <button class="core-btn" onclick="aSetCore(3)">3C</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Cable OD (mm)</label>
+          <input type="number" id="aOd" value="6.0" step="0.1" min="1" oninput="acalc()">
+          <div class="hint">PVC weight = OD × 0.85 kg / 100m</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px">
+        <h2>Rates</h2>
+        <div class="field">
+          <label>Copper Rate (₹/kg)</label>
+          <input type="number" id="aCopperRate" value="1360" min="1" oninput="acalc()">
+        </div>
+        <div class="field">
+          <label>PVC Rate (₹/kg) — GP57+RP</label>
+          <input type="number" id="aPvcRate" value="70" min="1" oninput="acalc()">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Per Piece Accessories</h2>
+        <div class="field">
+          <label>Cord Length (metres / piece)</label>
+          <input type="number" id="aCordLength" value="1.5" step="0.5" min="0.1" oninput="acalc()">
+        </div>
+        <div class="field">
+          <label>No. of Thimbles</label>
+          <input type="number" id="aThimbles" value="1" min="0" max="10" oninput="acalc()">
+          <div class="hint">₹1 per thimble</div>
+        </div>
+        <div class="field">
+          <label>No. of Grommets</label>
+          <input type="number" id="aGrommets" value="1" min="0" max="10" oninput="acalc()">
+          <div class="hint">₹1 per grommet</div>
+        </div>
+        <div class="field">
+          <label>Moulding Plug</label>
+          <div class="cores-row" style="margin-bottom:8px">
+            <button class="core-btn" id="aplug2pin"  onclick="aSetPlug('2pin',7.5)">2-Pin ₹7.50</button>
+            <button class="core-btn" id="aplug3pin"  onclick="aSetPlug('3pin',10)">3-Pin/6A ₹10</button>
+            <button class="core-btn" id="aplug16amp" onclick="aSetPlug('16amp',16.5)">16A ₹16.50</button>
+          </div>
+          <input type="number" id="aPlugCost" value="7.5" min="0" step="0.5" oninput="acalc()">
+          <div class="hint">Override ₹ if needed</div>
+        </div>
+        <div class="field">
+          <label>Assembly Cost (₹) — auto-calculated</label>
+          <input type="number" id="aAssemblyCost" value="2" min="0" step="0.5" oninput="acalc()">
+          <div class="hint">Based on appliance type × cores. Editable.</div>
+        </div>
+        <div class="field">
+          <label>Extra Accessories (₹)</label>
+          <input type="number" id="aExtraCost" value="0" min="0" step="0.5" oninput="acalc()">
+          <div class="hint">HST, blue cap, other</div>
+        </div>
       </div>
     </div>
 
+    <!-- Breakdown Tab 2 -->
+    <div class="card" style="height:fit-content; position:sticky; top:20px;">
+      <h2>Cost Breakdown</h2>
+      <div class="weight-row">Copper: <span id="awCopper">—</span> &nbsp;|&nbsp; PVC: <span id="awPvc">—</span></div>
+      <div class="section-label">Per 100 Metres (Raw Material)</div>
+      <div class="line"><span class="label">Copper Cost</span><span class="val" id="arCopper">—</span></div>
+      <div class="line"><span class="label">PVC Cost</span><span class="val" id="arPvc">—</span></div>
+      <div class="band blue" style="margin-top:4px"><span class="label">Material / 100m</span><span class="val" id="arMaterial">—</span></div>
+      <hr class="divider">
+      <div class="section-label">Per 1 Metre</div>
+      <div class="line sub"><span class="label">Material ÷ 100</span><span class="val" id="arPer1m">—</span></div>
+      <div class="line sub"><span class="label">+ Conversion 20%</span><span class="val" id="arConversion">—</span></div>
+      <div class="band blue"><span class="label">Rate / Metre</span><span class="val" id="arPer1mCost">—</span></div>
+      <hr class="divider">
+      <div class="section-label">Per Piece (<span id="alabelCordLen">1.5</span>m cord)</div>
+      <div class="line sub"><span class="label">Rate/m × <span class="acordLenSpan">1.5</span>m</span><span class="val" id="arPieceMaterial">—</span></div>
+      <div class="line sub"><span class="label">Plug + Thimble + Grommet</span><span class="val" id="arPlugAcc">—</span></div>
+      <div class="line sub"><span class="label">Assembly (₹<span id="arAssemblyRate">—</span>/core × <span id="arCores">2</span>C)</span><span class="val" id="arAssembly">—</span></div>
+      <div class="line sub"><span class="label">Extra</span><span class="val" id="arExtra">—</span></div>
+      <div class="band orange"><span class="label">Selling Price / Piece</span><span class="val" id="arPieceSell">—</span></div>
+    </div>
   </div>
+
 </div>
+</div><!-- end tab-assembly -->
 
 <script>
+// ═══════════════ TAB SWITCHING ═══════════════
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (i===0&&tab==='power')||(i===1&&tab==='assembly')));
+  document.getElementById('tab-power').classList.toggle('active', tab === 'power');
+  document.getElementById('tab-assembly').classList.toggle('active', tab === 'assembly');
+}
+
+// ═══════════════ TAB 1: POWER CORD ═══════════════
 let cores = 3;
 let cableType = 'round';
 
-// plugShow: which plug buttons to show; plugDefault: which to pre-select
 const PRESETS = {
-  '0.5_3c':      { strands:16, dia:0.202, cores:3, type:'round', od:6.0,  pvcKg:null, cordLen:1.5, plugShow:['3pin'],          plugDefault:'3pin',  plugCost:10   },
-  '0.5_2c_flat': { strands:16, dia:0.202, cores:2, type:'flat',  od:null, pvcKg:3.5,  cordLen:1.5, plugShow:['2pin'],          plugDefault:'2pin',  plugCost:7.5  },
-  '0.75_2c':     { strands:24, dia:0.202, cores:2, type:'round', od:6.5,  pvcKg:null, cordLen:1.5, plugShow:['2pin','3pin'],   plugDefault:'2pin',  plugCost:7.5  },
-  '0.75_3c':     { strands:24, dia:0.202, cores:3, type:'round', od:7.0,  pvcKg:null, cordLen:1.5, plugShow:['3pin','16amp'],  plugDefault:'3pin',  plugCost:10   },
-  'custom':       null
+  '0.5_3c':      { strands:16, dia:0.202, cores:3, type:'round', od:6.0,  pvcKg:null, cordLen:1.5, plugShow:['3pin'],         plugDefault:'3pin',  plugCost:10  },
+  '0.5_2c_flat': { strands:16, dia:0.202, cores:2, type:'flat',  od:null, pvcKg:3.5,  cordLen:1.5, plugShow:['2pin'],         plugDefault:'2pin',  plugCost:7.5 },
+  '0.75_2c':     { strands:24, dia:0.202, cores:2, type:'round', od:6.5,  pvcKg:null, cordLen:1.5, plugShow:['2pin','3pin'],  plugDefault:'2pin',  plugCost:7.5 },
+  '0.75_3c':     { strands:24, dia:0.202, cores:3, type:'round', od:7.0,  pvcKg:null, cordLen:1.5, plugShow:['3pin','16amp'], plugDefault:'3pin',  plugCost:10  },
+  'custom': null
 };
 
 function setPlug(id, cost) {
-  ['2pin','3pin','16amp'].forEach(p => document.getElementById('plug'+p).classList.toggle('active', p === id));
+  ['2pin','3pin','16amp'].forEach(p => document.getElementById('plug'+p).classList.toggle('active', p===id));
   document.getElementById('plugCost').value = cost;
   calc();
 }
 
 function loadPreset(e, key) {
-  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#tab-power .preset-btn').forEach(b => b.classList.remove('active'));
   e.target.classList.add('active');
   const p = PRESETS[key];
   if (!p) return;
@@ -304,19 +427,13 @@ function loadPreset(e, key) {
   document.getElementById('cordLength').value = p.cordLen;
   if (p.od    !== null) document.getElementById('od').value    = p.od;
   if (p.pvcKg !== null) document.getElementById('pvcKg').value = p.pvcKg;
-
-  // Show/hide plug buttons
   ['2pin','3pin','16amp'].forEach(id => {
     document.getElementById('plug'+id).style.display = p.plugShow.includes(id) ? '' : 'none';
     document.getElementById('plug'+id).classList.remove('active');
   });
-  if (p.plugDefault) {
-    document.getElementById('plug'+p.plugDefault).classList.add('active');
-  }
-  document.getElementById('plugCost').value = p.plugCost;
-
+  if (p.plugDefault) document.getElementById('plug'+p.plugDefault).classList.add('active');
+  document.getElementById('plugCost').value  = p.plugCost;
   document.getElementById('extraCost').value = 0;
-
   setCableType(p.type);
   setCore(p.cores);
 }
@@ -330,7 +447,7 @@ function setCableType(type) {
 
 function setCore(n) {
   cores = n;
-  document.querySelectorAll('.core-btn').forEach((b, i) => b.classList.toggle('active', i+1 === n));
+  document.querySelectorAll('#tab-power .cores-row .core-btn').forEach((b,i) => b.classList.toggle('active', i+1===n));
   calc();
 }
 
@@ -342,59 +459,165 @@ function calc() {
   const strands     = parseFloat(document.getElementById('strands').value)     || 0;
   const dia         = parseFloat(document.getElementById('strandDia').value)   || 0;
   const od          = parseFloat(document.getElementById('od').value)          || 0;
-  const pvcKgDirect = parseFloat(document.getElementById('pvcKg').value)      || 0;
+  const pvcKgDirect = parseFloat(document.getElementById('pvcKg').value)       || 0;
   const copperRate  = parseFloat(document.getElementById('copperRate').value)  || 0;
   const pvcRate     = parseFloat(document.getElementById('pvcRate').value)     || 0;
   const cordLength  = parseFloat(document.getElementById('cordLength').value)  || 0;
   const thimbles    = parseInt(document.getElementById('thimbles').value)      || 0;
   const grommets    = parseInt(document.getElementById('grommets').value)      || 0;
-  const plugCost  = parseFloat(document.getElementById('plugCost').value)  || 0;
-  const extraCost = parseFloat(document.getElementById('extraCost').value) || 0;
+  const plugCost    = parseFloat(document.getElementById('plugCost').value)    || 0;
+  const extraCost   = parseFloat(document.getElementById('extraCost').value)   || 0;
 
-  // All calculated per 100m
-  // Copper: n × d² × 0.7 = kg/100m per core
-  const copperKg100m = strands * (dia * dia) * 0.7 * cores;
-
-  // PVC per 100m
-  const pvcKg100m = cableType === 'flat' ? pvcKgDirect : od * 0.85;
-
+  const copperKg100m = strands * dia * dia * 0.7 * cores;
+  const pvcKg100m    = cableType === 'flat' ? pvcKgDirect : od * 0.85;
   const copperCost100 = copperKg100m * copperRate;
   const pvcCost100    = pvcKg100m    * pvcRate;
   const material100   = copperCost100 + pvcCost100;
-
-  // Per 1m: material ÷ 100, then +20% conversion, then +margin%
-  const per1m          = material100 / 100;
-  const conversion1m   = per1m * 0.20;
+  const per1m         = material100 / 100;
+  const conversion1m  = per1m * 0.20;
   const per1mWithConv = per1m + conversion1m;
-
-  // Per piece: rate/m × cord length + accessories
   const pieceMaterial = per1mWithConv * cordLength;
-  const accessoriesCost = thimbles * 1 + grommets * 1 + plugCost + extraCost;
-  const pieceSell       = pieceMaterial + accessoriesCost;
+  const accessories   = thimbles + grommets + plugCost + extraCost;
+  const pieceSell     = pieceMaterial + accessories;
 
-  // Update cord length labels
   const cl = cordLength.toFixed(1);
   document.getElementById('labelCordLen').textContent = cl;
   document.querySelectorAll('.cordLenSpan').forEach(el => el.textContent = cl);
 
-  document.getElementById('wCopper').textContent = copperKg100m.toFixed(4) + ' kg/100m';
-  document.getElementById('wPvc').textContent    = pvcKg100m.toFixed(4)    + ' kg/100m';
-
-  document.getElementById('rCopper').textContent       = fmt(copperCost100);
-  document.getElementById('rPvc').textContent          = fmt(pvcCost100);
-  document.getElementById('rMaterial').textContent     = fmt(material100);
-  document.getElementById('rPer1m').textContent        = fmt(per1m);
-  document.getElementById('rConversion').textContent   = fmt(conversion1m);
-  document.getElementById('rPer1mCost').textContent = fmt(per1mWithConv);
+  document.getElementById('wCopper').textContent     = copperKg100m.toFixed(4) + ' kg/100m';
+  document.getElementById('wPvc').textContent        = pvcKg100m.toFixed(4)    + ' kg/100m';
+  document.getElementById('rCopper').textContent     = fmt(copperCost100);
+  document.getElementById('rPvc').textContent        = fmt(pvcCost100);
+  document.getElementById('rMaterial').textContent   = fmt(material100);
+  document.getElementById('rPer1m').textContent      = fmt(per1m);
+  document.getElementById('rConversion').textContent = fmt(conversion1m);
+  document.getElementById('rPer1mCost').textContent  = fmt(per1mWithConv);
   document.getElementById('rPieceMaterial').textContent = fmt(pieceMaterial);
-  document.getElementById('rAccessories').textContent   = fmt(accessoriesCost);
+  document.getElementById('rAccessories').textContent   = fmt(accessories);
   document.getElementById('rPieceSell').textContent     = fmt(pieceSell);
+}
+
+// ═══════════════ TAB 2: ASSEMBLY APPLIANCES ═══════════════
+let aCores = 2;
+let aCurrentAppliance = 'kettle';
+let aAssemblyRatePerCore = 1;
+let solderType = 'non';
+
+const APPLIANCES = {
+  kettle:    { strands:16, dia:0.202, cores:2, od:6.0,  plugShow:['2pin'],        plugDefault:'2pin',  plugCost:7.5,  assemblyRate:1,   label:'Kettle — Ghundi ₹1/core' },
+  eggboiler: { strands:16, dia:0.202, cores:2, od:6.0,  plugShow:['2pin'],        plugDefault:'2pin',  plugCost:7.5,  assemblyRate:1.5, label:'Egg Boiler — Glass sleeve ₹1.5/core' },
+  induction: { strands:24, dia:0.202, cores:2, od:6.5,  plugShow:['3pin','16amp'],plugDefault:'3pin',  plugCost:10,   assemblyRate:2,   label:'Induction — Terminal ₹2/core' },
+  immersion: { strands:24, dia:0.202, cores:2, od:6.5,  plugShow:['2pin'],        plugDefault:'2pin',  plugCost:7.5,  assemblyRate:1,   label:'Immersion Rod — Ghundi Non-Soldered ₹1/core' }
+};
+
+function loadAppliance(key) {
+  aCurrentAppliance = key;
+  document.querySelectorAll('.app-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('app-'+key).classList.add('active');
+
+  const a = APPLIANCES[key];
+  document.getElementById('aStrands').value    = a.strands;
+  document.getElementById('aStrandDia').value  = a.dia;
+  document.getElementById('aOd').value         = a.od;
+  document.getElementById('aCordLength').value = 1.5;
+  document.getElementById('aThimbles').value   = 1;
+  document.getElementById('aGrommets').value   = 1;
+  document.getElementById('aExtraCost').value  = 0;
+
+  // Plug buttons
+  ['2pin','3pin','16amp'].forEach(id => {
+    document.getElementById('aplug'+id).style.display = a.plugShow.includes(id) ? '' : 'none';
+    document.getElementById('aplug'+id).classList.remove('active');
+  });
+  document.getElementById('aplug'+a.plugDefault).classList.add('active');
+  document.getElementById('aPlugCost').value = a.plugCost;
+
+  // Solder toggle (immersion only)
+  document.getElementById('solderSection').style.display = key === 'immersion' ? '' : 'none';
+  if (key === 'immersion') { setSolder('non', true); } // reset to non-soldered
+
+  aAssemblyRatePerCore = a.assemblyRate;
+  aSetCore(a.cores, true);
+  document.getElementById('aAssemblyDesc').textContent = a.label;
+  document.getElementById('aAssemblyCost').value = (a.assemblyRate * a.cores).toFixed(1);
+  acalc();
+}
+
+function setSolder(type, skipCalc) {
+  solderType = type;
+  document.getElementById('solderNo').classList.toggle('active',  type === 'non');
+  document.getElementById('solderYes').classList.toggle('active', type === 'sol');
+  aAssemblyRatePerCore = type === 'sol' ? 2 : 1;
+  const desc = type === 'sol' ? 'Immersion Rod — Ghundi Soldered ₹2/core' : 'Immersion Rod — Ghundi Non-Soldered ₹1/core';
+  document.getElementById('aAssemblyDesc').textContent = desc;
+  document.getElementById('aAssemblyCost').value = (aAssemblyRatePerCore * aCores).toFixed(1);
+  if (!skipCalc) acalc();
+}
+
+function aSetPlug(id, cost) {
+  ['2pin','3pin','16amp'].forEach(p => document.getElementById('aplug'+p).classList.toggle('active', p===id));
+  document.getElementById('aPlugCost').value = cost;
+  acalc();
+}
+
+function aSetCore(n, skipCalc) {
+  aCores = n;
+  document.querySelectorAll('#aCoresRow .core-btn').forEach((b,i) => b.classList.toggle('active', i+1===n));
+  document.getElementById('aAssemblyCost').value = (aAssemblyRatePerCore * n).toFixed(1);
+  document.getElementById('arCores').textContent = n;
+  if (!skipCalc) acalc();
+}
+
+function acalc() {
+  const strands      = parseFloat(document.getElementById('aStrands').value)      || 0;
+  const dia          = parseFloat(document.getElementById('aStrandDia').value)    || 0;
+  const od           = parseFloat(document.getElementById('aOd').value)           || 0;
+  const copperRate   = parseFloat(document.getElementById('aCopperRate').value)   || 0;
+  const pvcRate      = parseFloat(document.getElementById('aPvcRate').value)      || 0;
+  const cordLength   = parseFloat(document.getElementById('aCordLength').value)   || 0;
+  const thimbles     = parseInt(document.getElementById('aThimbles').value)       || 0;
+  const grommets     = parseInt(document.getElementById('aGrommets').value)       || 0;
+  const plugCost     = parseFloat(document.getElementById('aPlugCost').value)     || 0;
+  const assemblyCost = parseFloat(document.getElementById('aAssemblyCost').value) || 0;
+  const extraCost    = parseFloat(document.getElementById('aExtraCost').value)    || 0;
+
+  const copperKg100m  = strands * dia * dia * 0.7 * aCores;
+  const pvcKg100m     = od * 0.85;
+  const copperCost100 = copperKg100m * copperRate;
+  const pvcCost100    = pvcKg100m    * pvcRate;
+  const material100   = copperCost100 + pvcCost100;
+  const per1m         = material100 / 100;
+  const conversion1m  = per1m * 0.20;
+  const per1mWithConv = per1m + conversion1m;
+  const pieceMaterial = per1mWithConv * cordLength;
+  const plugAcc       = thimbles + grommets + plugCost;
+  const pieceSell     = pieceMaterial + plugAcc + assemblyCost + extraCost;
+
+  const cl = cordLength.toFixed(1);
+  document.getElementById('alabelCordLen').textContent = cl;
+  document.querySelectorAll('.acordLenSpan').forEach(el => el.textContent = cl);
+  document.getElementById('arAssemblyRate').textContent = aAssemblyRatePerCore;
+
+  document.getElementById('awCopper').textContent      = copperKg100m.toFixed(4) + ' kg/100m';
+  document.getElementById('awPvc').textContent         = pvcKg100m.toFixed(4)    + ' kg/100m';
+  document.getElementById('arCopper').textContent      = fmt(copperCost100);
+  document.getElementById('arPvc').textContent         = fmt(pvcCost100);
+  document.getElementById('arMaterial').textContent    = fmt(material100);
+  document.getElementById('arPer1m').textContent       = fmt(per1m);
+  document.getElementById('arConversion').textContent  = fmt(conversion1m);
+  document.getElementById('arPer1mCost').textContent   = fmt(per1mWithConv);
+  document.getElementById('arPieceMaterial').textContent = fmt(pieceMaterial);
+  document.getElementById('arPlugAcc').textContent       = fmt(plugAcc);
+  document.getElementById('arAssembly').textContent      = fmt(assemblyCost);
+  document.getElementById('arExtra').textContent         = fmt(extraCost);
+  document.getElementById('arPieceSell').textContent     = fmt(pieceSell);
 }
 
 // Init
 setCableType('round');
 setCore(3);
-loadPreset({ target: document.querySelector('.preset-btn') }, '0.5_3c');
+loadPreset({ target: document.querySelector('#tab-power .preset-btn') }, '0.5_3c');
+loadAppliance('kettle');
 </script>
 
 </body>
