@@ -131,11 +131,6 @@
       <div class="card" style="margin-bottom:20px">
         <h2>Wire Configuration</h2>
 
-        <div class="toggle-row">
-          <button class="toggle-btn active" id="toggleRound" onclick="setCableType('round')">Round</button>
-          <button class="toggle-btn" id="toggleFlat" onclick="setCableType('flat')">Flat</button>
-        </div>
-
         <div class="field">
           <label>No. of Strands</label>
           <input type="number" id="strands" value="16" min="1" oninput="calc()">
@@ -309,8 +304,6 @@ function loadPreset(e, key) {
 
 function setCableType(type) {
   cableType = type;
-  document.getElementById('toggleRound').classList.toggle('active', type === 'round');
-  document.getElementById('toggleFlat').classList.toggle('active',  type === 'flat');
   document.getElementById('fieldOD').style.display    = type === 'round' ? '' : 'none';
   document.getElementById('fieldPvcKg').style.display = type === 'flat'  ? '' : 'none';
   calc();
