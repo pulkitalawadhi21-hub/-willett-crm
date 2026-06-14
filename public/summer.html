@@ -162,16 +162,16 @@ tr:last-child td { border-bottom:none; }
     <table>
       <thead><tr><th>Customer</th><th class="num">Pcs</th></tr></thead>
       <tbody>
-        <tr><td>ULC</td><td class="num">—</td></tr>
-        <tr><td>GCF</td><td class="num">—</td></tr>
-        <tr><td>INNOV</td><td class="num">—</td></tr>
-        <tr><td>CKW</td><td class="num">—</td></tr>
-        <tr><td>Sun India</td><td class="num">—</td></tr>
-        <tr><td>YSH</td><td class="num">—</td></tr>
-        <tr><td>SAI</td><td class="num">—</td></tr>
-        <tr><td>NEW</td><td class="num">—</td></tr>
-        <tr><td>ARW</td><td class="num">—</td></tr>
-        <tr><td>DSN</td><td class="num">—</td></tr>
+        <tr><td>ULC</td><td class="num">30,000</td></tr>
+        <tr><td>GCF</td><td class="num">30,000</td></tr>
+        <tr><td>INNOV</td><td class="num">30,000</td></tr>
+        <tr><td>CKW</td><td class="num">30,000</td></tr>
+        <tr><td>Sun India</td><td class="num">10,000</td></tr>
+        <tr><td>YSH</td><td class="num">20,000</td></tr>
+        <tr><td>SAI</td><td class="num">20,000</td></tr>
+        <tr><td>NEW</td><td class="num">20,000</td></tr>
+        <tr><td>ARW</td><td class="num">20,000</td></tr>
+        <tr><td>DSN</td><td class="num">10,000</td></tr>
       </tbody>
     </table>
   </div>
@@ -181,14 +181,14 @@ tr:last-child td { border-bottom:none; }
     <table>
       <thead><tr><th>Customer</th><th class="num">Pcs</th></tr></thead>
       <tbody>
-        <tr><td>DYE</td><td class="num">—</td></tr>
-        <tr><td>ARD</td><td class="num">—</td></tr>
-        <tr><td>USK</td><td class="num">—</td></tr>
-        <tr><td>PMB</td><td class="num">—</td></tr>
-        <tr><td>SAE</td><td class="num">—</td></tr>
-        <tr><td>KWW</td><td class="num">—</td></tr>
-        <tr><td>DNG</td><td class="num">—</td></tr>
-        <tr><td>KKG <span style="font-size:.72rem;color:#aaa">(Hyd / Noida / Haridwar)</span></td><td class="num">—</td></tr>
+        <tr><td>DYE</td><td class="num">1,00,000</td></tr>
+        <tr><td>ARD</td><td class="num">20,000</td></tr>
+        <tr><td>USK</td><td class="num">15,000</td></tr>
+        <tr><td>PMB</td><td class="num">10,000</td></tr>
+        <tr><td>SAE</td><td class="num">15,000</td></tr>
+        <tr><td>KWW</td><td class="num">20,000</td></tr>
+        <tr><td>DNG</td><td class="num">15,000</td></tr>
+        <tr><td>KKG <span style="font-size:.72rem;color:#aaa">(Hyd / Noida / Haridwar)</span></td><td class="num">20,000</td></tr>
       </tbody>
     </table>
   </div>
@@ -198,15 +198,15 @@ tr:last-child td { border-bottom:none; }
     <table>
       <thead><tr><th>Customer</th><th class="num">Pcs</th></tr></thead>
       <tbody>
-        <tr><td>SND</td><td class="num">—</td></tr>
-        <tr><td>BNI</td><td class="num">—</td></tr>
-        <tr><td>Rocksun</td><td class="num">—</td></tr>
-        <tr><td>YET</td><td class="num">—</td></tr>
-        <tr><td>Avion</td><td class="num">—</td></tr>
-        <tr><td>Clarion</td><td class="num">—</td></tr>
-        <tr><td>Poswal</td><td class="num">—</td></tr>
-        <tr><td>BLU</td><td class="num">—</td></tr>
-        <tr><td>Vikram</td><td class="num">—</td></tr>
+        <tr><td>SND</td><td class="num">20,000</td></tr>
+        <tr><td>BNI</td><td class="num">10,000</td></tr>
+        <tr><td>Rocksun</td><td class="num">10,000</td></tr>
+        <tr><td>YET</td><td class="num">10,000</td></tr>
+        <tr><td>Avion</td><td class="num">10,000</td></tr>
+        <tr><td>Clarion</td><td class="num">5,000</td></tr>
+        <tr><td>Poswal</td><td class="num">5,000</td></tr>
+        <tr><td>BLU</td><td class="num">5,000</td></tr>
+        <tr><td>Vikram</td><td class="num">4,000</td></tr>
       </tbody>
     </table>
   </div>
@@ -489,51 +489,51 @@ renderBrands();
 // ══════════════════════════════════════════════
 const ETAB_DEFAULTS = {
   fan_conf: [
-    { key:'dye',  name:'DYE',                     monthly:'', note:'' },
-    { key:'ard',  name:'ARD',                     monthly:'', note:'' },
-    { key:'kww',  name:'KWW',                     monthly:'', note:'' },
-    { key:'kkg',  name:'KKG (Hyd/Noida/Haridwar)',monthly:'', note:'' },
-    { key:'usk',  name:'USK',                     monthly:'''' },
-    { key:'sae',  name:'SAE',                     monthly:'''' },
-    { key:'dng',  name:'DNG',                     monthly:'''' },
-    { key:'pmb',  name:'PMB',                     monthly:'''' },
+    { key:'dye',  name:'DYE',                      monthly:'1,00,000', note:'' },
+    { key:'ard',  name:'ARD',                      monthly:'20,000',   note:'' },
+    { key:'kww',  name:'KWW',                      monthly:'20,000',   note:'' },
+    { key:'kkg',  name:'KKG (Hyd/Noida/Haridwar)', monthly:'20,000',   note:'' },
+    { key:'usk',  name:'USK',                      monthly:'15,000',   note:'' },
+    { key:'sae',  name:'SAE',                      monthly:'15,000',   note:'' },
+    { key:'dng',  name:'DNG',                      monthly:'15,000',   note:'' },
+    { key:'pmb',  name:'PMB',                      monthly:'10,000',   note:'' },
   ],
   fan_tgt: [
-    { key:'orient',   name:'Orient',       monthly:'', note:'Top priority', star:true },
-    { key:'shristhi', name:'Shristhi',     monthly:'''' },
-    { key:'bhagwati', name:'Bhagwati',     monthly:'''' },
-    { key:'sania',    name:'Sania',        monthly:'''⚠ Very low rates' },
-    { key:'wonder',   name:'Wonder',       monthly:'''' },
-    { key:'modi',     name:'Modi Fan (CCA)',monthly:'''' },
-    { key:'toofan',   name:'Toofan',       monthly:'''Cord entry — harness upside' },
+    { key:'orient',   name:'Orient',        monthly:'1,00,000', note:'Top priority', star:true },
+    { key:'shristhi', name:'Shristhi',      monthly:'50,000',   note:'' },
+    { key:'bhagwati', name:'Bhagwati',      monthly:'40,000',   note:'' },
+    { key:'sania',    name:'Sania',         monthly:'20,000',   note:'Very low rates' },
+    { key:'wonder',   name:'Wonder',        monthly:'15,000',   note:'' },
+    { key:'modi',     name:'Modi Fan (CCA)',monthly:'15,000',   note:'' },
+    { key:'toofan',   name:'Toofan',        monthly:'5,000',    note:'Cord entry' },
   ],
   cooler_conf: [
-    { key:'snd',     name:'SND',     monthly:'''' },
-    { key:'bni',     name:'BNI',     monthly:'''' },
-    { key:'rocksun', name:'Rocksun', monthly:'''' },
-    { key:'yet',     name:'YET',     monthly:'''' },
-    { key:'avion',   name:'Avion',   monthly:'''' },
-    { key:'clarion', name:'Clarion', monthly:'''' },
-    { key:'poswal',  name:'Poswal',  monthly:'''' },
-    { key:'blu',     name:'BLU',     monthly:'''' },
-    { key:'vikram',  name:'Vikram',  monthly:'''' },
+    { key:'snd',     name:'SND',     monthly:'20,000', note:'' },
+    { key:'bni',     name:'BNI',     monthly:'10,000', note:'' },
+    { key:'rocksun', name:'Rocksun', monthly:'10,000', note:'' },
+    { key:'yet',     name:'YET',     monthly:'10,000', note:'' },
+    { key:'avion',   name:'Avion',   monthly:'10,000', note:'' },
+    { key:'clarion', name:'Clarion', monthly:'5,000',  note:'' },
+    { key:'poswal',  name:'Poswal',  monthly:'5,000',  note:'' },
+    { key:'blu',     name:'BLU',     monthly:'5,000',  note:'' },
+    { key:'vikram',  name:'Vikram',  monthly:'4,000',  note:'' },
   ],
   cooler_tgt: [
-    { key:'summercool', name:'Summercool',        monthly:'''' },
-    { key:'epack_c',    name:'Epack',             monthly:'''' },
-    { key:'pg_c',       name:'PG',                monthly:'''' },
-    { key:'mppl',       name:'MPPL',              monthly:'''' },
-    { key:'aroking',    name:'Aroking',           monthly:'''⚠ Low pricing, slow entry' },
-    { key:'ekkaa',      name:'Ekkaa',             monthly:'''' },
-    { key:'mr',         name:'MR',                monthly:'''' },
-    { key:'aeromax',    name:'Aeromax',           monthly:'''' },
-    { key:'wybor_c',    name:'Wybor',             monthly:'''' },
-    { key:'speedo',     name:'Speedo',            monthly:'''' },
-    { key:'novamax',    name:'Novamax',           monthly:'''' },
-    { key:'raj',        name:'Raj',               monthly:'''⚠ Slow payment' },
-    { key:'supreme',    name:'Supreme Industries',monthly:'''' },
-    { key:'vijay',      name:'Vijay Cooler',      monthly:'''' },
-    { key:'skyzen',     name:'Skyzen',            monthly:'''' },
+    { key:'summercool', name:'Summercool',         monthly:'20,000', note:'' },
+    { key:'epack_c',    name:'Epack',              monthly:'20,000', note:'' },
+    { key:'pg_c',       name:'PG',                 monthly:'20,000', note:'' },
+    { key:'mppl',       name:'MPPL',               monthly:'15,000', note:'' },
+    { key:'aroking',    name:'Aroking',            monthly:'15,000', note:'Low pricing, slow entry' },
+    { key:'ekkaa',      name:'Ekkaa',              monthly:'15,000', note:'' },
+    { key:'mr',         name:'MR',                 monthly:'15,000', note:'' },
+    { key:'aeromax',    name:'Aeromax',            monthly:'10,000', note:'' },
+    { key:'wybor_c',    name:'Wybor',              monthly:'10,000', note:'' },
+    { key:'speedo',     name:'Speedo',             monthly:'10,000', note:'' },
+    { key:'novamax',    name:'Novamax',            monthly:'10,000', note:'' },
+    { key:'raj',        name:'Raj',                monthly:'10,000', note:'Slow payment' },
+    { key:'supreme',    name:'Supreme Industries', monthly:'10,000', note:'' },
+    { key:'vijay',      name:'Vijay Cooler',       monthly:'5,000',  note:'' },
+    { key:'skyzen',     name:'Skyzen',             monthly:'5,000',  note:'' },
   ],
   ac_conf:  [],
   ac_oem: [
@@ -559,10 +559,10 @@ const ETAB_DEFAULTS = {
   washing_tgt:  [],
   fridge_conf:  [],
   fridge_tgt: [
-    { key:'rockwell',   name:'Rockwell',   monthly:'''Higher ticket size — priority', star:true },
-    { key:'frigoglass', name:'Frigoglass', monthly:'''Higher ticket size — priority', star:true },
-    { key:'westan',     name:'Westan',     monthly:'''' },
-    { key:'bluestar_f', name:'Blue Star',  monthly:'''' },
+    { key:'rockwell',   name:'Rockwell',   monthly:'6,000',  note:'Higher ticket size — priority', star:true },
+    { key:'frigoglass', name:'Frigoglass', monthly:'6,000',  note:'Higher ticket size — priority', star:true },
+    { key:'westan',     name:'Westan',     monthly:'15,000', note:'' },
+    { key:'bluestar_f', name:'Blue Star',  monthly:'15,000', note:'' },
   ],
   water_conf: [],
   water_tgt:  [
