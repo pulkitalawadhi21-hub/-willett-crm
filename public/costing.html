@@ -302,12 +302,12 @@
         <div class="field">
           <label>No. of Cores</label>
           <div class="cores-row" id="aCoresRow">
-            <button class="core-btn" onclick="aSetCore(1)">1C</button>
-            <button class="core-btn active" onclick="aSetCore(2)">2C</button>
-            <button class="core-btn" onclick="aSetCore(3)">3C</button>
+            <button class="core-btn" data-val="1" onclick="aSetCore(1)">1C</button>
+            <button class="core-btn active" data-val="2" onclick="aSetCore(2)">2C</button>
+            <button class="core-btn" data-val="3" onclick="aSetCore(3)">3C</button>
           </div>
-          <input type="number" id="aCoresInput" value="2" min="1" max="20" step="1" oninput="aSetCoreFromInput(this.value)" style="margin-top:6px;">
-          <div class="hint">Type any core count for cap auto-calc</div>
+          <input type="number" id="aCoresInput" value="2" min="0.5" max="20" step="0.5" oninput="aSetCoreFromInput(this.value)" style="margin-top:6px;">
+          <div class="hint">2.5C = earth at half strands</div>
         </div>
         <div class="field">
           <label>Cable OD (mm)</label>
@@ -537,7 +537,7 @@ const APPLIANCES = {
   kettle:    { strands:16, dia:0.202, cores:3, od:6.0, cordLen:1.0, grommets:0, plugShow:['3pin'],         plugDefault:'3pin',  plugCost:10, assemblyRate:1,            label:'Kettle — Thimble + HST ₹1/core × 3C = ₹3' },
   eggboiler: { strands:16, dia:0.202, cores:3, od:6.0, cordLen:1.5, grommets:0, plugShow:['3pin'],         plugDefault:'3pin',  plugCost:10, assemblyFlat:7.5,          label:'Egg Boiler — Thimble ₹4 + Caps ₹1 + Glass Sleeve ₹2.50 = ₹7.50' },
   induction: { strands:24, dia:0.202, cores:2, od:6.5, cordLen:1.5, grommets:0, plugShow:['3pin','16amp'], plugDefault:'3pin',  plugCost:10, assemblyRate:2.25,         label:'Induction — Thimble + Assembly ₹2.25/core' },
-  immersion: { strands:24, dia:0.202, cores:3, od:6.5, cordLen:1.5, grommets:1, plugShow:['3pin','16amp'], plugDefault:'3pin',  plugCost:10, assemblyFlat:4,            label:'Immersion Rod — Ghundi Soldered ₹4 total' }
+  immersion: { strands:24, dia:0.202, cores:3, od:6.5, cordLen:1.5, grommets:0, plugShow:['3pin','16amp'], plugDefault:'3pin',  plugCost:10, assemblyFlat:4,            label:'Immersion Rod — Ghundi Soldered ₹4 total' }
 };
 
 function loadAppliance(key) {
@@ -563,6 +563,18 @@ function loadAppliance(key) {
   });
   document.getElementById('aplug'+a.plugDefault).classList.add('active');
   document.getElementById('aPlugCost').value = a.plugCost;
+
+  // Core buttons — immersion gets 2.5C / 3C only
+  if (key === 'immersion') {
+    document.getElementById('aCoresRow').innerHTML =
+      `<button class="core-btn" data-val="2.5" onclick="aSetCore(2.5)">2.5C</button>
+       <button class="core-btn" data-val="3"   onclick="aSetCore(3)">3C</button>`;
+  } else {
+    document.getElementById('aCoresRow').innerHTML =
+      `<button class="core-btn" data-val="1" onclick="aSetCore(1)">1C</button>
+       <button class="core-btn" data-val="2" onclick="aSetCore(2)">2C</button>
+       <button class="core-btn" data-val="3" onclick="aSetCore(3)">3C</button>`;
+  }
 
   // Immersion options
   document.getElementById('immersionSection').style.display = key === 'immersion' ? '' : 'none';
@@ -603,16 +615,16 @@ function aSetPlug(id, cost) {
 
 function aSetCore(n, skipCalc) {
   aCores = n;
-  document.querySelectorAll('#aCoresRow .core-btn').forEach((b,i) => b.classList.toggle('active', i+1===n));
+  document.querySelectorAll('#aCoresRow .core-btn').forEach(b => b.classList.toggle('active', parseFloat(b.dataset.val) === n));
   document.getElementById('aCoresInput').value = n;
   document.getElementById('aAssemblyCost').value = (aAssemblyRatePerCore * n).toFixed(1);
   if (!skipCalc) acalc();
 }
 
 function aSetCoreFromInput(val) {
-  const n = Math.max(1, parseInt(val) || 1);
+  const n = Math.max(0.5, parseFloat(val) || 1);
   aCores = n;
-  document.querySelectorAll('#aCoresRow .core-btn').forEach((b,i) => b.classList.toggle('active', i+1===n));
+  document.querySelectorAll('#aCoresRow .core-btn').forEach(b => b.classList.toggle('active', parseFloat(b.dataset.val) === n));
   document.getElementById('aAssemblyCost').value = (aAssemblyRatePerCore * n).toFixed(1);
   acalc();
 }
