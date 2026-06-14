@@ -146,7 +146,7 @@ tr:last-child td { border-bottom:none; }
   <button class="app-tab" onclick="showTab('fridge')">Fridge</button>
   <button class="app-tab" onclick="showTab('water')">Water Dispenser</button>
   <button class="app-tab" onclick="showTab('tools')">Tools</button>
-  <button class="app-tab" onclick="showTab('inverter')">Transformer / Inverter</button>
+  <button class="app-tab" onclick="showTab('inverter')">Transformer / Stabiliser</button>
 </div>
 
 <!-- ═══════════════ OVERVIEW ═══════════════ -->
@@ -440,11 +440,26 @@ tr:last-child td { border-bottom:none; }
 </div>
 </div>
 
-<!-- ═══════════════ INVERTER / TRANSFORMER ═══════════════ -->
+<!-- ═══════════════ INVERTER / TRANSFORMER / STABILISER ═══════════════ -->
 <div id="tab-inverter" class="tab-panel">
 <div class="content">
   <div class="sec-label confirmed">Confirmed</div>
-  <div class="empty">No confirmed inverter/transformer customers yet</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Customer</th><th>Location</th><th class="num">Monthly</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Manjeet</strong></td><td>Bahadurgarh</td><td class="num tbd">TBD</td><td class="note"></td></tr>
+        <tr><td><strong>Helios</strong></td><td>—</td><td class="num tbd">TBD</td><td class="note"></td></tr>
+        <tr><td><strong>Kundi</strong></td><td>—</td><td class="num tbd">TBD</td><td class="note"></td></tr>
+        <tr><td><strong>Keeline</strong></td><td>Hyderabad</td><td class="num tbd">TBD</td><td class="note"></td></tr>
+        <tr><td><strong>Cari</strong></td><td>Hyderabad</td><td class="num tbd">TBD</td><td class="note"></td></tr>
+        <tr><td><strong>Tecnia</strong></td><td>Karnataka</td><td class="num tbd">TBD</td><td class="note"></td></tr>
+        <tr><td><strong>Donut</strong></td><td>—</td><td class="num tbd">TBD</td><td class="note"></td></tr>
+        <tr><td><strong>Dheeraj Ji</strong></td><td>Bhalswa, Delhi</td><td class="num tbd">TBD</td><td class="note"></td></tr>
+        <tr><td><strong>Bluebird Stabiliser</strong></td><td>—</td><td class="num tbd">TBD</td><td class="note">Stabiliser</td></tr>
+      </tbody>
+    </table>
+  </div>
 
   <div class="sec-label target">Targets — Year-Round</div>
   <div class="tbl-wrap">
