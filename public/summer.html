@@ -6,352 +6,520 @@
 <title>Summer Target — Willett CRM</title>
 <link rel="stylesheet" href="style.css">
 <style>
-  body { background:#f0f4f8; }
-  .page-header {
-    background: linear-gradient(135deg, #1a237e 0%, #283593 60%, #3949ab 100%);
-    color:#fff; padding:24px 32px; display:flex; align-items:center; justify-content:space-between;
-  }
-  .page-header h1 { margin:0; font-size:1.4rem; font-weight:700; letter-spacing:.5px; }
-  .page-header a { color:rgba(255,255,255,.8); font-size:.85rem; text-decoration:none; }
-  .page-header a:hover { color:#fff; }
+body { background:#f0f4f8; }
 
-  .summary-bar {
-    display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;
-    padding:20px 32px; background:#fff; border-bottom:1px solid #e0e0e0;
-  }
-  .sum-card {
-    border-radius:12px; padding:16px 20px; text-align:center;
-  }
-  .sum-card.confirmed { background:#e8f5e9; border:1.5px solid #a5d6a7; }
-  .sum-card.target    { background:#fff8e1; border:1.5px solid #ffe082; }
-  .sum-card.grand     { background:#e3f2fd; border:1.5px solid #90caf9; }
-  .sum-card .label { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:#666; margin-bottom:4px; }
-  .sum-card .amount { font-size:1.5rem; font-weight:800; }
-  .sum-card.confirmed .amount { color:#2e7d32; }
-  .sum-card.target .amount    { color:#f57f17; }
-  .sum-card.grand .amount     { color:#1565c0; }
-  .sum-card .per-day { font-size:.8rem; color:#888; margin-top:2px; }
+/* ── Header ── */
+.page-header {
+  background:linear-gradient(135deg,#1a237e,#3949ab);
+  color:#fff; padding:18px 24px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.page-header h1 { margin:0; font-size:1.25rem; font-weight:800; }
+.page-header a { color:rgba(255,255,255,.8); font-size:.83rem; text-decoration:none; }
 
-  .content { max-width:1100px; margin:0 auto; padding:24px 20px; }
+/* ── Summary bar ── */
+.sum-bar {
+  display:flex; gap:0; background:#fff;
+  border-bottom:2px solid #e0e0e0; overflow-x:auto;
+}
+.sum-item {
+  flex:1; min-width:140px; padding:12px 16px; text-align:center;
+  border-right:1px solid #f0f0f0;
+}
+.sum-item .lbl { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:#999; }
+.sum-item .val { font-size:1.1rem; font-weight:800; margin-top:2px; }
+.sum-item .val.green { color:#2e7d32; }
+.sum-item .val.orange { color:#e65100; }
+.sum-item .val.blue { color:#1565c0; }
+.sum-item .day { font-size:.72rem; color:#aaa; margin-top:1px; }
 
-  .section-header {
-    display:flex; align-items:center; gap:10px;
-    font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:1px;
-    padding:10px 16px; border-radius:8px; margin-bottom:12px; margin-top:28px;
-  }
-  .section-header.confirmed { background:#2e7d32; color:#fff; }
-  .section-header.target    { background:#e65100; color:#fff; }
-  .section-header.priority  { background:#1565c0; color:#fff; }
-  .section-header .total-badge {
-    margin-left:auto; background:rgba(255,255,255,.25);
-    padding:3px 10px; border-radius:20px; font-size:.8rem; font-weight:700;
-  }
+/* ── Appliance Tabs ── */
+.app-tabs {
+  display:flex; gap:0; background:#fff;
+  border-bottom:3px solid #e0e0e0;
+  overflow-x:auto; padding:0 8px;
+  position:sticky; top:0; z-index:100;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+.app-tab {
+  padding:11px 16px; font-size:.8rem; font-weight:700;
+  color:#888; cursor:pointer; border:none; background:none;
+  border-bottom:3px solid transparent; margin-bottom:-3px;
+  white-space:nowrap; text-transform:uppercase; letter-spacing:.4px;
+  transition:color .15s;
+}
+.app-tab:hover { color:#1a237e; }
+.app-tab.active { color:#1a237e; border-bottom-color:#1a237e; }
 
-  .cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
+/* ── Tab panels ── */
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
 
-  .block {
-    background:#fff; border-radius:12px; overflow:hidden;
-    box-shadow:0 1px 4px rgba(0,0,0,.08);
-  }
-  .block-title {
-    padding:10px 16px; font-size:.78rem; font-weight:700;
-    text-transform:uppercase; letter-spacing:.6px;
-  }
-  .block.confirmed .block-title { background:#e8f5e9; color:#1b5e20; border-bottom:1px solid #c8e6c9; }
-  .block.target    .block-title { background:#fff8e1; color:#e65100; border-bottom:1px solid #ffe082; }
+/* ── Content ── */
+.content { max-width:960px; margin:0 auto; padding:24px 16px; }
 
-  table { width:100%; border-collapse:collapse; font-size:.85rem; }
-  th { padding:7px 14px; text-align:left; font-size:.7rem; text-transform:uppercase;
-       letter-spacing:.5px; color:#888; font-weight:600; border-bottom:1px solid #f0f0f0; }
-  td { padding:8px 14px; border-bottom:1px solid #f5f5f5; }
-  tr:last-child td { border-bottom:none; }
-  .total-row td { font-weight:700; background:#fafafa; }
-  .confirmed .total-row td { color:#2e7d32; }
-  .target    .total-row td { color:#e65100; }
+/* ── Section labels ── */
+.sec-label {
+  font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:1px;
+  padding:6px 12px; border-radius:6px; margin:20px 0 10px;
+  display:inline-block;
+}
+.sec-label.confirmed { background:#e8f5e9; color:#2e7d32; }
+.sec-label.target    { background:#fff3e0; color:#e65100; }
+.sec-label.brand     { background:#e3f2fd; color:#1565c0; }
 
-  .amount-cell { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
-  .tbd { color:#aaa; font-style:italic; font-size:.8rem; }
+/* ── Tables ── */
+.tbl-wrap { background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.07); margin-bottom:16px; }
+table { width:100%; border-collapse:collapse; }
+th { padding:8px 14px; text-align:left; font-size:.68rem; text-transform:uppercase; letter-spacing:.5px; color:#aaa; font-weight:700; background:#fafafa; border-bottom:1px solid #f0f0f0; }
+td { padding:9px 14px; border-bottom:1px solid #f5f5f5; font-size:.87rem; }
+tr:last-child td { border-bottom:none; }
+.tot td { font-weight:800; background:#f9f9f9; }
+.tot.c td { color:#2e7d32; }
+.tot.t td { color:#e65100; }
+.num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.tbd { color:#ccc; font-style:italic; font-size:.8rem; }
+.note { font-size:.75rem; color:#aaa; }
+.note.w { color:#e53935; }
+.note.p { color:#1565c0; font-weight:600; }
+.star { color:#f9a825; margin-right:4px; }
 
-  .note-cell { font-size:.75rem; color:#888; }
-  .note-cell.warn { color:#e53935; }
-  .note-cell.prio { color:#1565c0; font-weight:600; }
+/* ── Empty state ── */
+.empty { text-align:center; padding:48px 20px; color:#ccc; font-size:.9rem; }
 
-  .priority-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; }
-  .prio-card {
-    background:#fff; border-radius:10px; padding:14px 16px;
-    box-shadow:0 1px 4px rgba(0,0,0,.08); display:flex; gap:12px; align-items:flex-start;
-  }
-  .prio-num {
-    width:28px; height:28px; border-radius:50%; background:#1a237e; color:#fff;
-    font-size:.85rem; font-weight:800; display:flex; align-items:center; justify-content:center;
-    flex-shrink:0;
-  }
-  .prio-text { font-size:.82rem; line-height:1.5; }
-  .prio-text strong { display:block; font-size:.87rem; margin-bottom:2px; }
+/* ── Priority cards ── */
+.prio-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin-top:8px; }
+.prio-card { background:#fff; border-radius:10px; padding:14px 16px; box-shadow:0 1px 4px rgba(0,0,0,.07); display:flex; gap:10px; align-items:flex-start; }
+.pnum { width:26px; height:26px; border-radius:50%; background:#1a237e; color:#fff; font-size:.8rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ptxt { font-size:.82rem; line-height:1.5; }
+.ptxt strong { display:block; }
 
-  .grand-target {
-    background: linear-gradient(135deg,#1a237e,#3949ab);
-    color:#fff; border-radius:14px; padding:22px 28px;
-    text-align:center; margin-top:28px;
-  }
-  .grand-target .label { font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; opacity:.8; margin-bottom:8px; }
-  .grand-target .amount { font-size:2.2rem; font-weight:900; }
-  .grand-target .sub { font-size:1rem; opacity:.85; margin-top:4px; }
+/* ── Grand total ── */
+.grand { background:linear-gradient(135deg,#1a237e,#3949ab); color:#fff; border-radius:14px; padding:22px; text-align:center; margin-top:28px; }
+.grand .lbl { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; opacity:.8; margin-bottom:6px; }
+.grand .val { font-size:2rem; font-weight:900; }
+.grand .sub { font-size:.95rem; opacity:.85; margin-top:4px; }
 
-  @media(max-width:600px) {
-    .summary-bar { grid-template-columns:1fr; padding:16px; }
-    .content { padding:16px 12px; }
-    .page-header { padding:16px; }
-    .page-header h1 { font-size:1.1rem; }
-  }
+/* ── Overview split ── */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media(max-width:600px) {
+  .two-col { grid-template-columns:1fr; }
+  .app-tab { padding:10px 12px; font-size:.72rem; }
+  .content { padding:16px 10px; }
+}
 </style>
 </head>
 <body>
 
 <div class="page-header">
-  <h1>Summer Target — Willett Cables</h1>
+  <h1>Summer Target 2025</h1>
   <a href="index.html">← CRM</a>
 </div>
 
 <!-- Summary Bar -->
-<div class="summary-bar">
-  <div class="sum-card confirmed">
-    <div class="label">Confirmed / Month</div>
-    <div class="amount">₹4,54,000</div>
-    <div class="per-day">₹18,160 / day</div>
+<div class="sum-bar">
+  <div class="sum-item">
+    <div class="lbl">Confirmed / Month</div>
+    <div class="val green">₹4,54,000</div>
+    <div class="day">₹18,160 / day</div>
   </div>
-  <div class="sum-card target">
-    <div class="label">Additional Target / Month</div>
-    <div class="amount">₹5,77,000+</div>
-    <div class="per-day">₹23,080+ / day (excl. AC/TBD)</div>
+  <div class="sum-item">
+    <div class="lbl">Target / Month</div>
+    <div class="val orange">₹5,77,000+</div>
+    <div class="day">Excl. AC/TBD</div>
   </div>
-  <div class="sum-card grand">
-    <div class="label">Goal if All Convert</div>
-    <div class="amount">₹10,31,000+</div>
-    <div class="per-day">₹41,240+ / day ✅</div>
+  <div class="sum-item">
+    <div class="lbl">Goal if All Convert</div>
+    <div class="val blue">₹10,31,000+</div>
+    <div class="day">₹41,240+ / day</div>
   </div>
 </div>
 
+<!-- Appliance Tabs -->
+<div class="app-tabs">
+  <button class="app-tab active" onclick="showTab('overview')">Overview</button>
+  <button class="app-tab" onclick="showTab('brands')">⭐ Big Brands</button>
+  <button class="app-tab" onclick="showTab('fan')">Fan</button>
+  <button class="app-tab" onclick="showTab('cooler')">Cooler</button>
+  <button class="app-tab" onclick="showTab('ac')">AC</button>
+  <button class="app-tab" onclick="showTab('washing')">Washing</button>
+  <button class="app-tab" onclick="showTab('fridge')">Fridge</button>
+  <button class="app-tab" onclick="showTab('water')">Water Dispenser</button>
+  <button class="app-tab" onclick="showTab('tools')">Tools</button>
+  <button class="app-tab" onclick="showTab('inverter')">Transformer / Inverter</button>
+</div>
+
+<!-- ═══════════════ OVERVIEW ═══════════════ -->
+<div id="tab-overview" class="tab-panel active">
 <div class="content">
 
-<!-- ═══════════════════ CONFIRMED ═══════════════════ -->
-<div class="section-header confirmed">
-  Confirmed Revenue
-  <span class="total-badge">₹4,54,000 / month</span>
+  <div class="sec-label confirmed">Confirmed Base — Year Round</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Customer</th><th class="num">Monthly</th></tr></thead>
+      <tbody>
+        <tr><td>ULC</td><td class="num">₹30,000</td></tr>
+        <tr><td>GCF</td><td class="num">₹30,000</td></tr>
+        <tr><td>INNOV</td><td class="num">₹30,000</td></tr>
+        <tr><td>CKW</td><td class="num">₹30,000</td></tr>
+        <tr><td>Sun India</td><td class="num">₹10,000</td></tr>
+        <tr><td>YSH</td><td class="num">₹20,000</td></tr>
+        <tr><td>SAI</td><td class="num">₹20,000</td></tr>
+        <tr><td>NEW</td><td class="num">₹20,000</td></tr>
+        <tr><td>ARW</td><td class="num">₹20,000</td></tr>
+        <tr class="tot c"><td>Total</td><td class="num">₹1,80,000</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-label confirmed">Summer Ramp — Jan Onwards</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Customer</th><th class="num">Monthly</th></tr></thead>
+      <tbody>
+        <tr><td>DYE</td><td class="num">₹1,00,000</td></tr>
+        <tr><td>ARD</td><td class="num">₹20,000</td></tr>
+        <tr><td>USK</td><td class="num">₹15,000</td></tr>
+        <tr><td>PMB</td><td class="num">₹10,000</td></tr>
+        <tr><td>SAE</td><td class="num">₹15,000</td></tr>
+        <tr><td>KWW</td><td class="num">₹20,000</td></tr>
+        <tr><td>DNG</td><td class="num">₹15,000</td></tr>
+        <tr class="tot c"><td>Total</td><td class="num">₹1,95,000</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-label brand">Priority Order</div>
+  <div class="prio-grid">
+    <div class="prio-card"><div class="pnum">1</div><div class="ptxt"><strong>AC</strong>Amber, PG, Wybor, Epack — year-round, high ticket</div></div>
+    <div class="prio-card"><div class="pnum">2</div><div class="ptxt"><strong>Fridge</strong>Rockwell, Frigoglass first — higher ticket</div></div>
+    <div class="prio-card"><div class="pnum">3</div><div class="ptxt"><strong>Inverter / Solar</strong>Eapro via contact, then Exide, UTL</div></div>
+    <div class="prio-card"><div class="pnum">4</div><div class="ptxt"><strong>Water Dispenser</strong>Veeline</div></div>
+    <div class="prio-card"><div class="pnum">5</div><div class="ptxt"><strong>Fan</strong>Orient #1, then Bhagwati, Shristhi</div></div>
+    <div class="prio-card"><div class="pnum">6</div><div class="ptxt"><strong>Cooler Targets</strong>After fan accounts locked</div></div>
+  </div>
+
+  <div class="grand">
+    <div class="lbl">Target Total — If All Convert</div>
+    <div class="val">₹10,31,000+ / month</div>
+    <div class="sub">₹41,240+ / day ✅</div>
+  </div>
+
+</div>
 </div>
 
-<div class="cards-grid">
+<!-- ═══════════════ BIG BRANDS ═══════════════ -->
+<div id="tab-brands" class="tab-panel">
+<div class="content">
 
-  <!-- Confirmed Base -->
-  <div class="block confirmed">
-    <div class="block-title">Base — Year Round</div>
+  <div style="font-size:.78rem;color:#888;margin-bottom:16px;padding:10px 14px;background:#fff;border-radius:8px;border-left:3px solid #1a237e;">
+    Combined view of high-value brand targets across all categories. Update Reference / Office / Action as things progress.
+  </div>
+
+  <div class="tbl-wrap">
     <table>
-      <thead><tr><th>Customer</th><th class="amount-cell">Monthly</th></tr></thead>
+      <thead>
+        <tr>
+          <th>Brand</th>
+          <th>Segment</th>
+          <th style="text-align:center">Reference?</th>
+          <th style="text-align:center">Office?</th>
+          <th>Action</th>
+        </tr>
+      </thead>
       <tbody>
-        <tr><td>ULC</td><td class="amount-cell">₹30,000</td></tr>
-        <tr><td>GCF</td><td class="amount-cell">₹30,000</td></tr>
-        <tr><td>INNOV</td><td class="amount-cell">₹30,000</td></tr>
-        <tr><td>CKW</td><td class="amount-cell">₹30,000</td></tr>
-        <tr><td>Sun India</td><td class="amount-cell">₹10,000</td></tr>
-        <tr><td>YSH</td><td class="amount-cell">₹20,000</td></tr>
-        <tr><td>SAI</td><td class="amount-cell">₹20,000</td></tr>
-        <tr><td>NEW</td><td class="amount-cell">₹20,000</td></tr>
-        <tr><td>ARW</td><td class="amount-cell">₹20,000</td></tr>
-        <tr class="total-row"><td>Total</td><td class="amount-cell">₹1,80,000</td></tr>
+        <tr style="background:#fffde7">
+          <td><span class="star">★</span><strong>Amber</strong></td>
+          <td><span style="font-size:.75rem;background:#e3f2fd;color:#1565c0;padding:2px 7px;border-radius:10px">AC</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td class="note p">Large OEM — #1 priority. Push for sample.</td>
+        </tr>
+        <tr style="background:#fffde7">
+          <td><span class="star">★</span><strong>PG</strong></td>
+          <td><span style="font-size:.75rem;background:#e3f2fd;color:#1565c0;padding:2px 7px;border-radius:10px">AC / Cooler</span></td>
+          <td style="text-align:center"><span style="color:#2e7d32;font-weight:700">✓ Yes</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td class="note p">Reference available — should convert. Follow up.</td>
+        </tr>
+        <tr>
+          <td><strong>Whirlpool</strong></td>
+          <td><span style="font-size:.75rem;background:#fce4ec;color:#c62828;padding:2px 7px;border-radius:10px">Fridge / WM</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td class="note">Cold — identify contact</td>
+        </tr>
+        <tr>
+          <td><strong>Blue Star</strong></td>
+          <td><span style="font-size:.75rem;background:#e3f2fd;color:#1565c0;padding:2px 7px;border-radius:10px">AC / Fridge</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td class="note">Cold — identify purchase contact</td>
+        </tr>
+        <tr>
+          <td><strong>Carrier</strong></td>
+          <td><span style="font-size:.75rem;background:#e3f2fd;color:#1565c0;padding:2px 7px;border-radius:10px">AC</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td class="note">Cold — Manesar plant</td>
+        </tr>
+        <tr>
+          <td><strong>Godrej</strong></td>
+          <td><span style="font-size:.75rem;background:#fce4ec;color:#c62828;padding:2px 7px;border-radius:10px">Fridge / AC</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td class="note">Cold — find plant contact</td>
+        </tr>
+        <tr>
+          <td><strong>Symphony</strong></td>
+          <td><span style="font-size:.75rem;background:#e8f5e9;color:#1b5e20;padding:2px 7px;border-radius:10px">Cooler / AC</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td class="note">Cold — large cooler OEM</td>
+        </tr>
+        <tr>
+          <td><strong>Hitachi</strong></td>
+          <td><span style="font-size:.75rem;background:#e3f2fd;color:#1565c0;padding:2px 7px;border-radius:10px">AC</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td class="note">Cold — identify contact</td>
+        </tr>
+        <tr>
+          <td><span class="star">★</span><strong>Orient</strong></td>
+          <td><span style="font-size:.75rem;background:#f3e5f5;color:#6a1b9a;padding:2px 7px;border-radius:10px">Fan</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td class="note p">Fan #1 target — ₹1L/month potential</td>
+        </tr>
+        <tr>
+          <td><span class="star">★</span><strong>Eapro</strong></td>
+          <td><span style="font-size:.75rem;background:#fff3e0;color:#e65100;padding:2px 7px;border-radius:10px">Inverter / Solar</span></td>
+          <td style="text-align:center"><span style="color:#2e7d32;font-weight:700">✓ Yes</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td class="note p">Ex-employee contact — warm lead. Act fast.</td>
+        </tr>
+        <tr>
+          <td><strong>Frigoglass</strong></td>
+          <td><span style="font-size:.75rem;background:#fce4ec;color:#c62828;padding:2px 7px;border-radius:10px">Fridge</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td class="note p">Higher ticket — priority</td>
+        </tr>
+        <tr>
+          <td><strong>Rockwell</strong></td>
+          <td><span style="font-size:.75rem;background:#fce4ec;color:#c62828;padding:2px 7px;border-radius:10px">Fridge</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td style="text-align:center"><span style="color:#aaa">—</span></td>
+          <td class="note p">Higher ticket — priority</td>
+        </tr>
       </tbody>
     </table>
   </div>
 
-  <!-- Confirmed Summer Ramp -->
-  <div class="block confirmed">
-    <div class="block-title">Summer Ramp — Jan Onwards</div>
-    <table>
-      <thead><tr><th>Customer</th><th class="amount-cell">Monthly</th></tr></thead>
-      <tbody>
-        <tr><td>DYE</td><td class="amount-cell">₹1,00,000</td></tr>
-        <tr><td>ARD</td><td class="amount-cell">₹20,000</td></tr>
-        <tr><td>USK</td><td class="amount-cell">₹15,000</td></tr>
-        <tr><td>PMB</td><td class="amount-cell">₹10,000</td></tr>
-        <tr><td>SAE</td><td class="amount-cell">₹15,000</td></tr>
-        <tr><td>KWW</td><td class="amount-cell">₹20,000</td></tr>
-        <tr><td>DNG</td><td class="amount-cell">₹15,000</td></tr>
-        <tr class="total-row"><td>Total</td><td class="amount-cell">₹1,95,000</td></tr>
-      </tbody>
-    </table>
+  <div style="font-size:.75rem;color:#bbb;text-align:center;padding:8px;">
+    ★ = High priority &nbsp;|&nbsp; Reference ✓ = warm lead with contact/intro available
   </div>
 
-  <!-- Confirmed Cooler -->
-  <div class="block confirmed">
-    <div class="block-title">Cooler — Confirmed</div>
-    <table>
-      <thead><tr><th>Customer</th><th class="amount-cell">Monthly</th></tr></thead>
-      <tbody>
-        <tr><td>BNI</td><td class="amount-cell">₹10,000</td></tr>
-        <tr><td>Clarion</td><td class="amount-cell">₹5,000</td></tr>
-        <tr><td>Rocksun</td><td class="amount-cell">₹10,000</td></tr>
-        <tr><td>YET</td><td class="amount-cell">₹10,000</td></tr>
-        <tr><td>Avion</td><td class="amount-cell">₹10,000</td></tr>
-        <tr><td>SND</td><td class="amount-cell">₹20,000</td></tr>
-        <tr><td>Poswal</td><td class="amount-cell">₹5,000</td></tr>
-        <tr><td>Vikram</td><td class="amount-cell">₹4,000</td></tr>
-        <tr><td>BLU</td><td class="amount-cell">₹5,000</td></tr>
-        <tr class="total-row"><td>Total</td><td class="amount-cell">₹79,000</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-</div><!-- end confirmed grid -->
-
-
-<!-- ═══════════════════ TARGETS ═══════════════════ -->
-<div class="section-header target" style="margin-top:36px;">
-  Target Pipeline
-  <span class="total-badge">₹5,77,000+ / month (excl. AC/TBD)</span>
+</div>
 </div>
 
-<div class="cards-grid">
+<!-- ═══════════════ FAN ═══════════════ -->
+<div id="tab-fan" class="tab-panel">
+<div class="content">
+  <div class="sec-label confirmed">Confirmed</div>
+  <div class="empty">No confirmed fan customers yet</div>
 
-  <!-- Target Fan -->
-  <div class="block target">
-    <div class="block-title">Fan</div>
+  <div class="sec-label target">Targets — ₹2,45,000 / month potential</div>
+  <div class="tbl-wrap">
     <table>
-      <thead><tr><th>Customer</th><th class="amount-cell">Monthly</th><th>Note</th></tr></thead>
+      <thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th></tr></thead>
       <tbody>
-        <tr><td><strong>Orient</strong></td><td class="amount-cell">₹1,00,000</td><td class="note-cell prio">Top priority</td></tr>
-        <tr><td>Bhagwati</td><td class="amount-cell">₹40,000</td><td class="note-cell"></td></tr>
-        <tr><td>Shristhi</td><td class="amount-cell">₹50,000</td><td class="note-cell"></td></tr>
-        <tr><td>Wonder</td><td class="amount-cell">₹15,000</td><td class="note-cell"></td></tr>
-        <tr><td>Modi Fan (CCA)</td><td class="amount-cell">₹15,000</td><td class="note-cell"></td></tr>
-        <tr><td>Toofan</td><td class="amount-cell">₹5,000</td><td class="note-cell">Cord entry — harness upside</td></tr>
-        <tr><td>Sania</td><td class="amount-cell">₹20,000</td><td class="note-cell warn">⚠ Very low rates</td></tr>
-        <tr class="total-row"><td>Total</td><td class="amount-cell">₹2,45,000</td><td></td></tr>
+        <tr><td><span class="star">★</span><strong>Orient</strong></td><td class="num">₹1,00,000</td><td class="note p">Top priority</td></tr>
+        <tr><td>Shristhi</td><td class="num">₹50,000</td><td class="note"></td></tr>
+        <tr><td>Bhagwati</td><td class="num">₹40,000</td><td class="note"></td></tr>
+        <tr><td>Sania</td><td class="num">₹20,000</td><td class="note w">⚠ Very low rates</td></tr>
+        <tr><td>Wonder</td><td class="num">₹15,000</td><td class="note"></td></tr>
+        <tr><td>Modi Fan (CCA)</td><td class="num">₹15,000</td><td class="note"></td></tr>
+        <tr><td>Toofan</td><td class="num">₹5,000</td><td class="note">Cord entry — harness upside</td></tr>
+        <tr class="tot t"><td>Total</td><td class="num">₹2,45,000</td><td></td></tr>
       </tbody>
     </table>
-  </div>
-
-  <!-- Target Cooler -->
-  <div class="block target">
-    <div class="block-title">Cooler</div>
-    <table>
-      <thead><tr><th>Customer</th><th class="amount-cell">Monthly</th><th>Note</th></tr></thead>
-      <tbody>
-        <tr><td>Summercool</td><td class="amount-cell">₹20,000</td><td class="note-cell"></td></tr>
-        <tr><td>Aeromax</td><td class="amount-cell">₹10,000</td><td class="note-cell"></td></tr>
-        <tr><td>Wybor</td><td class="amount-cell">₹10,000</td><td class="note-cell"></td></tr>
-        <tr><td>Speedo</td><td class="amount-cell">₹10,000</td><td class="note-cell"></td></tr>
-        <tr><td>Novamax</td><td class="amount-cell">₹10,000</td><td class="note-cell"></td></tr>
-        <tr><td>Epack</td><td class="amount-cell">₹20,000</td><td class="note-cell"></td></tr>
-        <tr><td>PG</td><td class="amount-cell">₹20,000</td><td class="note-cell"></td></tr>
-        <tr><td>MPPL</td><td class="amount-cell">₹15,000</td><td class="note-cell"></td></tr>
-        <tr><td>Aroking</td><td class="amount-cell">₹15,000</td><td class="note-cell warn">⚠ Low pricing, slow entry</td></tr>
-        <tr><td>Raj</td><td class="amount-cell">₹10,000</td><td class="note-cell warn">⚠ Slow payment</td></tr>
-        <tr><td>Vijay Cooler</td><td class="amount-cell">₹5,000</td><td class="note-cell"></td></tr>
-        <tr><td>Ekkaa</td><td class="amount-cell">₹15,000</td><td class="note-cell"></td></tr>
-        <tr><td>MR</td><td class="amount-cell">₹15,000</td><td class="note-cell"></td></tr>
-        <tr><td>Skyzen</td><td class="amount-cell">₹5,000</td><td class="note-cell"></td></tr>
-        <tr><td>Supreme Industries</td><td class="amount-cell">₹10,000</td><td class="note-cell"></td></tr>
-        <tr class="total-row"><td>Total</td><td class="amount-cell">₹1,90,000</td><td></td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Target Fridge -->
-  <div class="block target">
-    <div class="block-title">Fridge / Refrigerator</div>
-    <table>
-      <thead><tr><th>Customer</th><th class="amount-cell">Monthly</th><th>Note</th></tr></thead>
-      <tbody>
-        <tr><td><strong>Rockwell</strong></td><td class="amount-cell">₹6,000</td><td class="note-cell prio">Higher ticket — priority</td></tr>
-        <tr><td>Westan</td><td class="amount-cell">₹15,000</td><td class="note-cell"></td></tr>
-        <tr><td>Blue Star</td><td class="amount-cell">₹15,000</td><td class="note-cell"></td></tr>
-        <tr><td><strong>Frigoglass</strong></td><td class="amount-cell">₹6,000</td><td class="note-cell prio">Higher ticket — priority</td></tr>
-        <tr class="total-row"><td>Total</td><td class="amount-cell">₹42,000</td><td></td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Target AC -->
-  <div class="block target">
-    <div class="block-title">AC — #1 Priority (Year-Round)</div>
-    <table>
-      <thead><tr><th>Customer</th><th class="amount-cell">Monthly</th><th>Note</th></tr></thead>
-      <tbody>
-        <tr><td><strong>Amber</strong></td><td class="amount-cell tbd">TBD</td><td class="note-cell prio">Large OEM — #1 priority</td></tr>
-        <tr><td>PG</td><td class="amount-cell tbd">TBD</td><td class="note-cell"></td></tr>
-        <tr><td>Wybor</td><td class="amount-cell tbd">TBD</td><td class="note-cell"></td></tr>
-        <tr><td>Epack</td><td class="amount-cell tbd">TBD</td><td class="note-cell"></td></tr>
-        <tr class="total-row"><td>Total</td><td class="amount-cell tbd">TBD — Year-round</td><td></td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Target Water Dispenser -->
-  <div class="block target">
-    <div class="block-title">Water Dispenser</div>
-    <table>
-      <thead><tr><th>Customer</th><th class="amount-cell">Monthly</th></tr></thead>
-      <tbody>
-        <tr><td>Veeline</td><td class="amount-cell tbd">TBD</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Target Inverter/Solar -->
-  <div class="block target">
-    <div class="block-title">Inverter / Solar / Transformer</div>
-    <table>
-      <thead><tr><th>Customer</th><th class="amount-cell">Monthly</th><th>Note</th></tr></thead>
-      <tbody>
-        <tr><td>Exide Industries</td><td class="amount-cell tbd">TBD</td><td class="note-cell">Year-round, cold lead</td></tr>
-        <tr><td>UTL</td><td class="amount-cell tbd">TBD</td><td class="note-cell">Year-round, cold lead</td></tr>
-        <tr><td>Eapro</td><td class="amount-cell tbd">TBD</td><td class="note-cell prio">Ex-employee contact available</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-</div><!-- end target grid -->
-
-
-<!-- ═══════════════════ PRIORITY ORDER ═══════════════════ -->
-<div class="section-header priority" style="margin-top:36px;">
-  Priority Order
-</div>
-
-<div class="priority-grid">
-  <div class="prio-card">
-    <div class="prio-num">1</div>
-    <div class="prio-text"><strong>AC</strong>Amber, PG, Wybor, Epack — year-round, high ticket</div>
-  </div>
-  <div class="prio-card">
-    <div class="prio-num">2</div>
-    <div class="prio-text"><strong>Fridge</strong>Rockwell, Frigoglass first — higher ticket size</div>
-  </div>
-  <div class="prio-card">
-    <div class="prio-num">3</div>
-    <div class="prio-text"><strong>Inverter / Solar</strong>Eapro via contact, then Exide, UTL</div>
-  </div>
-  <div class="prio-card">
-    <div class="prio-num">4</div>
-    <div class="prio-text"><strong>Water Dispenser</strong>Veeline</div>
-  </div>
-  <div class="prio-card">
-    <div class="prio-num">5</div>
-    <div class="prio-text"><strong>Fan</strong>Orient #1, then Bhagwati, Shristhi</div>
-  </div>
-  <div class="prio-card">
-    <div class="prio-num">6</div>
-    <div class="prio-text"><strong>Cooler Targets</strong>After fan accounts locked in</div>
   </div>
 </div>
-
-<!-- Grand Target -->
-<div class="grand-target">
-  <div class="label">Target Total — If All Convert</div>
-  <div class="amount">₹10,31,000+ / month</div>
-  <div class="sub">₹41,240+ / day &nbsp;✅</div>
 </div>
 
-</div><!-- end content -->
+<!-- ═══════════════ COOLER ═══════════════ -->
+<div id="tab-cooler" class="tab-panel">
+<div class="content">
+  <div class="sec-label confirmed">Confirmed — ₹79,000 / month</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Customer</th><th class="num">Monthly</th></tr></thead>
+      <tbody>
+        <tr><td>SND</td><td class="num">₹20,000</td></tr>
+        <tr><td>BNI</td><td class="num">₹10,000</td></tr>
+        <tr><td>Rocksun</td><td class="num">₹10,000</td></tr>
+        <tr><td>YET</td><td class="num">₹10,000</td></tr>
+        <tr><td>Avion</td><td class="num">₹10,000</td></tr>
+        <tr><td>Clarion</td><td class="num">₹5,000</td></tr>
+        <tr><td>Poswal</td><td class="num">₹5,000</td></tr>
+        <tr><td>BLU</td><td class="num">₹5,000</td></tr>
+        <tr><td>Vikram</td><td class="num">₹4,000</td></tr>
+        <tr class="tot c"><td>Total</td><td class="num">₹79,000</td></tr>
+      </tbody>
+    </table>
+  </div>
 
+  <div class="sec-label target">Targets — ₹1,90,000 / month potential</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Summercool</td><td class="num">₹20,000</td><td class="note"></td></tr>
+        <tr><td>Epack</td><td class="num">₹20,000</td><td class="note"></td></tr>
+        <tr><td>PG</td><td class="num">₹20,000</td><td class="note"></td></tr>
+        <tr><td>MPPL</td><td class="num">₹15,000</td><td class="note"></td></tr>
+        <tr><td>Aroking</td><td class="num">₹15,000</td><td class="note w">⚠ Low pricing, slow entry</td></tr>
+        <tr><td>Ekkaa</td><td class="num">₹15,000</td><td class="note"></td></tr>
+        <tr><td>MR</td><td class="num">₹15,000</td><td class="note"></td></tr>
+        <tr><td>Aeromax</td><td class="num">₹10,000</td><td class="note"></td></tr>
+        <tr><td>Wybor</td><td class="num">₹10,000</td><td class="note"></td></tr>
+        <tr><td>Speedo</td><td class="num">₹10,000</td><td class="note"></td></tr>
+        <tr><td>Novamax</td><td class="num">₹10,000</td><td class="note"></td></tr>
+        <tr><td>Raj</td><td class="num">₹10,000</td><td class="note w">⚠ Slow payment</td></tr>
+        <tr><td>Supreme Industries</td><td class="num">₹10,000</td><td class="note"></td></tr>
+        <tr><td>Vijay Cooler</td><td class="num">₹5,000</td><td class="note"></td></tr>
+        <tr><td>Skyzen</td><td class="num">₹5,000</td><td class="note"></td></tr>
+        <tr class="tot t"><td>Total</td><td class="num">₹1,90,000</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════ AC ═══════════════ -->
+<div id="tab-ac" class="tab-panel">
+<div class="content">
+  <div class="sec-label confirmed">Confirmed</div>
+  <div class="empty">No confirmed AC customers yet — this is the #1 target category</div>
+
+  <div class="sec-label target">Target OEMs — High Priority (Year-Round)</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Customer</th><th class="num">Est. Monthly</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td><span class="star">★</span><strong>Amber</strong></td><td class="num tbd">TBD</td><td class="note p">Large OEM — #1 priority</td></tr>
+        <tr><td><span class="star">★</span><strong>PG</strong></td><td class="num tbd">TBD</td><td class="note p">Reference available — should convert</td></tr>
+        <tr><td>Wybor</td><td class="num tbd">TBD</td><td class="note"></td></tr>
+        <tr><td>Epack</td><td class="num tbd">TBD</td><td class="note"></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-label brand">Big Brand Pipeline</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Brand</th><th class="num">Est. Monthly</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Whirlpool</td><td class="num tbd">TBD</td><td class="note"></td></tr>
+        <tr><td>Blue Star</td><td class="num tbd">TBD</td><td class="note"></td></tr>
+        <tr><td>Carrier</td><td class="num tbd">TBD</td><td class="note"></td></tr>
+        <tr><td>Godrej</td><td class="num tbd">TBD</td><td class="note"></td></tr>
+        <tr><td>Symphony</td><td class="num tbd">TBD</td><td class="note"></td></tr>
+        <tr><td>Hitachi</td><td class="num tbd">TBD</td><td class="note"></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════ WASHING ═══════════════ -->
+<div id="tab-washing" class="tab-panel">
+<div class="content">
+  <div class="empty" style="padding-top:80px;">
+    No targets added yet for Washing Machine.<br>
+    <span style="font-size:.8rem;color:#ddd;">Add customers here as pipeline develops.</span>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════ FRIDGE ═══════════════ -->
+<div id="tab-fridge" class="tab-panel">
+<div class="content">
+  <div class="sec-label confirmed">Confirmed</div>
+  <div class="empty">No confirmed fridge customers yet</div>
+
+  <div class="sec-label target">Targets — ₹42,000 / month potential</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td><span class="star">★</span><strong>Rockwell</strong></td><td class="num">₹6,000</td><td class="note p">Higher ticket size — priority</td></tr>
+        <tr><td><span class="star">★</span><strong>Frigoglass</strong></td><td class="num">₹6,000</td><td class="note p">Higher ticket size — priority</td></tr>
+        <tr><td>Westan</td><td class="num">₹15,000</td><td class="note"></td></tr>
+        <tr><td>Blue Star</td><td class="num">₹15,000</td><td class="note"></td></tr>
+        <tr class="tot t"><td>Total</td><td class="num">₹42,000</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════ WATER DISPENSER ═══════════════ -->
+<div id="tab-water" class="tab-panel">
+<div class="content">
+  <div class="sec-label confirmed">Confirmed</div>
+  <div class="empty">No confirmed water dispenser customers yet</div>
+
+  <div class="sec-label target">Targets</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Veeline</td><td class="num tbd">TBD</td><td class="note"></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════ TOOLS ═══════════════ -->
+<div id="tab-tools" class="tab-panel">
+<div class="content">
+  <div class="empty" style="padding-top:80px;">
+    No targets added yet for Tools.<br>
+    <span style="font-size:.8rem;color:#ddd;">Add customers here as pipeline develops.</span>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════ INVERTER / TRANSFORMER ═══════════════ -->
+<div id="tab-inverter" class="tab-panel">
+<div class="content">
+  <div class="sec-label confirmed">Confirmed</div>
+  <div class="empty">No confirmed inverter/transformer customers yet</div>
+
+  <div class="sec-label target">Targets — Year-Round</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Customer</th><th class="num">Monthly</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td><span class="star">★</span><strong>Eapro</strong></td><td class="num tbd">TBD</td><td class="note p">Ex-employee contact available</td></tr>
+        <tr><td>Exide Industries</td><td class="num tbd">TBD</td><td class="note">Year-round, cold lead</td></tr>
+        <tr><td>UTL</td><td class="num tbd">TBD</td><td class="note">Year-round, cold lead</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.app-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
 </body>
 </html>
