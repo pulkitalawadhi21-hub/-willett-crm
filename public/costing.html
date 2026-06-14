@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Willett — Cable Costing Calculator</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100vh; }
+
+  header {
+    background: #1a237e; color: #fff;
+    padding: 18px 32px; display: flex; align-items: center; gap: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  }
+  header h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: .5px; }
+  header span { font-size: .85rem; opacity: .7; margin-left: auto; }
+
+  .container { max-width: 960px; margin: 28px auto; padding: 0 16px; }
+
+  /* Preset buttons */
+  .presets { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+  .preset-btn {
+    background: #fff; border: 2px solid #c5cae9; border-radius: 8px;
+    padding: 8px 18px; cursor: pointer; font-size: .85rem; font-weight: 600;
+    color: #3949ab; transition: all .15s;
+  }
+  .preset-btn:hover, .preset-btn.active { background: #3949ab; color: #fff; border-color: #3949ab; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media(max-width:680px) { .grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: #fff; border-radius: 12px; padding: 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  }
+  .card h2 {
+    font-size: .7rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    color: #9fa8da; margin-bottom: 18px;
+  }
+
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: .78rem; font-weight: 600; color: #555; margin-bottom: 5px; }
+  .field input, .field select {
+    width: 100%; padding: 9px 12px; border: 1.5px solid #e0e0e0;
+    border-radius: 7px; font-size: .95rem; color: #222;
+    transition: border-color .15s;
+  }
+  .field input:focus, .field select:focus { outline: none; border-color: #3949ab; }
+  .field .hint { font-size: .72rem; color: #aaa; margin-top: 3px; }
+
+  .cores-row { display: flex; gap: 10px; }
+  .core-btn {
+    flex: 1; padding: 8px; border: 2px solid #e0e0e0; border-radius: 7px;
+    background: #fff; cursor: pointer; font-size: .9rem; font-weight: 700;
+    color: #555; transition: all .15s; text-align: center;
+  }
+  .core-btn.active { border-color: #3949ab; background: #e8eaf6; color: #3949ab; }
+
+  /* Breakdown */
+  .breakdown { display: flex; flex-direction: column; gap: 0; }
+  .line {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid #f5f5f5; font-size: .9rem;
+  }
+  .line:last-child { border-bottom: none; }
+  .line .label { color: #666; }
+  .line .val { font-weight: 600; color: #222; font-variant-numeric: tabular-nums; }
+  .line.sub { padding: 6px 0; }
+  .line.sub .label { color: #aaa; font-size: .82rem; padding-left: 10px; }
+  .line.sub .val { color: #aaa; font-size: .82rem; }
+  .line.total { padding-top: 14px; border-top: 2px solid #e8eaf6; border-bottom: none; margin-top: 4px; }
+  .line.total .label { font-weight: 700; color: #1a237e; font-size: 1rem; }
+  .line.total .val { font-weight: 800; color: #1a237e; font-size: 1.1rem; }
+  .line.selling { border-top: none; border-bottom: none; }
+  .line.selling .label { font-weight: 700; color: #2e7d32; font-size: 1rem; }
+  .line.selling .val { font-weight: 800; color: #2e7d32; font-size: 1.15rem; }
+
+  .per-m {
+    margin-top: 16px; background: #e8f5e9; border-radius: 8px;
+    padding: 12px 16px; display: flex; justify-content: space-between;
+  }
+  .per-m span:first-child { font-size: .82rem; font-weight: 600; color: #388e3c; }
+  .per-m span:last-child { font-weight: 800; color: #2e7d32; font-size: 1rem; }
+
+  .divider { border: none; border-top: 2px dashed #e8eaf6; margin: 12px 0; }
+
+  .margin-row { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+  .margin-row label { font-size: .82rem; font-weight: 600; color: #555; white-space: nowrap; }
+  .margin-row input { width: 80px; padding: 7px 10px; border: 1.5px solid #e0e0e0; border-radius: 7px; font-size: .9rem; }
+
+  .weight-row { background: #f3f4ff; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: .82rem; color: #3949ab; font-weight: 600; }
+  .weight-row span { color: #555; font-weight: 400; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Willett Cables &mdash; Costing Calculator</h1>
+  </div>
+  <span>Power Cord Costing</span>
+</header>
+
+<div class="container">
+
+  <!-- Presets -->
+  <div class="presets">
+    <button class="preset-btn active" onclick="loadPreset('0.5_3c')">0.5mm 3C Round</button>
+    <button class="preset-btn" onclick="loadPreset('0.5_2c')">0.5mm 2C Flat</button>
+    <button class="preset-btn" onclick="loadPreset('0.75_2c')">0.75mm 2C Round</button>
+    <button class="preset-btn" onclick="loadPreset('0.75_3c')">0.75mm 3C Round</button>
+    <button class="preset-btn" onclick="loadPreset('custom')">Custom</button>
+  </div>
+
+  <div class="grid">
+
+    <!-- LEFT: Inputs -->
+    <div>
+
+      <div class="card" style="margin-bottom:20px">
+        <h2>Wire Configuration</h2>
+
+        <div class="field">
+          <label>No. of Strands</label>
+          <input type="number" id="strands" value="16" min="1" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Strand Diameter (mm)</label>
+          <input type="number" id="strandDia" value="0.202" step="0.001" min="0.01" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>No. of Cores</label>
+          <div class="cores-row">
+            <button class="core-btn" onclick="setCore(1)">1C</button>
+            <button class="core-btn active" onclick="setCore(2)">2C</button>
+            <button class="core-btn" onclick="setCore(3)">3C</button>
+            <button class="core-btn" onclick="setCore(4)">4C</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Cable OD (mm)</label>
+          <input type="number" id="od" value="6.0" step="0.1" min="1" oninput="calc()">
+          <div class="hint">Outer diameter of finished cable</div>
+        </div>
+        <div class="field">
+          <label>Length (metres)</label>
+          <input type="number" id="length" value="1.5" step="0.5" min="0.1" oninput="calc()">
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px">
+        <h2>Rates</h2>
+        <div class="field">
+          <label>Copper Rate (₹/kg)</label>
+          <input type="number" id="copperRate" value="850" min="1" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>PVC Rate (₹/kg) &mdash; GP57+RP</label>
+          <input type="number" id="pvcRate" value="70" min="1" oninput="calc()">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Accessories</h2>
+        <div class="field">
+          <label>No. of Thimbles</label>
+          <input type="number" id="thimbles" value="1" min="0" max="10" oninput="calc()">
+          <div class="hint">₹1 per thimble</div>
+        </div>
+        <div class="field">
+          <label>No. of Grommets</label>
+          <input type="number" id="grommets" value="1" min="0" max="10" oninput="calc()">
+          <div class="hint">₹1 per grommet</div>
+        </div>
+        <div class="field">
+          <label>Moulding Plug</label>
+          <input type="number" id="plugCost" value="10" min="0" oninput="calc()">
+          <div class="hint">₹ per piece (standard ₹10)</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Breakdown -->
+    <div class="card" style="height: fit-content; position: sticky; top: 20px;">
+      <h2>Cost Breakdown</h2>
+
+      <div class="weight-row" id="weightInfo">
+        Copper: <span id="wCopper">—</span> kg &nbsp;|&nbsp; PVC: <span id="wPvc">—</span> kg
+      </div>
+
+      <div class="breakdown">
+        <div class="line">
+          <span class="label">Copper Cost</span>
+          <span class="val" id="rCopper">₹ —</span>
+        </div>
+        <div class="line">
+          <span class="label">PVC Cost</span>
+          <span class="val" id="rPvc">₹ —</span>
+        </div>
+        <div class="line" style="padding-top:4px; border-top:1px solid #e8eaf6;">
+          <span class="label" style="font-weight:600; color:#333;">Material Cost</span>
+          <span class="val" id="rMaterial">₹ —</span>
+        </div>
+        <div class="line sub">
+          <span class="label">Conversion (20%)</span>
+          <span class="val" id="rConversion">₹ —</span>
+        </div>
+
+        <hr class="divider">
+
+        <div class="line sub">
+          <span class="label">Moulding Plug</span>
+          <span class="val" id="rPlug">₹ —</span>
+        </div>
+        <div class="line sub">
+          <span class="label">Thimble(s)</span>
+          <span class="val" id="rThimble">₹ —</span>
+        </div>
+        <div class="line sub">
+          <span class="label">Grommet(s)</span>
+          <span class="val" id="rGrommet">₹ —</span>
+        </div>
+
+        <div class="line total">
+          <span class="label">Total Cost Price</span>
+          <span class="val" id="rTotal">₹ —</span>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:10px; padding: 14px 0 8px;">
+          <label style="font-size:.82rem; font-weight:600; color:#555; white-space:nowrap;">Margin %</label>
+          <input type="number" id="margin" value="15" min="0" max="99" step="0.5"
+            style="width:80px; padding:7px 10px; border:1.5px solid #e0e0e0; border-radius:7px; font-size:.9rem;"
+            oninput="calc()">
+          <span style="font-size:.78rem; color:#aaa;">(markup on cost)</span>
+        </div>
+
+        <div class="line selling">
+          <span class="label">Selling Price</span>
+          <span class="val" id="rSelling">₹ —</span>
+        </div>
+      </div>
+
+      <div class="per-m">
+        <span>Selling Price per metre</span>
+        <span id="rPerM">₹ —</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let cores = 2;
+
+const PRESETS = {
+  '0.5_3c':  { strands: 16, dia: 0.202, cores: 3, od: 6.0 },
+  '0.5_2c':  { strands: 16, dia: 0.202, cores: 2, od: 5.5 },
+  '0.75_2c': { strands: 24, dia: 0.202, cores: 2, od: 6.5 },
+  '0.75_3c': { strands: 24, dia: 0.202, cores: 3, od: 7.0 },
+  'custom':  null
+};
+
+function loadPreset(key) {
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  const p = PRESETS[key];
+  if (!p) return;
+  document.getElementById('strands').value  = p.strands;
+  document.getElementById('strandDia').value = p.dia;
+  document.getElementById('od').value        = p.od;
+  setCore(p.cores);
+  calc();
+}
+
+function setCore(n) {
+  cores = n;
+  document.querySelectorAll('.core-btn').forEach((b, i) => {
+    b.classList.toggle('active', i + 1 === n);
+  });
+  calc();
+}
+
+function fmt(n) {
+  return '₹ ' + n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function fmtKg(n) {
+  return n.toFixed(4) + ' kg';
+}
+
+function calc() {
+  const strands    = parseFloat(document.getElementById('strands').value)    || 0;
+  const dia        = parseFloat(document.getElementById('strandDia').value)  || 0;
+  const od         = parseFloat(document.getElementById('od').value)         || 0;
+  const length     = parseFloat(document.getElementById('length').value)     || 0;
+  const copperRate = parseFloat(document.getElementById('copperRate').value) || 0;
+  const pvcRate    = parseFloat(document.getElementById('pvcRate').value)    || 0;
+  const thimbles   = parseInt(document.getElementById('thimbles').value)     || 0;
+  const grommets   = parseInt(document.getElementById('grommets').value)     || 0;
+  const plugCost   = parseFloat(document.getElementById('plugCost').value)   || 0;
+  const margin     = parseFloat(document.getElementById('margin').value)     || 0;
+
+  // Copper weight: n × d² × 0.7 = kg/100m per core
+  const copperPer100mPerCore = strands * (dia * dia) * 0.7;
+  const copperWeight = copperPer100mPerCore * cores * (length / 100);
+
+  // PVC weight: OD × 0.85 = kg/100m
+  const pvcPer100m = od * 0.85;
+  const pvcWeight  = pvcPer100m * (length / 100);
+
+  const copperCost     = copperWeight * copperRate;
+  const pvcCost        = pvcWeight    * pvcRate;
+  const materialCost   = copperCost + pvcCost;
+  const conversionCost = materialCost * 0.20;
+  const thimbleCost    = thimbles * 1;
+  const grommetCost    = grommets * 1;
+  const totalCost      = materialCost + conversionCost + thimbleCost + grommetCost + plugCost;
+  const sellingPrice   = totalCost * (1 + margin / 100);
+  const perMetre       = length > 0 ? sellingPrice / length : 0;
+
+  document.getElementById('wCopper').textContent = copperWeight.toFixed(4) + ' kg';
+  document.getElementById('wPvc').textContent    = pvcWeight.toFixed(4)    + ' kg';
+  document.getElementById('rCopper').textContent     = fmt(copperCost);
+  document.getElementById('rPvc').textContent        = fmt(pvcCost);
+  document.getElementById('rMaterial').textContent   = fmt(materialCost);
+  document.getElementById('rConversion').textContent = fmt(conversionCost);
+  document.getElementById('rPlug').textContent       = fmt(plugCost);
+  document.getElementById('rThimble').textContent    = fmt(thimbleCost);
+  document.getElementById('rGrommet').textContent    = fmt(grommetCost);
+  document.getElementById('rTotal').textContent      = fmt(totalCost);
+  document.getElementById('rSelling').textContent    = fmt(sellingPrice);
+  document.getElementById('rPerM').textContent       = fmt(perMetre);
+}
+
+// Init
+setCore(3);
+loadPreset('0.5_3c');
+</script>
+
+</body>
+</html>
