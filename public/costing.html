@@ -255,38 +255,31 @@
     <button class="app-btn active" id="app-kettle" onclick="loadAppliance('kettle')">
       <span class="app-icon">🫖</span>
       <span class="app-name">Kettle</span>
-      <span class="app-gauge">0.5mm 2C · ₹1/core</span>
+      <span class="app-gauge">0.5mm 3C · 1m · ₹3 total</span>
     </button>
     <button class="app-btn" id="app-eggboiler" onclick="loadAppliance('eggboiler')">
       <span class="app-icon">🥚</span>
       <span class="app-name">Egg Boiler</span>
-      <span class="app-gauge">0.5mm 2C · ₹1.5/core</span>
+      <span class="app-gauge">0.5mm 3C · ₹6.50 total</span>
     </button>
     <button class="app-btn" id="app-induction" onclick="loadAppliance('induction')">
       <span class="app-icon">🔥</span>
       <span class="app-name">Induction</span>
-      <span class="app-gauge">0.75mm 2C · ₹2/core</span>
+      <span class="app-gauge">0.75mm 2C · ₹4 total</span>
     </button>
     <button class="app-btn" id="app-immersion" onclick="loadAppliance('immersion')">
       <span class="app-icon">⚡</span>
       <span class="app-name">Immersion Rod</span>
-      <span class="app-gauge">0.75mm 2C · ₹1–2/core</span>
+      <span class="app-gauge">0.75mm 3C · ₹4 Ghundi</span>
     </button>
   </div>
 
   <!-- Immersion Rod options (shown only for immersion) -->
   <div id="immersionSection" style="display:none; margin-bottom:16px;">
-    <div style="font-size:.78rem; font-weight:700; color:#555; margin-bottom:8px;">Ghundi</div>
-    <div class="solder-row" style="margin-bottom:10px">
-      <button class="solder-btn active" id="ghundiWith"    onclick="setGhundi('with')">With Ghundi</button>
+    <div style="font-size:.78rem; font-weight:700; color:#555; margin-bottom:8px;">Ghundi (Soldered)</div>
+    <div class="solder-row">
+      <button class="solder-btn active" id="ghundiWith"    onclick="setGhundi('with')">With Ghundi ₹4</button>
       <button class="solder-btn"        id="ghundiWithout" onclick="setGhundi('without')">Without Ghundi</button>
-    </div>
-    <div id="solderSection" style="display:none">
-      <div style="font-size:.78rem; font-weight:600; color:#888; margin-bottom:6px;">Ghundi Type</div>
-      <div class="solder-row">
-        <button class="solder-btn active" id="solderNo"  onclick="setSolder('non')">Non-Soldered ₹1/core</button>
-        <button class="solder-btn"        id="solderYes" onclick="setSolder('sol')">Soldered ₹2/core</button>
-      </div>
     </div>
   </div>
 
@@ -389,7 +382,7 @@
       <div class="section-label">Per Piece (<span id="alabelCordLen">1.5</span>m cord)</div>
       <div class="line sub"><span class="label">Rate/m × <span class="acordLenSpan">1.5</span>m</span><span class="val" id="arPieceMaterial">—</span></div>
       <div class="line sub"><span class="label">Plug + Thimble + Grommet</span><span class="val" id="arPlugAcc">—</span></div>
-      <div class="line sub"><span class="label">Assembly (₹<span id="arAssemblyRate">—</span>/core × <span id="arCores">2</span>C)</span><span class="val" id="arAssembly">—</span></div>
+      <div class="line sub"><span class="label" id="arAssemblyLabel">Assembly</span><span class="val" id="arAssembly">—</span></div>
       <div class="line sub"><span class="label">Extra</span><span class="val" id="arExtra">—</span></div>
       <div class="band orange"><span class="label">Selling Price / Piece</span><span class="val" id="arPieceSell">—</span></div>
     </div>
@@ -511,10 +504,10 @@ let aAssemblyRatePerCore = 1;
 let solderType = 'non';
 
 const APPLIANCES = {
-  kettle:    { strands:16, dia:0.202, cores:2, od:6.0, plugShow:['3pin'],         plugDefault:'3pin',  plugCost:10, assemblyRate:1,   label:'Kettle — Ghundi ₹1/core' },
-  eggboiler: { strands:16, dia:0.202, cores:2, od:6.0, plugShow:['3pin'],         plugDefault:'3pin',  plugCost:10, assemblyRate:1.5, label:'Egg Boiler — Glass sleeve ₹1.5/core' },
-  induction: { strands:24, dia:0.202, cores:2, od:6.5, plugShow:['3pin','16amp'], plugDefault:'3pin',  plugCost:10, assemblyRate:2,   label:'Induction — Terminal ₹2/core' },
-  immersion: { strands:24, dia:0.202, cores:2, od:6.5, plugShow:['3pin','16amp'], plugDefault:'3pin',  plugCost:10, assemblyRate:1,   label:'Immersion Rod — With Ghundi Non-Soldered ₹1/core' }
+  kettle:    { strands:16, dia:0.202, cores:3, od:6.0, cordLen:1.0, grommets:0, plugShow:['3pin'],         plugDefault:'3pin',  plugCost:10, assemblyRate:1,            label:'Kettle — ₹1/core × 3C = ₹3 total' },
+  eggboiler: { strands:16, dia:0.202, cores:3, od:6.0, cordLen:1.5, grommets:0, plugShow:['3pin'],         plugDefault:'3pin',  plugCost:10, assemblyFlat:6.5,          label:'Egg Boiler — Terminal ₹4 + Work ₹2.50 = ₹6.50' },
+  induction: { strands:24, dia:0.202, cores:2, od:6.5, cordLen:1.5, grommets:0, plugShow:['3pin','16amp'], plugDefault:'3pin',  plugCost:10, assemblyFlat:4,            label:'Induction — Thimble + Assembly ₹4 total (2C)' },
+  immersion: { strands:24, dia:0.202, cores:3, od:6.5, cordLen:1.5, grommets:1, plugShow:['3pin','16amp'], plugDefault:'3pin',  plugCost:10, assemblyFlat:4,            label:'Immersion Rod — Ghundi Soldered ₹4 total' }
 };
 
 function loadAppliance(key) {
@@ -526,9 +519,9 @@ function loadAppliance(key) {
   document.getElementById('aStrands').value    = a.strands;
   document.getElementById('aStrandDia').value  = a.dia;
   document.getElementById('aOd').value         = a.od;
-  document.getElementById('aCordLength').value = 1.5;
+  document.getElementById('aCordLength').value = a.cordLen || 1.5;
   document.getElementById('aThimbles').value   = 1;
-  document.getElementById('aGrommets').value   = 1;
+  document.getElementById('aGrommets').value   = a.grommets !== undefined ? a.grommets : 1;
   document.getElementById('aExtraCost').value  = 0;
 
   // Plug buttons
@@ -543,35 +536,30 @@ function loadAppliance(key) {
   document.getElementById('immersionSection').style.display = key === 'immersion' ? '' : 'none';
   if (key === 'immersion') { setGhundi('with', true); }
 
-  aAssemblyRatePerCore = a.assemblyRate;
+  if (a.assemblyFlat !== undefined) {
+    aAssemblyRatePerCore = 0;
+  } else {
+    aAssemblyRatePerCore = a.assemblyRate;
+  }
   aSetCore(a.cores, true);
+  if (a.assemblyFlat !== undefined) {
+    document.getElementById('aAssemblyCost').value = a.assemblyFlat.toFixed(1);
+  }
   document.getElementById('aAssemblyDesc').textContent = a.label;
-  document.getElementById('aAssemblyCost').value = (a.assemblyRate * a.cores).toFixed(1);
   acalc();
 }
 
 function setGhundi(type, skipCalc) {
   document.getElementById('ghundiWith').classList.toggle('active',    type === 'with');
   document.getElementById('ghundiWithout').classList.toggle('active', type === 'without');
-  document.getElementById('solderSection').style.display = type === 'with' ? '' : 'none';
-  if (type === 'without') {
-    aAssemblyRatePerCore = 0;
-    document.getElementById('aAssemblyDesc').textContent = 'Immersion Rod — Without Ghundi (thimble only)';
-    document.getElementById('aAssemblyCost').value = 0;
+  aAssemblyRatePerCore = 0;
+  if (type === 'with') {
+    document.getElementById('aAssemblyDesc').textContent = 'Immersion Rod — Ghundi Soldered ₹4 total';
+    document.getElementById('aAssemblyCost').value = '4.0';
   } else {
-    setSolder('non', true);
+    document.getElementById('aAssemblyDesc').textContent = 'Immersion Rod — Without Ghundi (thimble only)';
+    document.getElementById('aAssemblyCost').value = '0.0';
   }
-  if (!skipCalc) acalc();
-}
-
-function setSolder(type, skipCalc) {
-  solderType = type;
-  document.getElementById('solderNo').classList.toggle('active',  type === 'non');
-  document.getElementById('solderYes').classList.toggle('active', type === 'sol');
-  aAssemblyRatePerCore = type === 'sol' ? 2 : 1;
-  const desc = type === 'sol' ? 'Immersion Rod — Ghundi Soldered ₹2/core' : 'Immersion Rod — Ghundi Non-Soldered ₹1/core';
-  document.getElementById('aAssemblyDesc').textContent = desc;
-  document.getElementById('aAssemblyCost').value = (aAssemblyRatePerCore * aCores).toFixed(1);
   if (!skipCalc) acalc();
 }
 
@@ -617,7 +605,12 @@ function acalc() {
   const cl = cordLength.toFixed(1);
   document.getElementById('alabelCordLen').textContent = cl;
   document.querySelectorAll('.acordLenSpan').forEach(el => el.textContent = cl);
-  document.getElementById('arAssemblyRate').textContent = aAssemblyRatePerCore;
+  const assemblyLabelEl = document.getElementById('arAssemblyLabel');
+  if (aAssemblyRatePerCore > 0) {
+    assemblyLabelEl.textContent = `Assembly (₹${aAssemblyRatePerCore}/core × ${aCores}C)`;
+  } else {
+    assemblyLabelEl.textContent = 'Assembly (flat)';
+  }
 
   document.getElementById('awCopper').textContent      = copperKg100m.toFixed(4) + ' kg/100m';
   document.getElementById('awPvc').textContent         = pvcKg100m.toFixed(4)    + ' kg/100m';
