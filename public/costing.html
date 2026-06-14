@@ -564,11 +564,14 @@ function loadAppliance(key) {
   document.getElementById('aplug'+a.plugDefault).classList.add('active');
   document.getElementById('aPlugCost').value = a.plugCost;
 
-  // Core buttons — immersion gets 2.5C / 3C only
+  // Core buttons per appliance
   if (key === 'immersion') {
     document.getElementById('aCoresRow').innerHTML =
       `<button class="core-btn" data-val="2.5" onclick="aSetCore(2.5)">2.5C</button>
        <button class="core-btn" data-val="3"   onclick="aSetCore(3)">3C</button>`;
+  } else if (key === 'kettle' || key === 'eggboiler') {
+    document.getElementById('aCoresRow').innerHTML =
+      `<button class="core-btn" data-val="3" onclick="aSetCore(3)">3C</button>`;
   } else {
     document.getElementById('aCoresRow').innerHTML =
       `<button class="core-btn" data-val="1" onclick="aSetCore(1)">1C</button>
