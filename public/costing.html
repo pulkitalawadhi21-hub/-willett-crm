@@ -245,6 +245,10 @@
         <span class="label">+ Conversion 20%</span>
         <span class="val" id="rConversion">—</span>
       </div>
+      <div class="line bold">
+        <span class="label">Cost / metre</span>
+        <span class="val" id="rPer1mCost">—</span>
+      </div>
       <div style="display:flex;align-items:center;gap:8px;padding:6px 0 10px;">
         <label style="font-size:.78rem;font-weight:600;color:#555;white-space:nowrap;">Margin %</label>
         <input type="number" id="margin" value="15" min="0" max="99" step="0.5"
@@ -380,6 +384,7 @@ function calc() {
   document.getElementById('rMaterial').textContent     = fmt(material100);
   document.getElementById('rPer1m').textContent        = fmt(per1m);
   document.getElementById('rConversion').textContent   = fmt(conversion1m);
+  document.getElementById('rPer1mCost').textContent    = fmt(per1mWithConv);
   document.getElementById('rPer1mMargin').textContent  = fmt(per1mMargin);
   document.getElementById('rPieceMaterial').textContent = fmt(pieceMaterial);
   document.getElementById('rAccessories').textContent   = fmt(accessoriesCost);
