@@ -121,7 +121,6 @@
     <button class="preset-btn" onclick="loadPreset(event,'0.5_2c_flat')">0.5mm 2C Flat</button>
     <button class="preset-btn" onclick="loadPreset(event,'0.75_2c')">0.75mm 2C Round</button>
     <button class="preset-btn" onclick="loadPreset(event,'0.75_3c')">0.75mm 3C Round</button>
-    <button class="preset-btn" onclick="loadPreset(event,'induction')">Induction Cord</button>
     <button class="preset-btn" onclick="loadPreset(event,'custom')">Custom</button>
   </div>
 
@@ -198,18 +197,17 @@
         <div id="plugSection" class="field">
           <label>Moulding Plug</label>
           <div class="cores-row" style="margin-bottom:8px">
-            <button class="core-btn" id="plug2pin" onclick="setPlug('2pin',7.5)">2-Pin ₹7.50</button>
-            <button class="core-btn" id="plug3pin" onclick="setPlug('3pin',10)">3-Pin ₹10</button>
+            <button class="core-btn" id="plug2pin"  onclick="setPlug('2pin',7.5)">2-Pin ₹7.50</button>
+            <button class="core-btn" id="plug3pin"  onclick="setPlug('3pin',10)">3-Pin/6A ₹10</button>
             <button class="core-btn" id="plug16amp" onclick="setPlug('16amp',16.5)">16A ₹16.50</button>
           </div>
           <input type="number" id="plugCost" value="10" min="0" step="0.5" oninput="calc()">
           <div class="hint">Override ₹ if needed</div>
         </div>
-        <!-- Terminal section (induction cord only) -->
-        <div id="terminalSection" class="field" style="display:none">
-          <label>Terminal Cost</label>
-          <input type="number" id="terminalCost" value="4" min="0" step="0.5" oninput="calc()">
-          <div class="hint">₹4 — both cores have terminal</div>
+        <div class="field">
+          <label>Extra Accessories (₹)</label>
+          <input type="number" id="extraCost" value="0" min="0" step="0.5" oninput="calc()">
+          <div class="hint">e.g. ₹3 kettle terminal, ₹4 induction, ₹2 HST/blue cap</div>
         </div>
       </div>
     </div>
@@ -263,10 +261,10 @@
         <span class="val" id="rPieceMaterial">—</span>
       </div>
       <div class="line sub">
-        <span class="label" id="accessoriesLabel">Plug + Thimble + Grommet</span>
+        <span class="label">Plug + Thimble + Grommet + Extra</span>
         <span class="val" id="rAccessories">—</span>
       </div>
-      <div style="font-size:.7rem;color:#b0bec5;padding:2px 0 8px 10px" id="accessoriesNote">Plug price includes margin</div>
+      <div style="font-size:.7rem;color:#b0bec5;padding:2px 0 8px 10px">Plug includes margin · Extra = terminal/HST/cap etc.</div>
 
       <div class="band orange">
         <span class="label">Selling Price / Piece</span>
@@ -281,13 +279,12 @@
 let cores = 3;
 let cableType = 'round';
 
-// plugShow: which plug buttons to show; plugDefault: which to pre-select; terminal: true = induction mode
+// plugShow: which plug buttons to show; plugDefault: which to pre-select
 const PRESETS = {
-  '0.5_3c':      { strands:16, dia:0.202, cores:3, type:'round', od:6.0,  pvcKg:null, cordLen:1.5, plugShow:['3pin'],          plugDefault:'3pin',  plugCost:10,   terminal:false },
-  '0.5_2c_flat': { strands:16, dia:0.202, cores:2, type:'flat',  od:null, pvcKg:3.5,  cordLen:1.5, plugShow:['2pin'],          plugDefault:'2pin',  plugCost:7.5,  terminal:false },
-  '0.75_2c':     { strands:24, dia:0.202, cores:2, type:'round', od:6.5,  pvcKg:null, cordLen:1.5, plugShow:['2pin'],          plugDefault:'2pin',  plugCost:7.5,  terminal:false },
-  '0.75_3c':     { strands:24, dia:0.202, cores:3, type:'round', od:7.0,  pvcKg:null, cordLen:1.5, plugShow:['16amp'],         plugDefault:'16amp', plugCost:16.5, terminal:false },
-  'induction':   { strands:24, dia:0.202, cores:2, type:'round', od:6.5,  pvcKg:null, cordLen:1.5, plugShow:['3pin','16amp'], plugDefault:'3pin',  plugCost:10,   terminal:true  },
+  '0.5_3c':      { strands:16, dia:0.202, cores:3, type:'round', od:6.0,  pvcKg:null, cordLen:1.5, plugShow:['3pin'],          plugDefault:'3pin',  plugCost:10   },
+  '0.5_2c_flat': { strands:16, dia:0.202, cores:2, type:'flat',  od:null, pvcKg:3.5,  cordLen:1.5, plugShow:['2pin'],          plugDefault:'2pin',  plugCost:7.5  },
+  '0.75_2c':     { strands:24, dia:0.202, cores:2, type:'round', od:6.5,  pvcKg:null, cordLen:1.5, plugShow:['2pin','3pin'],   plugDefault:'2pin',  plugCost:7.5  },
+  '0.75_3c':     { strands:24, dia:0.202, cores:3, type:'round', od:7.0,  pvcKg:null, cordLen:1.5, plugShow:['3pin','16amp'],  plugDefault:'3pin',  plugCost:10   },
   'custom':       null
 };
 
@@ -318,11 +315,7 @@ function loadPreset(e, key) {
   }
   document.getElementById('plugCost').value = p.plugCost;
 
-  // Show terminal field only for induction cord (in addition to plug)
-  document.getElementById('plugSection').style.display     = '';
-  document.getElementById('terminalSection').style.display = p.terminal ? '' : 'none';
-  document.getElementById('accessoriesLabel').textContent  = p.terminal ? 'Plug + Terminal + Thimble + Grommet' : 'Plug + Thimble + Grommet';
-  document.getElementById('accessoriesNote').textContent   = p.terminal ? 'Terminal ₹4 — both cores (auto-added)' : 'Plug price includes margin';
+  document.getElementById('extraCost').value = 0;
 
   setCableType(p.type);
   setCore(p.cores);
@@ -355,9 +348,8 @@ function calc() {
   const cordLength  = parseFloat(document.getElementById('cordLength').value)  || 0;
   const thimbles    = parseInt(document.getElementById('thimbles').value)      || 0;
   const grommets    = parseInt(document.getElementById('grommets').value)      || 0;
-  const plugCost     = parseFloat(document.getElementById('plugCost').value) || 0;
-  const terminalCost = document.getElementById('terminalSection').style.display !== 'none'
-                       ? (parseFloat(document.getElementById('terminalCost').value) || 0) : 0;
+  const plugCost  = parseFloat(document.getElementById('plugCost').value)  || 0;
+  const extraCost = parseFloat(document.getElementById('extraCost').value) || 0;
 
   // All calculated per 100m
   // Copper: n × d² × 0.7 = kg/100m per core
@@ -377,7 +369,7 @@ function calc() {
 
   // Per piece: rate/m × cord length + accessories
   const pieceMaterial = per1mWithConv * cordLength;
-  const accessoriesCost = thimbles * 1 + grommets * 1 + plugCost + terminalCost;
+  const accessoriesCost = thimbles * 1 + grommets * 1 + plugCost + extraCost;
   const pieceSell       = pieceMaterial + accessoriesCost;
 
   // Update cord length labels
