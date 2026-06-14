@@ -274,12 +274,19 @@
     </button>
   </div>
 
-  <!-- Soldering toggle for immersion rod -->
-  <div id="solderSection" style="display:none; margin-bottom:16px;">
-    <div style="font-size:.78rem; font-weight:700; color:#555; margin-bottom:8px;">Ghundi Type</div>
-    <div class="solder-row">
-      <button class="solder-btn active" id="solderNo"  onclick="setSolder('non')">Non-Soldered &nbsp;₹1/core</button>
-      <button class="solder-btn"        id="solderYes" onclick="setSolder('sol')">Soldered &nbsp;₹2/core</button>
+  <!-- Immersion Rod options (shown only for immersion) -->
+  <div id="immersionSection" style="display:none; margin-bottom:16px;">
+    <div style="font-size:.78rem; font-weight:700; color:#555; margin-bottom:8px;">Ghundi</div>
+    <div class="solder-row" style="margin-bottom:10px">
+      <button class="solder-btn active" id="ghundiWith"    onclick="setGhundi('with')">With Ghundi</button>
+      <button class="solder-btn"        id="ghundiWithout" onclick="setGhundi('without')">Without Ghundi</button>
+    </div>
+    <div id="solderSection" style="display:none">
+      <div style="font-size:.78rem; font-weight:600; color:#888; margin-bottom:6px;">Ghundi Type</div>
+      <div class="solder-row">
+        <button class="solder-btn active" id="solderNo"  onclick="setSolder('non')">Non-Soldered ₹1/core</button>
+        <button class="solder-btn"        id="solderYes" onclick="setSolder('sol')">Soldered ₹2/core</button>
+      </div>
     </div>
   </div>
 
@@ -504,10 +511,10 @@ let aAssemblyRatePerCore = 1;
 let solderType = 'non';
 
 const APPLIANCES = {
-  kettle:    { strands:16, dia:0.202, cores:2, od:6.0,  plugShow:['2pin'],        plugDefault:'2pin',  plugCost:7.5,  assemblyRate:1,   label:'Kettle — Ghundi ₹1/core' },
-  eggboiler: { strands:16, dia:0.202, cores:2, od:6.0,  plugShow:['2pin'],        plugDefault:'2pin',  plugCost:7.5,  assemblyRate:1.5, label:'Egg Boiler — Glass sleeve ₹1.5/core' },
-  induction: { strands:24, dia:0.202, cores:2, od:6.5,  plugShow:['3pin','16amp'],plugDefault:'3pin',  plugCost:10,   assemblyRate:2,   label:'Induction — Terminal ₹2/core' },
-  immersion: { strands:24, dia:0.202, cores:2, od:6.5,  plugShow:['2pin'],        plugDefault:'2pin',  plugCost:7.5,  assemblyRate:1,   label:'Immersion Rod — Ghundi Non-Soldered ₹1/core' }
+  kettle:    { strands:16, dia:0.202, cores:2, od:6.0, plugShow:['3pin'],         plugDefault:'3pin',  plugCost:10, assemblyRate:1,   label:'Kettle — Ghundi ₹1/core' },
+  eggboiler: { strands:16, dia:0.202, cores:2, od:6.0, plugShow:['3pin'],         plugDefault:'3pin',  plugCost:10, assemblyRate:1.5, label:'Egg Boiler — Glass sleeve ₹1.5/core' },
+  induction: { strands:24, dia:0.202, cores:2, od:6.5, plugShow:['3pin','16amp'], plugDefault:'3pin',  plugCost:10, assemblyRate:2,   label:'Induction — Terminal ₹2/core' },
+  immersion: { strands:24, dia:0.202, cores:2, od:6.5, plugShow:['3pin','16amp'], plugDefault:'3pin',  plugCost:10, assemblyRate:1,   label:'Immersion Rod — With Ghundi Non-Soldered ₹1/core' }
 };
 
 function loadAppliance(key) {
@@ -532,15 +539,29 @@ function loadAppliance(key) {
   document.getElementById('aplug'+a.plugDefault).classList.add('active');
   document.getElementById('aPlugCost').value = a.plugCost;
 
-  // Solder toggle (immersion only)
-  document.getElementById('solderSection').style.display = key === 'immersion' ? '' : 'none';
-  if (key === 'immersion') { setSolder('non', true); } // reset to non-soldered
+  // Immersion options
+  document.getElementById('immersionSection').style.display = key === 'immersion' ? '' : 'none';
+  if (key === 'immersion') { setGhundi('with', true); }
 
   aAssemblyRatePerCore = a.assemblyRate;
   aSetCore(a.cores, true);
   document.getElementById('aAssemblyDesc').textContent = a.label;
   document.getElementById('aAssemblyCost').value = (a.assemblyRate * a.cores).toFixed(1);
   acalc();
+}
+
+function setGhundi(type, skipCalc) {
+  document.getElementById('ghundiWith').classList.toggle('active',    type === 'with');
+  document.getElementById('ghundiWithout').classList.toggle('active', type === 'without');
+  document.getElementById('solderSection').style.display = type === 'with' ? '' : 'none';
+  if (type === 'without') {
+    aAssemblyRatePerCore = 0;
+    document.getElementById('aAssemblyDesc').textContent = 'Immersion Rod — Without Ghundi (thimble only)';
+    document.getElementById('aAssemblyCost').value = 0;
+  } else {
+    setSolder('non', true);
+  }
+  if (!skipCalc) acalc();
 }
 
 function setSolder(type, skipCalc) {
