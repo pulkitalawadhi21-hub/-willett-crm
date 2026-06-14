@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Summer Target — Willett CRM</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body { background:#f0f4f8; }
+  .page-header {
+    background: linear-gradient(135deg, #1a237e 0%, #283593 60%, #3949ab 100%);
+    color:#fff; padding:24px 32px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .page-header h1 { margin:0; font-size:1.4rem; font-weight:700; letter-spacing:.5px; }
+  .page-header a { color:rgba(255,255,255,.8); font-size:.85rem; text-decoration:none; }
+  .page-header a:hover { color:#fff; }
+
+  .summary-bar {
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;
+    padding:20px 32px; background:#fff; border-bottom:1px solid #e0e0e0;
+  }
+  .sum-card {
+    border-radius:12px; padding:16px 20px; text-align:center;
+  }
+  .sum-card.confirmed { background:#e8f5e9; border:1.5px solid #a5d6a7; }
+  .sum-card.target    { background:#fff8e1; border:1.5px solid #ffe082; }
+  .sum-card.grand     { background:#e3f2fd; border:1.5px solid #90caf9; }
+  .sum-card .label { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:#666; margin-bottom:4px; }
+  .sum-card .amount { font-size:1.5rem; font-weight:800; }
+  .sum-card.confirmed .amount { color:#2e7d32; }
+  .sum-card.target .amount    { color:#f57f17; }
+  .sum-card.grand .amount     { color:#1565c0; }
+  .sum-card .per-day { font-size:.8rem; color:#888; margin-top:2px; }
+
+  .content { max-width:1100px; margin:0 auto; padding:24px 20px; }
+
+  .section-header {
+    display:flex; align-items:center; gap:10px;
+    font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:1px;
+    padding:10px 16px; border-radius:8px; margin-bottom:12px; margin-top:28px;
+  }
+  .section-header.confirmed { background:#2e7d32; color:#fff; }
+  .section-header.target    { background:#e65100; color:#fff; }
+  .section-header.priority  { background:#1565c0; color:#fff; }
+  .section-header .total-badge {
+    margin-left:auto; background:rgba(255,255,255,.25);
+    padding:3px 10px; border-radius:20px; font-size:.8rem; font-weight:700;
+  }
+
+  .cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
+
+  .block {
+    background:#fff; border-radius:12px; overflow:hidden;
+    box-shadow:0 1px 4px rgba(0,0,0,.08);
+  }
+  .block-title {
+    padding:10px 16px; font-size:.78rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.6px;
+  }
+  .block.confirmed .block-title { background:#e8f5e9; color:#1b5e20; border-bottom:1px solid #c8e6c9; }
+  .block.target    .block-title { background:#fff8e1; color:#e65100; border-bottom:1px solid #ffe082; }
+
+  table { width:100%; border-collapse:collapse; font-size:.85rem; }
+  th { padding:7px 14px; text-align:left; font-size:.7rem; text-transform:uppercase;
+       letter-spacing:.5px; color:#888; font-weight:600; border-bottom:1px solid #f0f0f0; }
+  td { padding:8px 14px; border-bottom:1px solid #f5f5f5; }
+  tr:last-child td { border-bottom:none; }
+  .total-row td { font-weight:700; background:#fafafa; }
+  .confirmed .total-row td { color:#2e7d32; }
+  .target    .total-row td { color:#e65100; }
+
+  .amount-cell { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .tbd { color:#aaa; font-style:italic; font-size:.8rem; }
+
+  .note-cell { font-size:.75rem; color:#888; }
+  .note-cell.warn { color:#e53935; }
+  .note-cell.prio { color:#1565c0; font-weight:600; }
+
+  .priority-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; }
+  .prio-card {
+    background:#fff; border-radius:10px; padding:14px 16px;
+    box-shadow:0 1px 4px rgba(0,0,0,.08); display:flex; gap:12px; align-items:flex-start;
+  }
+  .prio-num {
+    width:28px; height:28px; border-radius:50%; background:#1a237e; color:#fff;
+    font-size:.85rem; font-weight:800; display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .prio-text { font-size:.82rem; line-height:1.5; }
+  .prio-text strong { display:block; font-size:.87rem; margin-bottom:2px; }
+
+  .grand-target {
+    background: linear-gradient(135deg,#1a237e,#3949ab);
+    color:#fff; border-radius:14px; padding:22px 28px;
+    text-align:center; margin-top:28px;
+  }
+  .grand-target .label { font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; opacity:.8; margin-bottom:8px; }
+  .grand-target .amount { font-size:2.2rem; font-weight:900; }
+  .grand-target .sub { font-size:1rem; opacity:.85; margin-top:4px; }
+
+  @media(max-width:600px) {
+    .summary-bar { grid-template-columns:1fr; padding:16px; }
+    .content { padding:16px 12px; }
+    .page-header { padding:16px; }
+    .page-header h1 { font-size:1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Summer Target — Willett Cables</h1>
+  <a href="index.html">← CRM</a>
+</div>
+
+<!-- Summary Bar -->
+<div class="summary-bar">
+  <div class="sum-card confirmed">
+    <div class="label">Confirmed / Month</div>
+    <div class="amount">₹4,54,000</div>
+    <div class="per-day">₹18,160 / day</div>
+  </div>
+  <div class="sum-card target">
+    <div class="label">Additional Target / Month</div>
+    <div class="amount">₹5,77,000+</div>
+    <div class="per-day">₹23,080+ / day (excl. AC/TBD)</div>
+  </div>
+  <div class="sum-card grand">
+    <div class="label">Goal if All Convert</div>
+    <div class="amount">₹10,31,000+</div>
+    <div class="per-day">₹41,240+ / day ✅</div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ═══════════════════ CONFIRMED ═══════════════════ -->
+<div class="section-header confirmed">
+  Confirmed Revenue
+  <span class="total-badge">₹4,54,000 / month</span>
+</div>
+
+<div class="cards-grid">
+
+  <!-- Confirmed Base -->
+  <div class="block confirmed">
+    <div class="block-title">Base — Year Round</div>
+    <table>
+      <thead><tr><th>Customer</th><th class="amount-cell">Monthly</th></tr></thead>
+      <tbody>
+        <tr><td>ULC</td><td class="amount-cell">₹30,000</td></tr>
+        <tr><td>GCF</td><td class="amount-cell">₹30,000</td></tr>
+        <tr><td>INNOV</td><td class="amount-cell">₹30,000</td></tr>
+        <tr><td>CKW</td><td class="amount-cell">₹30,000</td></tr>
+        <tr><td>Sun India</td><td class="amount-cell">₹10,000</td></tr>
+        <tr><td>YSH</td><td class="amount-cell">₹20,000</td></tr>
+        <tr><td>SAI</td><td class="amount-cell">₹20,000</td></tr>
+        <tr><td>NEW</td><td class="amount-cell">₹20,000</td></tr>
+        <tr><td>ARW</td><td class="amount-cell">₹20,000</td></tr>
+        <tr class="total-row"><td>Total</td><td class="amount-cell">₹1,80,000</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Confirmed Summer Ramp -->
+  <div class="block confirmed">
+    <div class="block-title">Summer Ramp — Jan Onwards</div>
+    <table>
+      <thead><tr><th>Customer</th><th class="amount-cell">Monthly</th></tr></thead>
+      <tbody>
+        <tr><td>DYE</td><td class="amount-cell">₹1,00,000</td></tr>
+        <tr><td>ARD</td><td class="amount-cell">₹20,000</td></tr>
+        <tr><td>USK</td><td class="amount-cell">₹15,000</td></tr>
+        <tr><td>PMB</td><td class="amount-cell">₹10,000</td></tr>
+        <tr><td>SAE</td><td class="amount-cell">₹15,000</td></tr>
+        <tr><td>KWW</td><td class="amount-cell">₹20,000</td></tr>
+        <tr><td>DNG</td><td class="amount-cell">₹15,000</td></tr>
+        <tr class="total-row"><td>Total</td><td class="amount-cell">₹1,95,000</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Confirmed Cooler -->
+  <div class="block confirmed">
+    <div class="block-title">Cooler — Confirmed</div>
+    <table>
+      <thead><tr><th>Customer</th><th class="amount-cell">Monthly</th></tr></thead>
+      <tbody>
+        <tr><td>BNI</td><td class="amount-cell">₹10,000</td></tr>
+        <tr><td>Clarion</td><td class="amount-cell">₹5,000</td></tr>
+        <tr><td>Rocksun</td><td class="amount-cell">₹10,000</td></tr>
+        <tr><td>YET</td><td class="amount-cell">₹10,000</td></tr>
+        <tr><td>Avion</td><td class="amount-cell">₹10,000</td></tr>
+        <tr><td>SND</td><td class="amount-cell">₹20,000</td></tr>
+        <tr><td>Poswal</td><td class="amount-cell">₹5,000</td></tr>
+        <tr><td>Vikram</td><td class="amount-cell">₹4,000</td></tr>
+        <tr><td>BLU</td><td class="amount-cell">₹5,000</td></tr>
+        <tr class="total-row"><td>Total</td><td class="amount-cell">₹79,000</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- end confirmed grid -->
+
+
+<!-- ═══════════════════ TARGETS ═══════════════════ -->
+<div class="section-header target" style="margin-top:36px;">
+  Target Pipeline
+  <span class="total-badge">₹5,77,000+ / month (excl. AC/TBD)</span>
+</div>
+
+<div class="cards-grid">
+
+  <!-- Target Fan -->
+  <div class="block target">
+    <div class="block-title">Fan</div>
+    <table>
+      <thead><tr><th>Customer</th><th class="amount-cell">Monthly</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Orient</strong></td><td class="amount-cell">₹1,00,000</td><td class="note-cell prio">Top priority</td></tr>
+        <tr><td>Bhagwati</td><td class="amount-cell">₹40,000</td><td class="note-cell"></td></tr>
+        <tr><td>Shristhi</td><td class="amount-cell">₹50,000</td><td class="note-cell"></td></tr>
+        <tr><td>Wonder</td><td class="amount-cell">₹15,000</td><td class="note-cell"></td></tr>
+        <tr><td>Modi Fan (CCA)</td><td class="amount-cell">₹15,000</td><td class="note-cell"></td></tr>
+        <tr><td>Toofan</td><td class="amount-cell">₹5,000</td><td class="note-cell">Cord entry — harness upside</td></tr>
+        <tr><td>Sania</td><td class="amount-cell">₹20,000</td><td class="note-cell warn">⚠ Very low rates</td></tr>
+        <tr class="total-row"><td>Total</td><td class="amount-cell">₹2,45,000</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Target Cooler -->
+  <div class="block target">
+    <div class="block-title">Cooler</div>
+    <table>
+      <thead><tr><th>Customer</th><th class="amount-cell">Monthly</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Summercool</td><td class="amount-cell">₹20,000</td><td class="note-cell"></td></tr>
+        <tr><td>Aeromax</td><td class="amount-cell">₹10,000</td><td class="note-cell"></td></tr>
+        <tr><td>Wybor</td><td class="amount-cell">₹10,000</td><td class="note-cell"></td></tr>
+        <tr><td>Speedo</td><td class="amount-cell">₹10,000</td><td class="note-cell"></td></tr>
+        <tr><td>Novamax</td><td class="amount-cell">₹10,000</td><td class="note-cell"></td></tr>
+        <tr><td>Epack</td><td class="amount-cell">₹20,000</td><td class="note-cell"></td></tr>
+        <tr><td>PG</td><td class="amount-cell">₹20,000</td><td class="note-cell"></td></tr>
+        <tr><td>MPPL</td><td class="amount-cell">₹15,000</td><td class="note-cell"></td></tr>
+        <tr><td>Aroking</td><td class="amount-cell">₹15,000</td><td class="note-cell warn">⚠ Low pricing, slow entry</td></tr>
+        <tr><td>Raj</td><td class="amount-cell">₹10,000</td><td class="note-cell warn">⚠ Slow payment</td></tr>
+        <tr><td>Vijay Cooler</td><td class="amount-cell">₹5,000</td><td class="note-cell"></td></tr>
+        <tr><td>Ekkaa</td><td class="amount-cell">₹15,000</td><td class="note-cell"></td></tr>
+        <tr><td>MR</td><td class="amount-cell">₹15,000</td><td class="note-cell"></td></tr>
+        <tr><td>Skyzen</td><td class="amount-cell">₹5,000</td><td class="note-cell"></td></tr>
+        <tr><td>Supreme Industries</td><td class="amount-cell">₹10,000</td><td class="note-cell"></td></tr>
+        <tr class="total-row"><td>Total</td><td class="amount-cell">₹1,90,000</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Target Fridge -->
+  <div class="block target">
+    <div class="block-title">Fridge / Refrigerator</div>
+    <table>
+      <thead><tr><th>Customer</th><th class="amount-cell">Monthly</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Rockwell</strong></td><td class="amount-cell">₹6,000</td><td class="note-cell prio">Higher ticket — priority</td></tr>
+        <tr><td>Westan</td><td class="amount-cell">₹15,000</td><td class="note-cell"></td></tr>
+        <tr><td>Blue Star</td><td class="amount-cell">₹15,000</td><td class="note-cell"></td></tr>
+        <tr><td><strong>Frigoglass</strong></td><td class="amount-cell">₹6,000</td><td class="note-cell prio">Higher ticket — priority</td></tr>
+        <tr class="total-row"><td>Total</td><td class="amount-cell">₹42,000</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Target AC -->
+  <div class="block target">
+    <div class="block-title">AC — #1 Priority (Year-Round)</div>
+    <table>
+      <thead><tr><th>Customer</th><th class="amount-cell">Monthly</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Amber</strong></td><td class="amount-cell tbd">TBD</td><td class="note-cell prio">Large OEM — #1 priority</td></tr>
+        <tr><td>PG</td><td class="amount-cell tbd">TBD</td><td class="note-cell"></td></tr>
+        <tr><td>Wybor</td><td class="amount-cell tbd">TBD</td><td class="note-cell"></td></tr>
+        <tr><td>Epack</td><td class="amount-cell tbd">TBD</td><td class="note-cell"></td></tr>
+        <tr class="total-row"><td>Total</td><td class="amount-cell tbd">TBD — Year-round</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Target Water Dispenser -->
+  <div class="block target">
+    <div class="block-title">Water Dispenser</div>
+    <table>
+      <thead><tr><th>Customer</th><th class="amount-cell">Monthly</th></tr></thead>
+      <tbody>
+        <tr><td>Veeline</td><td class="amount-cell tbd">TBD</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Target Inverter/Solar -->
+  <div class="block target">
+    <div class="block-title">Inverter / Solar / Transformer</div>
+    <table>
+      <thead><tr><th>Customer</th><th class="amount-cell">Monthly</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Exide Industries</td><td class="amount-cell tbd">TBD</td><td class="note-cell">Year-round, cold lead</td></tr>
+        <tr><td>UTL</td><td class="amount-cell tbd">TBD</td><td class="note-cell">Year-round, cold lead</td></tr>
+        <tr><td>Eapro</td><td class="amount-cell tbd">TBD</td><td class="note-cell prio">Ex-employee contact available</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- end target grid -->
+
+
+<!-- ═══════════════════ PRIORITY ORDER ═══════════════════ -->
+<div class="section-header priority" style="margin-top:36px;">
+  Priority Order
+</div>
+
+<div class="priority-grid">
+  <div class="prio-card">
+    <div class="prio-num">1</div>
+    <div class="prio-text"><strong>AC</strong>Amber, PG, Wybor, Epack — year-round, high ticket</div>
+  </div>
+  <div class="prio-card">
+    <div class="prio-num">2</div>
+    <div class="prio-text"><strong>Fridge</strong>Rockwell, Frigoglass first — higher ticket size</div>
+  </div>
+  <div class="prio-card">
+    <div class="prio-num">3</div>
+    <div class="prio-text"><strong>Inverter / Solar</strong>Eapro via contact, then Exide, UTL</div>
+  </div>
+  <div class="prio-card">
+    <div class="prio-num">4</div>
+    <div class="prio-text"><strong>Water Dispenser</strong>Veeline</div>
+  </div>
+  <div class="prio-card">
+    <div class="prio-num">5</div>
+    <div class="prio-text"><strong>Fan</strong>Orient #1, then Bhagwati, Shristhi</div>
+  </div>
+  <div class="prio-card">
+    <div class="prio-num">6</div>
+    <div class="prio-text"><strong>Cooler Targets</strong>After fan accounts locked in</div>
+  </div>
+</div>
+
+<!-- Grand Target -->
+<div class="grand-target">
+  <div class="label">Target Total — If All Convert</div>
+  <div class="amount">₹10,31,000+ / month</div>
+  <div class="sub">₹41,240+ / day &nbsp;✅</div>
+</div>
+
+</div><!-- end content -->
+
+</body>
+</html>
