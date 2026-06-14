@@ -440,19 +440,20 @@ tr:last-child td { border-bottom:none; }
 </div>
 </div>
 
-<!-- ═══════════════ INVERTER / TRANSFORMER / STABILISER ═══════════════ -->
+<!-- ═══════════════ INVERTER / STABILISER ═══════════════ -->
 <div id="tab-inverter" class="tab-panel">
 <div class="content">
-  <div class="sec-label confirmed">Confirmed</div>
+
+  <div class="sec-label confirmed">Confirmed — Inverter</div>
   <div class="tbl-wrap">
     <table>
       <thead><tr><th>Customer</th><th>Address / Location</th><th class="num">Monthly</th><th>Action</th><th></th></tr></thead>
-      <tbody id="invConfTbody"></tbody>
+      <tbody id="invInvTbody"></tbody>
     </table>
   </div>
-  <button onclick="invAddCustomer()" style="margin:8px 0 4px;padding:6px 16px;background:#1a237e;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.85rem">+ Add Customer</button>
+  <button onclick="invAdd('inv')" style="margin:8px 0 4px;padding:6px 16px;background:#1a237e;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.85rem">+ Add Inverter Customer</button>
 
-  <div class="sec-label target" style="margin-top:1rem">Targets — Inverter Manufacturers</div>
+  <div class="sec-label target" style="margin-top:1.5rem">Targets — Inverter Manufacturers</div>
   <div class="tbl-wrap">
     <table>
       <thead><tr><th>Manufacturer</th><th class="num">Monthly</th><th>Note</th></tr></thead>
@@ -465,6 +466,16 @@ tr:last-child td { border-bottom:none; }
       </tbody>
     </table>
   </div>
+
+  <div class="sec-label confirmed" style="margin-top:1.5rem">Confirmed — Stabiliser</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Customer</th><th>Address / Location</th><th class="num">Monthly</th><th>Action</th><th></th></tr></thead>
+      <tbody id="invStabTbody"></tbody>
+    </table>
+  </div>
+  <button onclick="invAdd('stab')" style="margin:8px 0 4px;padding:6px 16px;background:#1a237e;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.85rem">+ Add Stabiliser Customer</button>
+
 </div>
 </div>
 
@@ -569,7 +580,11 @@ function renderBrands() {
 renderBrands();
 
 // ── Inverter / Stabiliser confirmed ──
-const INV_CUSTOMERS = [
+const INV_INVERTER = [
+  { key:'eastman',   name:'Eastman',   addr:'Delhi' },
+  { key:'millenium', name:'Millenium', addr:'Parwanoo', note:'Slow + mixed payment' },
+];
+const INV_STABILISER = [
   { key:'manjeet',   name:'Manjeet',            addr:'Bahadurgarh' },
   { key:'helios',    name:'Helios',              addr:'' },
   { key:'kundi',     name:'Kundi',               addr:'' },
@@ -579,8 +594,6 @@ const INV_CUSTOMERS = [
   { key:'donut',     name:'Donut',               addr:'' },
   { key:'dheeraj',   name:'Dheeraj Ji',          addr:'Bhalswa, Delhi' },
   { key:'bluebird',  name:'Bluebird Stabiliser', addr:'' },
-  { key:'eastman',   name:'Eastman',             addr:'Delhi' },
-  { key:'millenium', name:'Millenium',           addr:'Parwanoo', note:'Slow + mixed payment' },
 ];
 
 function invState(key) {
@@ -592,33 +605,31 @@ function saveInvState(key, field, val) {
   localStorage.setItem('inv_' + key, JSON.stringify(s));
 }
 
-function editCell(key, field, el) {
-  saveInvState(key, field, el.innerText.trim());
-}
-
-function invAddCustomer() {
-  const extras = JSON.parse(localStorage.getItem('inv_extras') || '[]');
-  const key = 'inv_extra_' + Date.now();
+function invAdd(section) {
+  const lsKey = 'inv_extras_' + section;
+  const extras = JSON.parse(localStorage.getItem(lsKey) || '[]');
+  const key = 'inv_x_' + section + '_' + Date.now();
   extras.push(key);
-  localStorage.setItem('inv_extras', JSON.stringify(extras));
+  localStorage.setItem(lsKey, JSON.stringify(extras));
   localStorage.setItem(key, JSON.stringify({ name:'New Customer', addr:'', monthly:'', action:'' }));
-  renderInvConf();
-  // focus the new name cell
-  const rows = document.querySelectorAll('#invConfTbody tr');
+  renderInvSection(section);
+  const tbodyId = section === 'inv' ? 'invInvTbody' : 'invStabTbody';
+  const rows = document.querySelectorAll('#' + tbodyId + ' tr');
   if (rows.length) {
     const nameCell = rows[rows.length - 1].querySelector('span[contenteditable]');
     if (nameCell) { nameCell.focus(); document.execCommand('selectAll', false, null); }
   }
 }
 
-function invDeleteRow(key) {
+function invDeleteRow(key, section) {
   localStorage.removeItem(key);
-  const extras = JSON.parse(localStorage.getItem('inv_extras') || '[]').filter(k => k !== key);
-  localStorage.setItem('inv_extras', JSON.stringify(extras));
-  renderInvConf();
+  const lsKey = 'inv_extras_' + section;
+  const extras = JSON.parse(localStorage.getItem(lsKey) || '[]').filter(k => k !== key);
+  localStorage.setItem(lsKey, JSON.stringify(extras));
+  renderInvSection(section);
 }
 
-function invRow(key, defaultName, defaultAddr, isExtra, defaultNote) {
+function invRow(key, defaultName, defaultAddr, isExtra, defaultNote, section) {
   const s      = isExtra ? (JSON.parse(localStorage.getItem(key) || '{}')) : invState(key);
   const name   = s.name    !== undefined ? s.name    : defaultName;
   const addr   = s.addr    !== undefined ? s.addr    : defaultAddr;
@@ -628,7 +639,7 @@ function invRow(key, defaultName, defaultAddr, isExtra, defaultNote) {
   const edStyle = 'display:block;font-size:.8rem;outline:none;cursor:text;border-bottom:1px dashed transparent;min-width:60px';
   const saveKey = isExtra ? key : ('inv_' + key);
   const delBtn = isExtra
-    ? `<td><button onclick="invDeleteRow('${key}')" style="background:none;border:none;color:#e53935;cursor:pointer;font-size:1rem;padding:0 4px" title="Remove">✕</button></td>`
+    ? `<td><button onclick="invDeleteRow('${key}','${section}')" style="background:none;border:none;color:#e53935;cursor:pointer;font-size:1rem;padding:0 4px" title="Remove">✕</button></td>`
     : `<td></td>`;
   return `<tr>
     <td><span contenteditable="true" style="${edStyle};color:#111;font-weight:700"
@@ -657,16 +668,19 @@ function invSave(storageKey, field, el) {
   localStorage.setItem(storageKey, JSON.stringify(s));
 }
 
-function renderInvConf() {
-  const tbody = document.getElementById('invConfTbody');
+function renderInvSection(section) {
+  const tbodyId = section === 'inv' ? 'invInvTbody' : 'invStabTbody';
+  const tbody = document.getElementById(tbodyId);
   if (!tbody) return;
-  const extras = JSON.parse(localStorage.getItem('inv_extras') || '[]');
-  const baseRows = INV_CUSTOMERS.map(c => invRow(c.key, c.name, c.addr, false, c.note)).join('');
-  const extraRows = extras.map(k => invRow(k, 'New Customer', '', true)).join('');
+  const baseList = section === 'inv' ? INV_INVERTER : INV_STABILISER;
+  const extras = JSON.parse(localStorage.getItem('inv_extras_' + section) || '[]');
+  const baseRows  = baseList.map(c => invRow(c.key, c.name, c.addr, false, c.note, section)).join('');
+  const extraRows = extras.map(k  => invRow(k, 'New Customer', '', true, '', section)).join('');
   tbody.innerHTML = baseRows + extraRows;
 }
 
-renderInvConf();
+renderInvSection('inv');
+renderInvSection('stab');
 </script>
 </body>
 </html>
