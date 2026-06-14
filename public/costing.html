@@ -245,19 +245,9 @@
         <span class="label">+ Conversion 20%</span>
         <span class="val" id="rConversion">—</span>
       </div>
-      <div class="line bold">
-        <span class="label">Cost / metre</span>
-        <span class="val" id="rPer1mCost">—</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;padding:6px 0 10px;">
-        <label style="font-size:.78rem;font-weight:600;color:#555;white-space:nowrap;">Margin %</label>
-        <input type="number" id="margin" value="15" min="0" max="99" step="0.5"
-          style="width:75px;padding:6px 10px;border:1.5px solid #e0e0e0;border-radius:7px;font-size:.9rem;"
-          oninput="calc()">
-      </div>
       <div class="band blue">
-        <span class="label">Rate / Metre (with margin)</span>
-        <span class="val" id="rPer1mMargin">—</span>
+        <span class="label">Rate / Metre</span>
+        <span class="val" id="rPer1mCost">—</span>
       </div>
 
       <hr class="divider">
@@ -347,7 +337,6 @@ function calc() {
   const thimbles    = parseInt(document.getElementById('thimbles').value)      || 0;
   const grommets    = parseInt(document.getElementById('grommets').value)      || 0;
   const plugCost    = parseFloat(document.getElementById('plugCost').value)    || 0;
-  const margin      = parseFloat(document.getElementById('margin').value)      || 0;
 
   // All calculated per 100m
   // Copper: n × d² × 0.7 = kg/100m per core
@@ -363,11 +352,10 @@ function calc() {
   // Per 1m: material ÷ 100, then +20% conversion, then +margin%
   const per1m          = material100 / 100;
   const conversion1m   = per1m * 0.20;
-  const per1mWithConv  = per1m + conversion1m;
-  const per1mMargin    = per1mWithConv * (1 + margin / 100);
+  const per1mWithConv = per1m + conversion1m;
 
-  // Per piece: rate/m (with margin) × cord length + accessories
-  const pieceMaterial   = per1mMargin * cordLength;
+  // Per piece: rate/m × cord length + accessories
+  const pieceMaterial = per1mWithConv * cordLength;
   const accessoriesCost = thimbles * 1 + grommets * 1 + plugCost;
   const pieceSell       = pieceMaterial + accessoriesCost;
 
@@ -384,8 +372,7 @@ function calc() {
   document.getElementById('rMaterial').textContent     = fmt(material100);
   document.getElementById('rPer1m').textContent        = fmt(per1m);
   document.getElementById('rConversion').textContent   = fmt(conversion1m);
-  document.getElementById('rPer1mCost').textContent    = fmt(per1mWithConv);
-  document.getElementById('rPer1mMargin').textContent  = fmt(per1mMargin);
+  document.getElementById('rPer1mCost').textContent = fmt(per1mWithConv);
   document.getElementById('rPieceMaterial').textContent = fmt(pieceMaterial);
   document.getElementById('rAccessories').textContent   = fmt(accessoriesCost);
   document.getElementById('rPieceSell').textContent     = fmt(pieceSell);
