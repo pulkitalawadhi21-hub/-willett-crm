@@ -358,11 +358,33 @@
           <div class="hint">Based on appliance type × cores. Editable.</div>
         </div>
         <div class="field">
+          <label style="font-weight:600;margin-bottom:6px;display:block;">Cap Type (× cores)</label>
+          <div style="display:flex;flex-direction:column;gap:4px;font-size:.82rem;">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:400;">
+              <input type="radio" name="aCap" value="0"    onchange="acalc()" checked style="width:auto;margin:0;"> None
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:400;">
+              <input type="radio" name="aCap" value="0.40" onchange="acalc()" style="width:auto;margin:0;"> 6.4 Flag Cap — ₹0.40/core
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:400;">
+              <input type="radio" name="aCap" value="0.17" onchange="acalc()" style="width:auto;margin:0;"> 4.8 P-Lock Cap — ₹0.17/core
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:400;">
+              <input type="radio" name="aCap" value="0.18" onchange="acalc()" style="width:auto;margin:0;"> 6.4 P-Lock Cap — ₹0.18/core
+            </label>
+          </div>
+        </div>
+        <div class="field">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="aFibreCheck" onchange="acalc()" style="width:auto;margin:0;">
+            Fiberglass Sleeve — ₹1/core (100mm)
+          </label>
+        </div>
+        <div class="field">
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
             <input type="checkbox" id="aHstCheck" onchange="acalc()" style="width:auto;margin:0;">
-            HST — ₹1.25/core (auto × cores)
+            HST — ₹1.25/core (100mm, incl. margin)
           </label>
-          <div class="hint">100mm heat shrink per core, incl. cutting & margin</div>
         </div>
         <div class="field">
           <label>Extra Accessories (₹)</label>
@@ -390,7 +412,9 @@
       <div class="line sub"><span class="label">Rate/m × <span class="acordLenSpan">1.5</span>m</span><span class="val" id="arPieceMaterial">—</span></div>
       <div class="line sub"><span class="label">Plug + Thimble + Grommet</span><span class="val" id="arPlugAcc">—</span></div>
       <div class="line sub"><span class="label" id="arAssemblyLabel">Assembly</span><span class="val" id="arAssembly">—</span></div>
-      <div class="line sub"><span class="label">HST (₹1.25 × <span id="arHstCores">—</span>C)</span><span class="val" id="arHst">—</span></div>
+      <div class="line sub"><span class="label">Cap (× <span id="arCapCores">—</span>C)</span><span class="val" id="arCap">—</span></div>
+      <div class="line sub"><span class="label">Fibre Sleeve (× <span id="arFibreCores">—</span>C)</span><span class="val" id="arFibre">—</span></div>
+      <div class="line sub"><span class="label">HST (× <span id="arHstCores">—</span>C)</span><span class="val" id="arHst">—</span></div>
       <div class="line sub"><span class="label">Extra</span><span class="val" id="arExtra">—</span></div>
       <div class="band orange"><span class="label">Selling Price / Piece</span><span class="val" id="arPieceSell">—</span></div>
     </div>
@@ -595,7 +619,10 @@ function acalc() {
   const grommets     = parseInt(document.getElementById('aGrommets').value)       || 0;
   const plugCost     = parseFloat(document.getElementById('aPlugCost').value)     || 0;
   const assemblyCost = parseFloat(document.getElementById('aAssemblyCost').value) || 0;
-  const hstCost      = document.getElementById('aHstCheck').checked ? 1.25 * aCores : 0;
+  const capRate      = parseFloat(document.querySelector('input[name="aCap"]:checked')?.value) || 0;
+  const capCost      = capRate * aCores;
+  const fibreCost    = document.getElementById('aFibreCheck').checked ? 1.0 * aCores : 0;
+  const hstCost      = document.getElementById('aHstCheck').checked  ? 1.25 * aCores : 0;
   const extraCost    = parseFloat(document.getElementById('aExtraCost').value)    || 0;
 
   const copperKg100m  = strands * dia * dia * 0.7 * aCores;
@@ -608,7 +635,7 @@ function acalc() {
   const per1mWithConv = per1m + conversion1m;
   const pieceMaterial = per1mWithConv * cordLength;
   const plugAcc       = thimbles + grommets + plugCost;
-  const pieceSell     = pieceMaterial + plugAcc + assemblyCost + hstCost + extraCost;
+  const pieceSell     = pieceMaterial + plugAcc + assemblyCost + capCost + fibreCost + hstCost + extraCost;
 
   const cl = cordLength.toFixed(1);
   document.getElementById('alabelCordLen').textContent = cl;
@@ -631,8 +658,12 @@ function acalc() {
   document.getElementById('arPieceMaterial').textContent = fmt(pieceMaterial);
   document.getElementById('arPlugAcc').textContent       = fmt(plugAcc);
   document.getElementById('arAssembly').textContent      = fmt(assemblyCost);
+  document.getElementById('arCapCores').textContent      = aCores;
+  document.getElementById('arCap').textContent           = capCost > 0  ? fmt(capCost)   : '—';
+  document.getElementById('arFibreCores').textContent    = aCores;
+  document.getElementById('arFibre').textContent         = fibreCost > 0 ? fmt(fibreCost) : '—';
   document.getElementById('arHstCores').textContent      = aCores;
-  document.getElementById('arHst').textContent           = hstCost > 0 ? fmt(hstCost) : '—';
+  document.getElementById('arHst').textContent           = hstCost > 0  ? fmt(hstCost)   : '—';
   document.getElementById('arExtra').textContent         = fmt(extraCost);
   document.getElementById('arPieceSell').textContent     = fmt(pieceSell);
 }
