@@ -287,7 +287,7 @@ const PRESETS = {
   '0.5_2c_flat': { strands:16, dia:0.202, cores:2, type:'flat',  od:null, pvcKg:3.5,  cordLen:1.5, plugShow:['2pin'],          plugDefault:'2pin',  plugCost:7.5,  terminal:false },
   '0.75_2c':     { strands:24, dia:0.202, cores:2, type:'round', od:6.5,  pvcKg:null, cordLen:1.5, plugShow:['2pin'],          plugDefault:'2pin',  plugCost:7.5,  terminal:false },
   '0.75_3c':     { strands:24, dia:0.202, cores:3, type:'round', od:7.0,  pvcKg:null, cordLen:1.5, plugShow:['16amp'],         plugDefault:'16amp', plugCost:16.5, terminal:false },
-  'induction':   { strands:24, dia:0.202, cores:2, type:'round', od:6.5,  pvcKg:null, cordLen:1.5, plugShow:[],               plugDefault:null,    plugCost:0,    terminal:true  },
+  'induction':   { strands:24, dia:0.202, cores:2, type:'round', od:6.5,  pvcKg:null, cordLen:1.5, plugShow:['3pin','16amp'], plugDefault:'3pin',  plugCost:10,   terminal:true  },
   'custom':       null
 };
 
@@ -318,12 +318,11 @@ function loadPreset(e, key) {
   }
   document.getElementById('plugCost').value = p.plugCost;
 
-  // Terminal vs plug mode
-  const isTerminal = p.terminal;
-  document.getElementById('plugSection').style.display     = isTerminal ? 'none' : '';
-  document.getElementById('terminalSection').style.display = isTerminal ? '' : 'none';
-  document.getElementById('accessoriesLabel').textContent  = isTerminal ? 'Terminal + Thimble + Grommet' : 'Plug + Thimble + Grommet';
-  document.getElementById('accessoriesNote').textContent   = isTerminal ? 'Terminal ₹4 — both cores' : 'Plug price includes margin';
+  // Show terminal field only for induction cord (in addition to plug)
+  document.getElementById('plugSection').style.display     = '';
+  document.getElementById('terminalSection').style.display = p.terminal ? '' : 'none';
+  document.getElementById('accessoriesLabel').textContent  = p.terminal ? 'Plug + Terminal + Thimble + Grommet' : 'Plug + Thimble + Grommet';
+  document.getElementById('accessoriesNote').textContent   = p.terminal ? 'Terminal ₹4 — both cores (auto-added)' : 'Plug price includes margin';
 
   setCableType(p.type);
   setCore(p.cores);
@@ -356,9 +355,9 @@ function calc() {
   const cordLength  = parseFloat(document.getElementById('cordLength').value)  || 0;
   const thimbles    = parseInt(document.getElementById('thimbles').value)      || 0;
   const grommets    = parseInt(document.getElementById('grommets').value)      || 0;
-  const isTerminal   = document.getElementById('terminalSection').style.display !== 'none';
-  const plugCost     = isTerminal ? 0 : (parseFloat(document.getElementById('plugCost').value) || 0);
-  const terminalCost = isTerminal ? (parseFloat(document.getElementById('terminalCost').value) || 0) : 0;
+  const plugCost     = parseFloat(document.getElementById('plugCost').value) || 0;
+  const terminalCost = document.getElementById('terminalSection').style.display !== 'none'
+                       ? (parseFloat(document.getElementById('terminalCost').value) || 0) : 0;
 
   // All calculated per 100m
   // Copper: n × d² × 0.7 = kg/100m per core
