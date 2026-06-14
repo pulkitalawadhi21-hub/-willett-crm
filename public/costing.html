@@ -219,7 +219,7 @@
       </div>
 
       <!-- 100m section -->
-      <div class="section-label">Per 100 Metres</div>
+      <div class="section-label">Per 100 Metres (Raw Material)</div>
       <div class="line">
         <span class="label">Copper Cost</span>
         <span class="val" id="rCopper">—</span>
@@ -228,17 +228,9 @@
         <span class="label">PVC Cost</span>
         <span class="val" id="rPvc">—</span>
       </div>
-      <div class="line bold">
-        <span class="label">Material Cost</span>
+      <div class="band blue" style="margin-top:4px">
+        <span class="label">Material / 100m</span>
         <span class="val" id="rMaterial">—</span>
-      </div>
-      <div class="line sub">
-        <span class="label">+ Conversion (20%)</span>
-        <span class="val" id="rConversion">—</span>
-      </div>
-      <div class="band blue" style="margin-top:6px">
-        <span class="label">Total / 100m</span>
-        <span class="val" id="rTotal100">—</span>
       </div>
 
       <hr class="divider">
@@ -246,8 +238,12 @@
       <!-- Per 1m -->
       <div class="section-label">Per 1 Metre</div>
       <div class="line sub">
-        <span class="label">Material + Conversion (20%)</span>
+        <span class="label">Material ÷ 100</span>
         <span class="val" id="rPer1m">—</span>
+      </div>
+      <div class="line sub">
+        <span class="label">+ Conversion 20%</span>
+        <span class="val" id="rConversion">—</span>
       </div>
       <div style="display:flex;align-items:center;gap:8px;padding:6px 0 10px;">
         <label style="font-size:.78rem;font-weight:600;color:#555;white-space:nowrap;">Margin %</label>
@@ -356,17 +352,15 @@ function calc() {
   // PVC per 100m
   const pvcKg100m = cableType === 'flat' ? pvcKgDirect : od * 0.85;
 
-  const copperCost100  = copperKg100m * copperRate;
-  const pvcCost100     = pvcKg100m    * pvcRate;
-  const material100    = copperCost100 + pvcCost100;
-  const conversion100  = material100 * 0.20;
-  const total100       = material100 + conversion100;
+  const copperCost100 = copperKg100m * copperRate;
+  const pvcCost100    = pvcKg100m    * pvcRate;
+  const material100   = copperCost100 + pvcCost100;
 
-  // Per 1m
-  const per1m = total100 / 100;
-
-  // Per 1m with margin
-  const per1mMargin = per1m * (1 + margin / 100);
+  // Per 1m: material ÷ 100, then +20% conversion, then +margin%
+  const per1m          = material100 / 100;
+  const conversion1m   = per1m * 0.20;
+  const per1mWithConv  = per1m + conversion1m;
+  const per1mMargin    = per1mWithConv * (1 + margin / 100);
 
   // Per piece: rate/m (with margin) × cord length + accessories
   const pieceMaterial   = per1mMargin * cordLength;
@@ -381,13 +375,12 @@ function calc() {
   document.getElementById('wCopper').textContent = copperKg100m.toFixed(4) + ' kg/100m';
   document.getElementById('wPvc').textContent    = pvcKg100m.toFixed(4)    + ' kg/100m';
 
-  document.getElementById('rCopper').textContent         = fmt(copperCost100);
-  document.getElementById('rPvc').textContent            = fmt(pvcCost100);
-  document.getElementById('rMaterial').textContent       = fmt(material100);
-  document.getElementById('rConversion').textContent     = fmt(conversion100);
-  document.getElementById('rTotal100').textContent       = fmt(total100);
-  document.getElementById('rPer1m').textContent         = fmt(per1m);
-  document.getElementById('rPer1mMargin').textContent   = fmt(per1mMargin);
+  document.getElementById('rCopper').textContent       = fmt(copperCost100);
+  document.getElementById('rPvc').textContent          = fmt(pvcCost100);
+  document.getElementById('rMaterial').textContent     = fmt(material100);
+  document.getElementById('rPer1m').textContent        = fmt(per1m);
+  document.getElementById('rConversion').textContent   = fmt(conversion1m);
+  document.getElementById('rPer1mMargin').textContent  = fmt(per1mMargin);
   document.getElementById('rPieceMaterial').textContent = fmt(pieceMaterial);
   document.getElementById('rAccessories').textContent   = fmt(accessoriesCost);
   document.getElementById('rPieceSell').textContent     = fmt(pieceSell);
