@@ -121,6 +121,7 @@
     <button class="preset-btn" onclick="loadPreset(event,'0.5_2c_flat')">0.5mm 2C Flat</button>
     <button class="preset-btn" onclick="loadPreset(event,'0.75_2c')">0.75mm 2C Round</button>
     <button class="preset-btn" onclick="loadPreset(event,'0.75_3c')">0.75mm 3C Round</button>
+    <button class="preset-btn" onclick="loadPreset(event,'induction')">Induction Cord</button>
     <button class="preset-btn" onclick="loadPreset(event,'custom')">Custom</button>
   </div>
 
@@ -193,14 +194,22 @@
           <input type="number" id="grommets" value="1" min="0" max="10" oninput="calc()">
           <div class="hint">₹1 per grommet</div>
         </div>
-        <div class="field">
+        <!-- Plug section (hidden for induction cord) -->
+        <div id="plugSection" class="field">
           <label>Moulding Plug</label>
           <div class="cores-row" style="margin-bottom:8px">
-            <button class="core-btn" id="plug2pin" onclick="setPlug(2)">2-Pin  ₹7.50</button>
-            <button class="core-btn active" id="plug3pin" onclick="setPlug(3)">3-Pin  ₹10</button>
+            <button class="core-btn" id="plug2pin" onclick="setPlug('2pin',7.5)">2-Pin ₹7.50</button>
+            <button class="core-btn" id="plug3pin" onclick="setPlug('3pin',10)">3-Pin ₹10</button>
+            <button class="core-btn" id="plug16amp" onclick="setPlug('16amp',16.5)">16A ₹16.50</button>
           </div>
           <input type="number" id="plugCost" value="10" min="0" step="0.5" oninput="calc()">
           <div class="hint">Override ₹ if needed</div>
+        </div>
+        <!-- Terminal section (induction cord only) -->
+        <div id="terminalSection" class="field" style="display:none">
+          <label>Terminal Cost</label>
+          <input type="number" id="terminalCost" value="4" min="0" step="0.5" oninput="calc()">
+          <div class="hint">₹4 — both cores have terminal</div>
         </div>
       </div>
     </div>
@@ -254,10 +263,10 @@
         <span class="val" id="rPieceMaterial">—</span>
       </div>
       <div class="line sub">
-        <span class="label">Plug + Thimble + Grommet</span>
+        <span class="label" id="accessoriesLabel">Plug + Thimble + Grommet</span>
         <span class="val" id="rAccessories">—</span>
       </div>
-      <div style="font-size:.7rem;color:#b0bec5;padding:2px 0 8px 10px">Plug price includes margin</div>
+      <div style="font-size:.7rem;color:#b0bec5;padding:2px 0 8px 10px" id="accessoriesNote">Plug price includes margin</div>
 
       <div class="band orange">
         <span class="label">Selling Price / Piece</span>
@@ -272,18 +281,19 @@
 let cores = 3;
 let cableType = 'round';
 
+// plugShow: which plug buttons to show; plugDefault: which to pre-select; terminal: true = induction mode
 const PRESETS = {
-  '0.5_3c':      { strands:16, dia:0.202, cores:3, type:'round', od:6.0,  pvcKg:null, plug:3, cordLen:1.5 },
-  '0.5_2c_flat': { strands:16, dia:0.202, cores:2, type:'flat',  od:null, pvcKg:3.5,  plug:2, cordLen:1.5 },
-  '0.75_2c':     { strands:24, dia:0.202, cores:2, type:'round', od:6.5,  pvcKg:null, plug:2, cordLen:1.5 },
-  '0.75_3c':     { strands:24, dia:0.202, cores:3, type:'round', od:7.0,  pvcKg:null, plug:3, cordLen:1.5 },
+  '0.5_3c':      { strands:16, dia:0.202, cores:3, type:'round', od:6.0,  pvcKg:null, cordLen:1.5, plugShow:['3pin'],          plugDefault:'3pin',  plugCost:10,   terminal:false },
+  '0.5_2c_flat': { strands:16, dia:0.202, cores:2, type:'flat',  od:null, pvcKg:3.5,  cordLen:1.5, plugShow:['2pin'],          plugDefault:'2pin',  plugCost:7.5,  terminal:false },
+  '0.75_2c':     { strands:24, dia:0.202, cores:2, type:'round', od:6.5,  pvcKg:null, cordLen:1.5, plugShow:['2pin'],          plugDefault:'2pin',  plugCost:7.5,  terminal:false },
+  '0.75_3c':     { strands:24, dia:0.202, cores:3, type:'round', od:7.0,  pvcKg:null, cordLen:1.5, plugShow:['16amp'],         plugDefault:'16amp', plugCost:16.5, terminal:false },
+  'induction':   { strands:24, dia:0.202, cores:2, type:'round', od:6.5,  pvcKg:null, cordLen:1.5, plugShow:[],               plugDefault:null,    plugCost:0,    terminal:true  },
   'custom':       null
 };
 
-function setPlug(pins) {
-  document.getElementById('plug2pin').classList.toggle('active', pins === 2);
-  document.getElementById('plug3pin').classList.toggle('active', pins === 3);
-  document.getElementById('plugCost').value = pins === 2 ? 7.5 : 10;
+function setPlug(id, cost) {
+  ['2pin','3pin','16amp'].forEach(p => document.getElementById('plug'+p).classList.toggle('active', p === id));
+  document.getElementById('plugCost').value = cost;
   calc();
 }
 
@@ -292,12 +302,29 @@ function loadPreset(e, key) {
   e.target.classList.add('active');
   const p = PRESETS[key];
   if (!p) return;
-  document.getElementById('strands').value   = p.strands;
-  document.getElementById('strandDia').value = p.dia;
+  document.getElementById('strands').value    = p.strands;
+  document.getElementById('strandDia').value  = p.dia;
   document.getElementById('cordLength').value = p.cordLen;
   if (p.od    !== null) document.getElementById('od').value    = p.od;
   if (p.pvcKg !== null) document.getElementById('pvcKg').value = p.pvcKg;
-  setPlug(p.plug);
+
+  // Show/hide plug buttons
+  ['2pin','3pin','16amp'].forEach(id => {
+    document.getElementById('plug'+id).style.display = p.plugShow.includes(id) ? '' : 'none';
+    document.getElementById('plug'+id).classList.remove('active');
+  });
+  if (p.plugDefault) {
+    document.getElementById('plug'+p.plugDefault).classList.add('active');
+  }
+  document.getElementById('plugCost').value = p.plugCost;
+
+  // Terminal vs plug mode
+  const isTerminal = p.terminal;
+  document.getElementById('plugSection').style.display     = isTerminal ? 'none' : '';
+  document.getElementById('terminalSection').style.display = isTerminal ? '' : 'none';
+  document.getElementById('accessoriesLabel').textContent  = isTerminal ? 'Terminal + Thimble + Grommet' : 'Plug + Thimble + Grommet';
+  document.getElementById('accessoriesNote').textContent   = isTerminal ? 'Terminal ₹4 — both cores' : 'Plug price includes margin';
+
   setCableType(p.type);
   setCore(p.cores);
 }
@@ -329,7 +356,9 @@ function calc() {
   const cordLength  = parseFloat(document.getElementById('cordLength').value)  || 0;
   const thimbles    = parseInt(document.getElementById('thimbles').value)      || 0;
   const grommets    = parseInt(document.getElementById('grommets').value)      || 0;
-  const plugCost    = parseFloat(document.getElementById('plugCost').value)    || 0;
+  const isTerminal   = document.getElementById('terminalSection').style.display !== 'none';
+  const plugCost     = isTerminal ? 0 : (parseFloat(document.getElementById('plugCost').value) || 0);
+  const terminalCost = isTerminal ? (parseFloat(document.getElementById('terminalCost').value) || 0) : 0;
 
   // All calculated per 100m
   // Copper: n × d² × 0.7 = kg/100m per core
@@ -349,7 +378,7 @@ function calc() {
 
   // Per piece: rate/m × cord length + accessories
   const pieceMaterial = per1mWithConv * cordLength;
-  const accessoriesCost = thimbles * 1 + grommets * 1 + plugCost;
+  const accessoriesCost = thimbles * 1 + grommets * 1 + plugCost + terminalCost;
   const pieceSell       = pieceMaterial + accessoriesCost;
 
   // Update cord length labels
@@ -374,7 +403,6 @@ function calc() {
 // Init
 setCableType('round');
 setCore(3);
-setPlug(3);
 loadPreset({ target: document.querySelector('.preset-btn') }, '0.5_3c');
 </script>
 
