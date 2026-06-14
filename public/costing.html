@@ -260,7 +260,7 @@
     <button class="app-btn" id="app-eggboiler" onclick="loadAppliance('eggboiler')">
       <span class="app-icon">🥚</span>
       <span class="app-name">Egg Boiler</span>
-      <span class="app-gauge">0.5mm 3C · ₹6.50 total</span>
+      <span class="app-gauge">0.5mm 3C · ₹7.50 total</span>
     </button>
     <button class="app-btn" id="app-induction" onclick="loadAppliance('induction')">
       <span class="app-icon">🔥</span>
@@ -535,7 +535,7 @@ let solderType = 'non';
 
 const APPLIANCES = {
   kettle:    { strands:16, dia:0.202, cores:3, od:6.0, cordLen:1.0, grommets:0, plugShow:['3pin'],         plugDefault:'3pin',  plugCost:10, assemblyRate:1,            label:'Kettle — Thimble + HST ₹1/core × 3C = ₹3' },
-  eggboiler: { strands:16, dia:0.202, cores:3, od:6.0, cordLen:1.5, grommets:0, plugShow:['3pin'],         plugDefault:'3pin',  plugCost:10, assemblyFlat:6.5,          label:'Egg Boiler — Terminal ₹4 + Work ₹2.50 = ₹6.50' },
+  eggboiler: { strands:16, dia:0.202, cores:3, od:6.0, cordLen:1.5, grommets:0, plugShow:['3pin'],         plugDefault:'3pin',  plugCost:10, assemblyFlat:7.5,          label:'Egg Boiler — Thimble ₹4 + Caps ₹1 + Glass Sleeve ₹2.50 = ₹7.50' },
   induction: { strands:24, dia:0.202, cores:2, od:6.5, cordLen:1.5, grommets:0, plugShow:['3pin','16amp'], plugDefault:'3pin',  plugCost:10, assemblyRate:2.25,         label:'Induction — Thimble + Assembly ₹2.25/core' },
   immersion: { strands:24, dia:0.202, cores:3, od:6.5, cordLen:1.5, grommets:1, plugShow:['3pin','16amp'], plugDefault:'3pin',  plugCost:10, assemblyFlat:4,            label:'Immersion Rod — Ghundi Soldered ₹4 total' }
 };
