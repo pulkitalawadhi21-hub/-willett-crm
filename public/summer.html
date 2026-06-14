@@ -446,18 +446,8 @@ tr:last-child td { border-bottom:none; }
   <div class="sec-label confirmed">Confirmed</div>
   <div class="tbl-wrap">
     <table>
-      <thead><tr><th>Customer</th><th>Location</th><th class="num">Monthly</th><th>Note</th></tr></thead>
-      <tbody>
-        <tr><td><strong>Manjeet</strong></td><td>Bahadurgarh</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-        <tr><td><strong>Helios</strong></td><td>—</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-        <tr><td><strong>Kundi</strong></td><td>—</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-        <tr><td><strong>Keeline</strong></td><td>Hyderabad</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-        <tr><td><strong>Capri</strong></td><td>Delhi</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-        <tr><td><strong>Tecnia</strong></td><td>Karnataka</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-        <tr><td><strong>Donut</strong></td><td>—</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-        <tr><td><strong>Dheeraj Ji</strong></td><td>Bhalswa, Delhi</td><td class="num tbd">TBD</td><td class="note"></td></tr>
-        <tr><td><strong>Bluebird Stabiliser</strong></td><td>—</td><td class="num tbd">TBD</td><td class="note">Stabiliser</td></tr>
-      </tbody>
+      <thead><tr><th>Customer</th><th>Address / Location</th><th class="num">Monthly</th><th>Action</th></tr></thead>
+      <tbody id="invConfTbody"></tbody>
     </table>
   </div>
 
@@ -574,6 +564,61 @@ function renderBrands() {
 }
 
 renderBrands();
+
+// ── Transformer / Stabiliser confirmed ──
+const INV_CUSTOMERS = [
+  { key:'manjeet',   name:'Manjeet',            addr:'Bahadurgarh' },
+  { key:'helios',    name:'Helios',              addr:'' },
+  { key:'kundi',     name:'Kundi',               addr:'' },
+  { key:'keeline',   name:'Keeline',             addr:'Hyderabad' },
+  { key:'capri',     name:'Capri',               addr:'Delhi' },
+  { key:'tecnia',    name:'Tecnia',              addr:'Karnataka' },
+  { key:'donut',     name:'Donut',               addr:'' },
+  { key:'dheeraj',   name:'Dheeraj Ji',          addr:'Bhalswa, Delhi' },
+  { key:'bluebird',  name:'Bluebird Stabiliser', addr:'' },
+];
+
+function invState(key) {
+  try { return JSON.parse(localStorage.getItem('inv_' + key)) || {}; } catch { return {}; }
+}
+function saveInvState(key, field, val) {
+  const s = invState(key);
+  s[field] = val;
+  localStorage.setItem('inv_' + key, JSON.stringify(s));
+}
+
+function editCell(key, field, el) {
+  saveInvState(key, field, el.innerText.trim());
+}
+
+function renderInvConf() {
+  const tbody = document.getElementById('invConfTbody');
+  if (!tbody) return;
+  tbody.innerHTML = INV_CUSTOMERS.map(c => {
+    const s      = invState(c.key);
+    const addr   = s.addr   !== undefined ? s.addr   : c.addr;
+    const monthly= s.monthly !== undefined ? s.monthly : '';
+    const action = s.action !== undefined ? s.action : '';
+    const edStyle = 'display:block;font-size:.8rem;outline:none;cursor:text;border-bottom:1px dashed transparent;min-width:80px';
+    return `<tr>
+      <td><strong>${c.name}</strong></td>
+      <td><span contenteditable="true" style="${edStyle};color:#444"
+        onfocus="this.style.borderBottomColor='#1a237e'"
+        onblur="this.style.borderBottomColor='transparent';editCell('${c.key}','addr',this)"
+      >${addr || '—'}</span></td>
+      <td class="num"><span contenteditable="true" style="${edStyle};color:#1a237e;font-weight:600;text-align:right"
+        onfocus="this.style.borderBottomColor='#1a237e'"
+        onblur="this.style.borderBottomColor='transparent';editCell('${c.key}','monthly',this)"
+      >${monthly || 'TBD'}</span></td>
+      <td style="min-width:180px"><span contenteditable="true" style="${edStyle};color:#555"
+        onfocus="this.style.borderBottomColor='#1a237e'"
+        onblur="this.style.borderBottomColor='transparent';editCell('${c.key}','action',this)"
+      >${action || 'Click to add action…'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+renderInvConf();
 </script>
 </body>
 </html>
