@@ -123,19 +123,19 @@ tr:last-child td { border-bottom:none; }
 <!-- Summary Bar -->
 <div class="sum-bar">
   <div class="sum-item">
-    <div class="lbl">Confirmed Customers</div>
-    <div class="val green">Active</div>
-    <div class="day">Base + Fan + Cooler</div>
+    <div class="lbl">Confirmed Pcs / Month</div>
+    <div class="val green">4,84,000</div>
+    <div class="day">Base 1,90,000 · Fan 2,15,000 · Cooler 79,000</div>
   </div>
   <div class="sum-item">
-    <div class="lbl">Pipeline</div>
-    <div class="val orange">AC / Fridge / Inverter</div>
-    <div class="day">Targets in progress</div>
+    <div class="lbl">Pipeline Cords / Month</div>
+    <div class="val orange">4,77,000+</div>
+    <div class="day">Fan 2,45,000 · Cooler 1,90,000 · Fridge 42,000</div>
   </div>
   <div class="sum-item">
-    <div class="lbl">Big Brands</div>
-    <div class="val blue">Luminous · Amber · PG</div>
-    <div class="day">Long-term conversion</div>
+    <div class="lbl">Goal if All Convert</div>
+    <div class="val blue">10,61,000+</div>
+    <div class="day">42,440+ / day</div>
   </div>
 </div>
 
@@ -172,6 +172,7 @@ tr:last-child td { border-bottom:none; }
         <tr><td>NEW</td><td class="num">20,000</td></tr>
         <tr><td>ARW</td><td class="num">20,000</td></tr>
         <tr><td>DSN</td><td class="num">10,000</td></tr>
+        <tr class="tot c"><td>Total</td><td class="num">1,90,000</td></tr>
       </tbody>
     </table>
   </div>
@@ -189,6 +190,7 @@ tr:last-child td { border-bottom:none; }
         <tr><td>KWW</td><td class="num">20,000</td></tr>
         <tr><td>DNG</td><td class="num">15,000</td></tr>
         <tr><td>KKG <span style="font-size:.72rem;color:#aaa">(Hyd / Noida / Haridwar)</span></td><td class="num">20,000</td></tr>
+        <tr class="tot c"><td>Total</td><td class="num">2,15,000</td></tr>
       </tbody>
     </table>
   </div>
@@ -207,6 +209,7 @@ tr:last-child td { border-bottom:none; }
         <tr><td>Poswal</td><td class="num">5,000</td></tr>
         <tr><td>BLU</td><td class="num">5,000</td></tr>
         <tr><td>Vikram</td><td class="num">4,000</td></tr>
+        <tr class="tot c"><td>Total</td><td class="num">79,000</td></tr>
       </tbody>
     </table>
   </div>
@@ -577,6 +580,7 @@ function eTabSave(section, key, field, el) {
   const s = JSON.parse(localStorage.getItem(lsKey) || '{}');
   s[field] = el.innerText.trim();
   localStorage.setItem(lsKey, JSON.stringify(s));
+  if (field === 'monthly') renderETab(section);
 }
 
 function eTabDelete(section, key, isExtra) {
@@ -630,16 +634,33 @@ function eTabMakeRow(section, key, defaults, isExtra) {
   </tr>`;
 }
 
+function eTabGetVal(section, key, defaultVal) {
+  const saved = JSON.parse(localStorage.getItem('etr_' + section + '_' + key) || 'null') || {};
+  const raw = saved.monthly !== undefined ? saved.monthly : (defaultVal || '');
+  return parseInt(raw.replace(/[^0-9]/g,'')) || 0;
+}
+
 function renderETab(section) {
   const tbody = document.getElementById('etab_' + section);
   if (!tbody) return;
   const defaults = ETAB_DEFAULTS[section] || [];
   const deleted  = JSON.parse(localStorage.getItem('etab_del_' + section) || '[]');
   const extras   = JSON.parse(localStorage.getItem('etab_add_' + section) || '[]');
-  const baseRows  = defaults.filter(r => !deleted.includes(r.key)).map(r => eTabMakeRow(section, r.key, r, false));
+  const activeDefaults = defaults.filter(r => !deleted.includes(r.key));
+  const baseRows  = activeDefaults.map(r => eTabMakeRow(section, r.key, r, false));
   const extraRows = extras.map(k => eTabMakeRow(section, k, {}, true));
-  tbody.innerHTML = [...baseRows, ...extraRows].join('') ||
-    `<tr><td colspan="4" style="color:#bbb;font-size:.8rem;padding:10px 0">No entries — click + Add below</td></tr>`;
+  const rows = [...baseRows, ...extraRows];
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="4" style="color:#bbb;font-size:.8rem;padding:10px 0">No entries — click + Add below</td></tr>`;
+    return;
+  }
+  // calc total
+  let total = 0;
+  activeDefaults.forEach(r => { total += eTabGetVal(section, r.key, r.monthly); });
+  extras.forEach(k => { total += eTabGetVal(section, k, ''); });
+  const totalFmt = total > 0 ? total.toLocaleString('en-IN') : '—';
+  const totalRow = `<tr class="tot c"><td colspan="2" style="text-align:right;font-weight:800;padding-right:14px">Total</td><td class="num" style="font-weight:800;color:#2e7d32">${totalFmt}</td><td></td></tr>`;
+  tbody.innerHTML = rows.join('') + totalRow;
 }
 
 Object.keys(ETAB_DEFAULTS).forEach(renderETab);
