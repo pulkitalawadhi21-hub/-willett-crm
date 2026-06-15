@@ -151,6 +151,7 @@ tr:last-child td { border-bottom:none; }
   <button class="app-tab" onclick="showTab('water')">Water Dispenser</button>
   <button class="app-tab" onclick="showTab('tools')">Tools</button>
   <button class="app-tab" onclick="showTab('inverter')">Inverter / Stabiliser</button>
+  <button class="app-tab" onclick="showTab('cmotor')">Cooler Motor</button>
 </div>
 
 <!-- ═══════════════ OVERVIEW ═══════════════ -->
@@ -345,6 +346,19 @@ tr:last-child td { border-bottom:none; }
   <div class="sec-label target" style="margin-top:1.2rem">Targets</div>
   <div class="tbl-wrap"><table><thead><tr><th>Customer</th><th class="num">Pcs</th><th>Note</th><th></th></tr></thead><tbody id="etab_tools_tgt"></tbody></table></div>
   <button class="etab-add-btn" onclick="eTabAdd('tools_tgt')">+ Add Target</button>
+</div>
+</div>
+
+<!-- ═══════════════ COOLER MOTOR ═══════════════ -->
+<div id="tab-cmotor" class="tab-panel">
+<div class="content">
+  <div class="sec-label confirmed">Confirmed</div>
+  <div class="tbl-wrap"><table><thead><tr><th>Customer</th><th class="num">Pcs</th><th>Note</th><th></th></tr></thead><tbody id="etab_cmotor_conf"></tbody></table></div>
+  <button class="etab-add-btn" onclick="eTabAdd('cmotor_conf')">+ Add Customer</button>
+
+  <div class="sec-label target" style="margin-top:1.2rem">Targets</div>
+  <div class="tbl-wrap"><table><thead><tr><th>Customer</th><th class="num">Pcs</th><th>Note</th><th></th></tr></thead><tbody id="etab_cmotor_tgt"></tbody></table></div>
+  <button class="etab-add-btn" onclick="eTabAdd('cmotor_tgt')">+ Add Target</button>
 </div>
 </div>
 
@@ -573,6 +587,8 @@ const ETAB_DEFAULTS = {
   ],
   tools_conf: [],
   tools_tgt:  [],
+  cmotor_conf: [],
+  cmotor_tgt:  [],
 };
 
 function eTabSave(section, key, field, el) {
