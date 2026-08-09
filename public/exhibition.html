@@ -179,6 +179,36 @@
     padding: 10px 14px;
     background: white;
   }
+  .badge {
+    display: inline-block;
+    padding: 3.5px 9px;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-right: 6px;
+    margin-bottom: 8px;
+    border: 1px solid transparent;
+  }
+  .badge-action.meeting {
+    background: #f5e6ff;
+    color: #8a2be2;
+    border-color: #d8b2ff;
+  }
+  .badge-action.sampling {
+    background: #e0f7fa;
+    color: #00838f;
+    border-color: #b2ebf2;
+  }
+  .badge-action.followup {
+    background: #fff3e0;
+    color: #e65100;
+    border-color: #ffe0b2;
+  }
+  .badge-week {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-color: #c8e6c9;
+  }
   .ex-card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -384,6 +414,20 @@
       </div>
 
       <div style="display:flex;gap:10px;align-items:center;">
+        <select id="filter-action" class="select-assign" onchange="filterList()" style="margin-bottom:0;padding:8px 12px;font-size:0.8rem;border-color:#cbd5e1;">
+          <option value="">All Actions</option>
+          <option value="Meeting">🎯 Meeting</option>
+          <option value="Sampling">🧪 Sampling</option>
+          <option value="Followup">📞 Followup</option>
+          <option value="None">No Action</option>
+        </select>
+        
+        <select id="filter-week" class="select-assign" onchange="filterList()" style="margin-bottom:0;padding:8px 12px;font-size:0.8rem;border-color:#cbd5e1;">
+          <option value="">All Weeks</option>
+        </select>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center;">
         <button class="btn btn-premium-outline" onclick="openBulkModal()">🚀 Bulk Import</button>
         <button class="btn btn-premium" onclick="openAddModal()">+ Add Lead</button>
         <button class="btn btn-premium-outline" style="background:#ffd54f;border-color:#f5b041;color:#512e5f;" onclick="triggerAutoSplit()">⚡ Auto Split 50/50</button>
@@ -458,6 +502,26 @@
         </select>
       </div>
     </div>
+    <div class="row">
+      <div class="col">
+        <label>Action Tag</label>
+        <select id="a-action">
+          <option value="None">None</option>
+          <option value="Meeting">🎯 Meeting</option>
+          <option value="Sampling">🧪 Sampling</option>
+          <option value="Followup">📞 Followup</option>
+        </select>
+      </div>
+      <div class="col">
+        <label>Schedule Week</label>
+        <input type="text" id="a-week" placeholder="e.g. 10-15 August" list="week-suggestions">
+        <datalist id="week-suggestions">
+          <option value="10-15 August">
+          <option value="17-22 August">
+          <option value="24-29 August">
+        </datalist>
+      </div>
+    </div>
     <label>Notes</label>
     <textarea id="a-notes" rows="3" placeholder="What they manufacture, product interest, etc..."></textarea>
     <div id="add-msg" style="margin-bottom:8px;font-size:0.85rem;color:#ef4444;font-weight:600;"></div>
@@ -510,6 +574,21 @@
         </select>
       </div>
     </div>
+    <div class="row">
+      <div class="col">
+        <label>Action Tag</label>
+        <select id="e-action">
+          <option value="None">None</option>
+          <option value="Meeting">🎯 Meeting</option>
+          <option value="Sampling">🧪 Sampling</option>
+          <option value="Followup">📞 Followup</option>
+        </select>
+      </div>
+      <div class="col">
+        <label>Schedule Week</label>
+        <input type="text" id="e-week" placeholder="e.g. 10-15 August" list="week-suggestions">
+      </div>
+    </div>
     <label>Notes</label>
     <textarea id="e-notes" rows="3"></textarea>
     <div id="edit-msg" style="margin-bottom:8px;font-size:0.85rem;color:#ef4444;font-weight:600;"></div>
@@ -545,14 +624,42 @@ async function loadStats() {
 
 async function loadLeads() {
   const searchVal = document.getElementById('search').value.trim();
+  const filterAction = document.getElementById('filter-action').value;
+  const filterWeek = document.getElementById('filter-week').value;
+  
   let url = `/api/exhibition?q=${encodeURIComponent(searchVal)}`;
   
   if (currentTab !== 'all') {
     url += `&assigned_to=${encodeURIComponent(currentTab)}`;
   }
+  if (filterAction) {
+    url += `&action_tag=${encodeURIComponent(filterAction)}`;
+  }
+  if (filterWeek) {
+    url += `&schedule_week=${encodeURIComponent(filterWeek)}`;
+  }
   
   allLeads = await fetch(url).then(r => r.json());
   renderGrid(allLeads);
+}
+
+async function loadWeeks() {
+  const select = document.getElementById('filter-week');
+  const currentVal = select.value;
+  
+  try {
+    const weeks = await fetch('/api/exhibition/weeks').then(r => r.json());
+    select.innerHTML = '<option value="">All Weeks</option>';
+    weeks.forEach(w => {
+      select.innerHTML += `<option value="${w}">${w}</option>`;
+    });
+    
+    if (weeks.includes(currentVal)) {
+      select.value = currentVal;
+    }
+  } catch (e) {
+    console.error("Error loading weeks:", e);
+  }
 }
 
 function renderGrid(leads) {
@@ -592,6 +699,11 @@ function renderGrid(leads) {
         <div>
           <div class="contact-name-main">${l.name}</div>
           <div class="contact-company">${l.company || 'No Company'}</div>
+          
+          <div style="margin-top: -6px; margin-bottom: 12px; display: flex; flex-wrap: wrap;">
+            ${l.action_tag && l.action_tag !== 'None' ? `<span class="badge badge-action ${l.action_tag.toLowerCase()}">${l.action_tag === 'Meeting' ? '🎯 Meeting' : l.action_tag === 'Sampling' ? '🧪 Sampling' : '📞 Followup'}</span>` : ''}
+            ${l.schedule_week ? `<span class="badge badge-week">📅 ${l.schedule_week}</span>` : ''}
+          </div>
           
           ${l.phone ? `
             <div class="contact-detail">
@@ -682,6 +794,8 @@ function openAddModal() {
   document.getElementById('a-email').value = '';
   document.getElementById('a-assigned').value = 'Unassigned';
   document.getElementById('a-status').value = 'Pending';
+  document.getElementById('a-action').value = 'None';
+  document.getElementById('a-week').value = '';
   document.getElementById('a-notes').value = '';
   document.getElementById('add-modal').classList.add('open');
 }
@@ -697,6 +811,8 @@ async function saveSingleContact() {
   const email = document.getElementById('a-email').value.trim();
   const assigned_to = document.getElementById('a-assigned').value;
   const status = document.getElementById('a-status').value;
+  const action_tag = document.getElementById('a-action').value;
+  const schedule_week = document.getElementById('a-week').value.trim();
   const notes = document.getElementById('a-notes').value.trim();
   
   if (!name) {
@@ -704,7 +820,7 @@ async function saveSingleContact() {
     return;
   }
   
-  const body = { name, company, phone, email, assigned_to, status, notes };
+  const body = { name, company, phone, email, assigned_to, status, notes, action_tag, schedule_week };
   const res = await fetch('/api/exhibition', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -714,6 +830,7 @@ async function saveSingleContact() {
   if (res.ok) {
     closeAddModal();
     loadStats();
+    loadWeeks();
     loadLeads();
   } else {
     const err = await res.json();
@@ -734,6 +851,8 @@ async function openEditModal(id) {
   document.getElementById('e-email').value = lead.email || '';
   document.getElementById('e-assigned').value = lead.assigned_to;
   document.getElementById('e-status').value = lead.status;
+  document.getElementById('e-action').value = lead.action_tag || 'None';
+  document.getElementById('e-week').value = lead.schedule_week || '';
   document.getElementById('e-notes').value = lead.notes || '';
   
   document.getElementById('edit-modal').classList.add('open');
@@ -751,6 +870,8 @@ async function saveEdit() {
   const email = document.getElementById('e-email').value.trim();
   const assigned_to = document.getElementById('e-assigned').value;
   const status = document.getElementById('e-status').value;
+  const action_tag = document.getElementById('e-action').value;
+  const schedule_week = document.getElementById('e-week').value.trim();
   const notes = document.getElementById('e-notes').value.trim();
   
   if (!name) {
@@ -758,7 +879,7 @@ async function saveEdit() {
     return;
   }
   
-  const body = { name, company, phone, email, assigned_to, status, notes };
+  const body = { name, company, phone, email, assigned_to, status, notes, action_tag, schedule_week };
   const res = await fetch(`/api/exhibition/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -768,6 +889,7 @@ async function saveEdit() {
   if (res.ok) {
     closeEditModal();
     loadStats();
+    loadWeeks();
     loadLeads();
   } else {
     const err = await res.json();
@@ -779,6 +901,7 @@ async function deleteLead(id) {
   if (!confirm('Are you sure you want to delete this exhibition lead?')) return;
   await fetch(`/api/exhibition/${id}`, { method: 'DELETE' });
   loadStats();
+  loadWeeks();
   loadLeads();
 }
 
@@ -872,6 +995,7 @@ async function saveBulkImport() {
     if (res.ok) {
       closeBulkModal();
       loadStats();
+      loadWeeks();
       loadLeads();
     } else {
       const err = await res.json();
@@ -887,6 +1011,7 @@ async function saveBulkImport() {
 
 // ── INITIAL LOAD ──
 loadStats();
+loadWeeks();
 loadLeads();
 </script>
 </body>

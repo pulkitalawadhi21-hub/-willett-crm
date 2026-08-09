@@ -260,4 +260,16 @@ db.exec(`
   UPDATE exhibition_contacts SET assigned_to = 'Garv' WHERE assigned_to = 'Brother';
 `);
 
+// Add new columns if they do not exist
+const tableInfo = db.pragma("table_info(exhibition_contacts)");
+const hasActionTag = tableInfo.some(col => col.name === 'action_tag');
+const hasScheduleWeek = tableInfo.some(col => col.name === 'schedule_week');
+
+if (!hasActionTag) {
+  db.exec("ALTER TABLE exhibition_contacts ADD COLUMN action_tag TEXT DEFAULT 'None'");
+}
+if (!hasScheduleWeek) {
+  db.exec("ALTER TABLE exhibition_contacts ADD COLUMN schedule_week TEXT DEFAULT ''");
+}
+
 module.exports = db;

@@ -263,7 +263,7 @@ app.get('/api/stats', (req, res) => {
 // ── EXHIBITION TRACKER ──
 
 app.get('/api/exhibition', (req, res) => {
-  const { assigned_to, status, q } = req.query;
+  const { assigned_to, status, q, action_tag, schedule_week } = req.query;
   let query = 'SELECT * FROM exhibition_contacts WHERE 1=1';
   const params = [];
   
@@ -274,6 +274,14 @@ app.get('/api/exhibition', (req, res) => {
   if (status) {
     query += ' AND status = ?';
     params.push(status);
+  }
+  if (action_tag) {
+    query += ' AND action_tag = ?';
+    params.push(action_tag);
+  }
+  if (schedule_week) {
+    query += ' AND schedule_week = ?';
+    params.push(schedule_week);
   }
   
   let rows = db.prepare(query + ' ORDER BY id DESC').all(params);
@@ -290,13 +298,22 @@ app.get('/api/exhibition', (req, res) => {
   res.json(rows);
 });
 
+app.get('/api/exhibition/weeks', (req, res) => {
+  try {
+    const rows = db.prepare("SELECT DISTINCT schedule_week FROM exhibition_contacts WHERE schedule_week IS NOT NULL AND schedule_week != '' ORDER BY schedule_week ASC").all();
+    res.json(rows.map(r => r.schedule_week));
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.post('/api/exhibition', (req, res) => {
-  const { name, company, phone, email, notes, assigned_to, status } = req.body;
+  const { name, company, phone, email, notes, assigned_to, status, action_tag, schedule_week } = req.body;
   if (!name) return res.status(400).json({ error: 'Name is required' });
   
   const r = db.prepare(`
-    INSERT INTO exhibition_contacts (name, company, phone, email, notes, assigned_to, status)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO exhibition_contacts (name, company, phone, email, notes, assigned_to, status, action_tag, schedule_week)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     name,
     company || null,
@@ -304,7 +321,9 @@ app.post('/api/exhibition', (req, res) => {
     email || null,
     notes || null,
     assigned_to || 'Unassigned',
-    status || 'Pending'
+    status || 'Pending',
+    action_tag || 'None',
+    schedule_week || ''
   );
   res.json({ id: r.lastInsertRowid });
 });
@@ -316,8 +335,8 @@ app.post('/api/exhibition/bulk', (req, res) => {
   }
   
   const insert = db.prepare(`
-    INSERT INTO exhibition_contacts (name, company, phone, email, notes, assigned_to, status)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO exhibition_contacts (name, company, phone, email, notes, assigned_to, status, action_tag, schedule_week)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 'None', '')
   `);
   
   const insertMany = db.transaction((list) => {
@@ -341,14 +360,14 @@ app.post('/api/exhibition/bulk', (req, res) => {
 
 app.put('/api/exhibition/:id', (req, res) => {
   const id = parseInt(req.params.id);
-  const { name, company, phone, email, notes, assigned_to, status } = req.body;
+  const { name, company, phone, email, notes, assigned_to, status, action_tag, schedule_week } = req.body;
   
   const existing = db.prepare('SELECT * FROM exhibition_contacts WHERE id = ?').get(id);
   if (!existing) return res.status(404).json({ error: 'Not found' });
   
   db.prepare(`
     UPDATE exhibition_contacts 
-    SET name = ?, company = ?, phone = ?, email = ?, notes = ?, assigned_to = ?, status = ?
+    SET name = ?, company = ?, phone = ?, email = ?, notes = ?, assigned_to = ?, status = ?, action_tag = ?, schedule_week = ?
     WHERE id = ?
   `).run(
     name !== undefined ? name : existing.name,
@@ -358,6 +377,8 @@ app.put('/api/exhibition/:id', (req, res) => {
     notes !== undefined ? notes : existing.notes,
     assigned_to !== undefined ? assigned_to : existing.assigned_to,
     status !== undefined ? status : existing.status,
+    action_tag !== undefined ? action_tag : existing.action_tag,
+    schedule_week !== undefined ? schedule_week : existing.schedule_week,
     id
   );
   res.json({ ok: true });
