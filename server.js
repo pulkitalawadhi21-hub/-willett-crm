@@ -378,7 +378,7 @@ app.post('/api/exhibition/split', (req, res) => {
   const update = db.prepare("UPDATE exhibition_contacts SET assigned_to = ? WHERE id = ?");
   const runSplit = db.transaction((list) => {
     list.forEach((contact, idx) => {
-      const assignee = idx % 2 === 0 ? 'Pulkit' : 'Brother';
+      const assignee = idx % 2 === 0 ? 'Pulkit' : 'Garv';
       update.run(assignee, contact.id);
     });
   });
@@ -396,16 +396,16 @@ app.get('/api/exhibition/stats', (req, res) => {
   const pulkitCompleted = db.prepare("SELECT COUNT(*) as n FROM exhibition_contacts WHERE assigned_to = 'Pulkit' AND status = 'Completed'").get().n;
   const pulkitPending = db.prepare("SELECT COUNT(*) as n FROM exhibition_contacts WHERE assigned_to = 'Pulkit' AND status = 'Pending'").get().n;
   
-  const brotherTotal = db.prepare("SELECT COUNT(*) as n FROM exhibition_contacts WHERE assigned_to = 'Brother'").get().n;
-  const brotherCompleted = db.prepare("SELECT COUNT(*) as n FROM exhibition_contacts WHERE assigned_to = 'Brother' AND status = 'Completed'").get().n;
-  const brotherPending = db.prepare("SELECT COUNT(*) as n FROM exhibition_contacts WHERE assigned_to = 'Brother' AND status = 'Pending'").get().n;
+  const brotherTotal = db.prepare("SELECT COUNT(*) as n FROM exhibition_contacts WHERE assigned_to = 'Garv'").get().n;
+  const brotherCompleted = db.prepare("SELECT COUNT(*) as n FROM exhibition_contacts WHERE assigned_to = 'Garv' AND status = 'Completed'").get().n;
+  const brotherPending = db.prepare("SELECT COUNT(*) as n FROM exhibition_contacts WHERE assigned_to = 'Garv' AND status = 'Pending'").get().n;
   
   const unassigned = db.prepare("SELECT COUNT(*) as n FROM exhibition_contacts WHERE assigned_to = 'Unassigned'").get().n;
   
   res.json({
     total, completed, pending,
     pulkit: { total: pulkitTotal, completed: pulkitCompleted, pending: pulkitPending },
-    brother: { total: brotherTotal, completed: brotherCompleted, pending: brotherPending },
+    garv: { total: brotherTotal, completed: brotherCompleted, pending: brotherPending },
     unassigned
   });
 });
@@ -440,7 +440,7 @@ app.get('/api/exhibition/whatsapp-query', (req, res) => {
   if (sender && pulkitPhone && sender === pulkitPhone) {
     identifiedUser = 'Pulkit';
   } else if (sender && brotherPhone && sender === brotherPhone) {
-    identifiedUser = 'Brother';
+    identifiedUser = 'Garv';
   }
 
   let listUser = null;
@@ -449,8 +449,8 @@ app.get('/api/exhibition/whatsapp-query', (req, res) => {
 
   if (subCmd === 'pulkit' || subCmd === 'p') {
     listUser = 'Pulkit';
-  } else if (subCmd === 'brother' || subCmd === 'b') {
-    listUser = 'Brother';
+  } else if (subCmd === 'brother' || subCmd === 'b' || subCmd === 'garv' || subCmd === 'g') {
+    listUser = 'Garv';
   } else if (subCmd === 'all' || subCmd === 'a') {
     showAll = true;
   } else if (subCmd === 'unassigned' || subCmd === 'u') {
@@ -464,7 +464,7 @@ app.get('/api/exhibition/whatsapp-query', (req, res) => {
           COUNT(*) as total,
           SUM(case when status='Completed' then 1 else 0 end) as completed,
           SUM(case when assigned_to='Pulkit' AND status='Pending' then 1 else 0 end) as pulkit_pending,
-          SUM(case when assigned_to='Brother' AND status='Pending' then 1 else 0 end) as brother_pending,
+          SUM(case when assigned_to='Garv' AND status='Pending' then 1 else 0 end) as garv_pending,
           SUM(case when assigned_to='Unassigned' then 1 else 0 end) as unassigned
         FROM exhibition_contacts
       `).get();
@@ -472,7 +472,7 @@ app.get('/api/exhibition/whatsapp-query', (req, res) => {
       const totalCount = stats.total || 0;
       const completedCount = stats.completed || 0;
       const pulkitPending = stats.pulkit_pending || 0;
-      const brotherPending = stats.brother_pending || 0;
+      const garvPending = stats.garv_pending || 0;
       const unassignedCount = stats.unassigned || 0;
       
       let reply = `📊 *Exhibition Lead Tracker*\n`;
@@ -480,11 +480,11 @@ app.get('/api/exhibition/whatsapp-query', (req, res) => {
       reply += `Completed: ${completedCount} / ${totalCount} (${totalCount ? Math.round(completedCount/totalCount*100) : 0}%)\n\n`;
       reply += `📋 *Pending List Counts:*\n`;
       reply += `- Pulkit's List: ${pulkitPending} pending\n`;
-      reply += `- Brother's List: ${brotherPending} pending\n`;
+      reply += `- Garv's List: ${garvPending} pending\n`;
       reply += `- Unassigned: ${unassignedCount}\n\n`;
       reply += `💡 *Commands:*\n`;
       reply += `- \`exhibition pulkit\`\n`;
-      reply += `- \`exhibition brother\`\n`;
+      reply += `- \`exhibition garv\`\n`;
       reply += `- \`exhibition unassigned\`\n`;
       reply += `- \`exhibition all\`\n`;
       reply += `- \`exhibition met <id>\` : Mark as met\n\n`;

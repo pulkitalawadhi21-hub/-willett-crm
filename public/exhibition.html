@@ -211,7 +211,7 @@
   .ex-card.Pending {
     border-left: 4px solid #6366f1;
   }
-  .ex-card.Brother.Pending {
+  .ex-card.Garv.Pending {
     border-left-color: #f59e0b;
   }
   .ex-card.Unassigned.Pending {
@@ -358,7 +358,7 @@
       <span class="kpi-sub" id="kpi-pulkit-total">0 assigned</span>
     </div>
     <div class="kpi-card brother">
-      <span class="kpi-title">Brother's Leads</span>
+      <span class="kpi-title">Garv's Leads</span>
       <span class="kpi-value" id="kpi-brother-pending">0</span>
       <span class="kpi-sub" id="kpi-brother-total">0 assigned</span>
     </div>
@@ -375,7 +375,7 @@
       <div class="tab-container" id="tabs">
         <button class="tab-btn active" onclick="switchTab('all', this)">All Contacts</button>
         <button class="tab-btn" onclick="switchTab('Pulkit', this)">Pulkit</button>
-        <button class="tab-btn" onclick="switchTab('Brother', this)">Brother</button>
+        <button class="tab-btn" onclick="switchTab('Garv', this)">Garv</button>
         <button class="tab-btn" onclick="switchTab('Unassigned', this)">Unassigned</button>
       </div>
 
@@ -447,7 +447,7 @@
         <select id="a-assigned">
           <option value="Unassigned">Unassigned</option>
           <option value="Pulkit">Pulkit</option>
-          <option value="Brother">Brother</option>
+          <option value="Garv">Garv</option>
         </select>
       </div>
       <div class="col">
@@ -499,7 +499,7 @@
         <select id="e-assigned">
           <option value="Unassigned">Unassigned</option>
           <option value="Pulkit">Pulkit</option>
-          <option value="Brother">Brother</option>
+          <option value="Garv">Garv</option>
         </select>
       </div>
       <div class="col">
@@ -537,8 +537,8 @@ async function loadStats() {
   document.getElementById('kpi-pulkit-pending').textContent = s.pulkit.pending;
   document.getElementById('kpi-pulkit-total').textContent = `${s.pulkit.total} assigned`;
   
-  document.getElementById('kpi-brother-pending').textContent = s.brother.pending;
-  document.getElementById('kpi-brother-total').textContent = `${s.brother.total} assigned`;
+  document.getElementById('kpi-brother-pending').textContent = s.garv.pending;
+  document.getElementById('kpi-brother-total').textContent = `${s.garv.total} assigned`;
   
   document.getElementById('kpi-unassigned').textContent = s.unassigned;
 }
@@ -613,7 +613,7 @@ function renderGrid(leads) {
           <select class="select-assign" onchange="updateAssignment(${l.id}, this.value)">
             <option value="Unassigned" ${l.assigned_to === 'Unassigned' ? 'selected' : ''}>Unassigned</option>
             <option value="Pulkit" ${l.assigned_to === 'Pulkit' ? 'selected' : ''}>Pulkit</option>
-            <option value="Brother" ${l.assigned_to === 'Brother' ? 'selected' : ''}>Brother</option>
+            <option value="Garv" ${l.assigned_to === 'Garv' ? 'selected' : ''}>Garv</option>
           </select>
           
           <label style="display:flex;align-items:center;gap:6px;font-size:0.8rem;font-weight:700;margin-bottom:0;cursor:pointer;flex-grow:1;justify-content:center;">

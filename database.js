@@ -255,4 +255,9 @@ if (summerCount === 0) {
   seedTransaction(seeds);
 }
 
+// Migrate "Brother" assignments to "Garv"
+db.exec(`
+  UPDATE exhibition_contacts SET assigned_to = 'Garv' WHERE assigned_to = 'Brother';
+`);
+
 module.exports = db;
