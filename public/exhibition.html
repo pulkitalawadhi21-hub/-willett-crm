@@ -846,6 +846,12 @@ async function saveBulkImport() {
       name = parts[0];
     }
     
+    // Fallback: If contact name is empty but company is provided, use company as name
+    if (!name && company) {
+      name = company;
+      company = '';
+    }
+    
     contacts.push({ name, company, phone, notes });
   }
   
