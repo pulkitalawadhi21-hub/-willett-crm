@@ -454,24 +454,72 @@ function offDisplay(v) {
   return '<span style="color:#ccc;cursor:pointer">—</span>';
 }
 
-function toggleRef(key) {
+async function toggleRef(key) {
   const s = brandState(key);
   const cur = REF_STATES.indexOf(s.ref || 'none');
   s.ref = REF_STATES[(cur + 1) % REF_STATES.length];
   saveBrandState(key, s);
   renderBrands();
+  
+  const b = BRANDS.find(x => x.key === key) || {};
+  await fetch('/api/summer-targets/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      section: 'brands',
+      customer_key: key,
+      name: b.name || key,
+      volume: b.segment || '',
+      note: s.action || b.action || '',
+      star: b.star ? 1 : 0,
+      ref_status: s.ref,
+      off_status: s.office || 'none'
+    })
+  });
 }
-function toggleOff(key) {
+async function toggleOff(key) {
   const s = brandState(key);
   const cur = OFF_STATES.indexOf(s.office || 'none');
   s.office = OFF_STATES[(cur + 1) % OFF_STATES.length];
   saveBrandState(key, s);
   renderBrands();
+  
+  const b = BRANDS.find(x => x.key === key) || {};
+  await fetch('/api/summer-targets/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      section: 'brands',
+      customer_key: key,
+      name: b.name || key,
+      volume: b.segment || '',
+      note: s.action || b.action || '',
+      star: b.star ? 1 : 0,
+      ref_status: s.ref || 'none',
+      off_status: s.office
+    })
+  });
 }
-function saveAction(key, val) {
+async function saveAction(key, val) {
   const s = brandState(key);
   s.action = val;
   saveBrandState(key, s);
+  
+  const b = BRANDS.find(x => x.key === key) || {};
+  await fetch('/api/summer-targets/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      section: 'brands',
+      customer_key: key,
+      name: b.name || key,
+      volume: b.segment || '',
+      note: val,
+      star: b.star ? 1 : 0,
+      ref_status: s.ref || 'none',
+      off_status: s.office || 'none'
+    })
+  });
 }
 
 function renderBrands() {
@@ -630,15 +678,28 @@ const ETAB_DEFAULTS = {
   ],
 };
 
-function eTabSave(section, key, field, el) {
+async function eTabSave(section, key, field, el) {
   const lsKey = 'etr_' + section + '_' + key;
   const s = JSON.parse(localStorage.getItem(lsKey) || '{}');
   s[field] = el.innerText.trim();
   localStorage.setItem(lsKey, JSON.stringify(s));
   if (field === 'monthly') renderETab(section);
+  
+  await fetch('/api/summer-targets/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      section,
+      customer_key: key,
+      name: s.name || '',
+      volume: s.monthly || '',
+      note: s.note || '',
+      star: 0
+    })
+  });
 }
 
-function eTabDelete(section, key, isExtra) {
+async function eTabDelete(section, key, isExtra) {
   if (isExtra) {
     const addKey = 'etab_add_' + section;
     const adds = JSON.parse(localStorage.getItem(addKey) || '[]').filter(k => k !== key);
@@ -651,6 +712,12 @@ function eTabDelete(section, key, isExtra) {
     localStorage.setItem(delKey, JSON.stringify(dels));
   }
   renderETab(section);
+  
+  await fetch('/api/summer-targets/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ section, customer_key: key })
+  });
 }
 
 function eTabAdd(section) {
@@ -709,7 +776,6 @@ function renderETab(section) {
     tbody.innerHTML = `<tr><td colspan="4" style="color:#bbb;font-size:.8rem;padding:10px 0">No entries — click + Add below</td></tr>`;
     return;
   }
-  // calc total
   let total = 0;
   activeDefaults.forEach(r => { total += eTabGetVal(section, r.key, r.monthly); });
   extras.forEach(k => { total += eTabGetVal(section, k, ''); });
@@ -762,12 +828,18 @@ function invAdd(section) {
   }
 }
 
-function invDeleteRow(key, section) {
+async function invDeleteRow(key, section) {
   localStorage.removeItem(key);
   const lsKey = 'inv_extras_' + section;
   const extras = JSON.parse(localStorage.getItem(lsKey) || '[]').filter(k => k !== key);
   localStorage.setItem(lsKey, JSON.stringify(extras));
   renderInvSection(section);
+  
+  await fetch('/api/summer-targets/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ section, customer_key: key })
+  });
 }
 
 function invRow(key, defaultName, defaultAddr, isExtra, defaultNote, section) {
@@ -803,10 +875,32 @@ function invRow(key, defaultName, defaultAddr, isExtra, defaultNote, section) {
   </tr>`;
 }
 
-function invSave(storageKey, field, el) {
+async function invSave(storageKey, field, el) {
   const s = JSON.parse(localStorage.getItem(storageKey) || '{}');
   s[field] = el.innerText.trim();
   localStorage.setItem(storageKey, JSON.stringify(s));
+  
+  let key = storageKey;
+  let section = 'inv';
+  if (storageKey.startsWith('inv_x_')) {
+    section = storageKey.includes('_inv_') ? 'inv' : 'stab';
+  } else if (storageKey.startsWith('inv_')) {
+    key = storageKey.substring(4);
+    section = INV_INVERTER.find(c => c.key === key) ? 'inv' : 'stab';
+  }
+  
+  await fetch('/api/summer-targets/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      section,
+      customer_key: key,
+      name: s.name || '',
+      volume: s.monthly || s.addr || '',
+      note: s.action || '',
+      star: 0
+    })
+  });
 }
 
 function renderInvSection(section) {
@@ -820,8 +914,95 @@ function renderInvSection(section) {
   tbody.innerHTML = baseRows + extraRows;
 }
 
-renderInvSection('inv');
-renderInvSection('stab');
+async function initSummerTargets() {
+  try {
+    const rows = await fetch('/api/summer-targets').then(r => r.json());
+    
+    // Clear localStorage for targets to sync
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.startsWith('etr_') || key.startsWith('brand_') || key.startsWith('inv_') || key.startsWith('etab_'))) {
+        localStorage.removeItem(key);
+        i--;
+      }
+    }
+    
+    const etabAdds = {};
+    const invExtras = { inv: [], stab: [] };
+    const baseKeysPresent = {};
+    
+    rows.forEach(r => {
+      if (r.section === 'brands') {
+        localStorage.setItem('brand_' + r.customer_key, JSON.stringify({
+          ref: r.ref_status,
+          office: r.off_status,
+          action: r.note
+        }));
+      } else if (r.section === 'inv' || r.section === 'stab') {
+        const isExtra = r.customer_key.startsWith('inv_x_');
+        if (isExtra) {
+          invExtras[r.section].push(r.customer_key);
+          localStorage.setItem(r.customer_key, JSON.stringify({
+            name: r.name,
+            addr: r.volume,
+            monthly: r.volume,
+            action: r.note
+          }));
+        } else {
+          localStorage.setItem('inv_' + r.customer_key, JSON.stringify({
+            name: r.name,
+            addr: r.volume,
+            monthly: r.volume,
+            action: r.note
+          }));
+        }
+      } else {
+        const isExtra = r.customer_key.startsWith('x');
+        if (isExtra) {
+          if (!etabAdds[r.section]) etabAdds[r.section] = [];
+          etabAdds[r.section].push(r.customer_key);
+        } else {
+          if (!baseKeysPresent[r.section]) baseKeysPresent[r.section] = [];
+          baseKeysPresent[r.section].push(r.customer_key);
+        }
+        localStorage.setItem('etr_' + r.section + '_' + r.customer_key, JSON.stringify({
+          name: r.name,
+          monthly: r.volume,
+          note: r.note
+        }));
+      }
+    });
+    
+    Object.keys(etabAdds).forEach(sec => {
+      localStorage.setItem('etab_add_' + sec, JSON.stringify(etabAdds[sec]));
+    });
+    Object.keys(invExtras).forEach(sec => {
+      localStorage.setItem('inv_extras_' + sec, JSON.stringify(invExtras[sec]));
+    });
+    
+    Object.keys(ETAB_DEFAULTS).forEach(sec => {
+      const defaults = ETAB_DEFAULTS[sec] || [];
+      const present = baseKeysPresent[sec] || [];
+      const dels = [];
+      defaults.forEach(d => {
+        if (!present.includes(d.key)) dels.push(d.key);
+      });
+      if (dels.length > 0) {
+        localStorage.setItem('etab_del_' + sec, JSON.stringify(dels));
+      }
+    });
+    
+  } catch (e) {
+    console.error("Error loading summer targets, using local:", e);
+  }
+  
+  Object.keys(ETAB_DEFAULTS).forEach(renderETab);
+  renderBrands();
+  renderInvSection('inv');
+  renderInvSection('stab');
+}
+
+initSummerTargets();
 </script>
 </body>
 </html>

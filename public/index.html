@@ -10,6 +10,7 @@
 <div class="header">
   <h1>Willett Cables — CRM</h1>
   <div style="display:flex;gap:12px;align-items:center;">
+    <a href="exhibition.html" style="font-size:0.85rem;font-weight:bold;color:#ffd54f;">Exhibition Tracker</a>
     <a href="summer.html" style="font-size:0.85rem;">Summer Target</a>
     <a href="competitor.html" style="font-size:0.85rem;">Competitor Analysis</a>
     <a href="costing.html" style="font-size:0.85rem;">Costing Calculator</a>
@@ -412,6 +413,22 @@ async function saveCustomer() {
 
 loadStats();
 loadCustomers();
+
+// Pre-fill fields and open "Add Customer" modal if redirected from Exhibition Tracker
+const urlParams = new URLSearchParams(location.search);
+if (urlParams.get('add') === '1') {
+  const companyVal = urlParams.get('company') || '';
+  const nameVal = urlParams.get('name') || '';
+  const phoneVal = urlParams.get('phone') || '';
+  const notesVal = urlParams.get('notes') || '';
+  
+  document.getElementById('a-name').value = companyVal || nameVal || '';
+  document.getElementById('a-contact').value = nameVal || '';
+  document.getElementById('a-phone').value = phoneVal || '';
+  document.getElementById('a-notes').value = notesVal ? `[Exhibition Lead] ${notesVal}` : '[Exhibition Lead]';
+  
+  openAddModal();
+}
 </script>
 </body>
 </html>

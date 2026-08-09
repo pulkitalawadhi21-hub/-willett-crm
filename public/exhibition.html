@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Exhibition Leads — Willett CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Premium Design Overrides */
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: linear-gradient(135deg, #f5f7fb 0%, #e4e9f2 100%);
+    min-height: 100vh;
+  }
+  .header {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .header h1 {
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .glass-card:hover {
+    box-shadow: 0 10px 40px rgba(31, 38, 135, 0.08);
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .kpi-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    border-left: 5px solid #64748b;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card.pulkit { border-left-color: #6366f1; }
+  .kpi-card.brother { border-left-color: #f59e0b; }
+  .kpi-card.unassigned { border-left-color: #94a3b8; }
+  .kpi-card.total { border-left-color: #0ea5e9; }
+  .kpi-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #1e293b;
+    line-height: 1;
+  }
+  .kpi-sub {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-top: 6px;
+  }
+  .progress-container {
+    background: #f1f5f9;
+    height: 8px;
+    border-radius: 10px;
+    margin-top: 14px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    background: linear-gradient(90deg, #3b82f6, #0ea5e9);
+    height: 100%;
+    width: 0%;
+    border-radius: 10px;
+    transition: width 0.5s ease-in-out;
+  }
+  .btn-premium {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: white;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 10px 20px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    transition: all 0.2s;
+  }
+  .btn-premium:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.25);
+    opacity: 0.95;
+  }
+  .btn-premium-outline {
+    background: white;
+    color: #0f172a;
+    border: 1.5px solid #0f172a;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 9px 18px;
+    transition: all 0.2s;
+  }
+  .btn-premium-outline:hover {
+    background: #f8fafc;
+    transform: translateY(-1px);
+  }
+  .btn-premium-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 10px 20px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+    transition: all 0.2s;
+  }
+  .btn-premium-danger:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
+    opacity: 0.95;
+  }
+  .action-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .tab-container {
+    display: flex;
+    background: #f1f5f9;
+    border-radius: 10px;
+    padding: 4px;
+    width: fit-content;
+  }
+  .tab-btn {
+    border: none;
+    background: transparent;
+    padding: 8px 18px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #64748b;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab-btn.active {
+    background: white;
+    color: #0f172a;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  .search-wrap {
+    display: flex;
+    gap: 10px;
+    flex-grow: 1;
+    max-width: 400px;
+  }
+  .search-wrap input {
+    margin-bottom: 0;
+    border-radius: 10px;
+    border: 1.5px solid #cbd5e1;
+    padding: 10px 14px;
+    background: white;
+  }
+  .ex-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+  .ex-card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+  }
+  .ex-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+  }
+  .ex-card.Completed {
+    border-left: 4px solid #10b981;
+    background: #fcfdfa;
+  }
+  .ex-card.Completed .contact-name-main {
+    text-decoration: line-through;
+    color: #94a3b8;
+  }
+  .ex-card.Pending {
+    border-left: 4px solid #6366f1;
+  }
+  .ex-card.Brother.Pending {
+    border-left-color: #f59e0b;
+  }
+  .ex-card.Unassigned.Pending {
+    border-left-color: #94a3b8;
+  }
+  .contact-name-main {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 4px;
+  }
+  .contact-company {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 12px;
+  }
+  .contact-detail {
+    font-size: 0.82rem;
+    color: #334155;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .contact-detail a {
+    color: #6366f1;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .contact-detail a:hover {
+    text-decoration: underline;
+  }
+  .contact-notes {
+    font-size: 0.8rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 10px;
+    color: #475569;
+    margin: 12px 0;
+    border-left: 2px solid #cbd5e1;
+    white-space: pre-wrap;
+  }
+  .contact-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #f1f5f9;
+  }
+  .select-assign {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1.5px solid #e2e8f0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #1e293b;
+    background: white;
+    width: auto;
+    margin-bottom: 0;
+    cursor: pointer;
+  }
+  .btn-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid #e2e8f0;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+  .btn-circle:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+  }
+  .status-badge {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+  }
+  .status-badge.pending {
+    background: #e0e7ff;
+    color: #4338ca;
+  }
+  .status-badge.completed {
+    background: #d1fae5;
+    color: #065f46;
+  }
+  .bulk-info-text {
+    font-size: 0.78rem;
+    color: #64748b;
+    margin-top: -6px;
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+  .loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #0f172a;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Willett Cables — CRM</h1>
+  <a href="index.html">← Back to Dashboard</a>
+</div>
+
+<div class="container">
+  
+  <!-- KPI DASHBOARD -->
+  <div class="kpi-grid">
+    <div class="kpi-card total">
+      <span class="kpi-title">Total Leads</span>
+      <span class="kpi-value" id="kpi-total">0</span>
+      <span class="kpi-sub" id="kpi-completed-text">0 Met</span>
+      <div class="progress-container">
+        <div class="progress-bar" id="kpi-progress"></div>
+      </div>
+    </div>
+    <div class="kpi-card pulkit">
+      <span class="kpi-title">Pulkit's Leads</span>
+      <span class="kpi-value" id="kpi-pulkit-pending">0</span>
+      <span class="kpi-sub" id="kpi-pulkit-total">0 assigned</span>
+    </div>
+    <div class="kpi-card brother">
+      <span class="kpi-title">Brother's Leads</span>
+      <span class="kpi-value" id="kpi-brother-pending">0</span>
+      <span class="kpi-sub" id="kpi-brother-total">0 assigned</span>
+    </div>
+    <div class="kpi-card unassigned">
+      <span class="kpi-title">Unassigned</span>
+      <span class="kpi-value" id="kpi-unassigned">0</span>
+      <span class="kpi-sub">Need splitting</span>
+    </div>
+  </div>
+
+  <!-- CONTROL ACTIONS -->
+  <div class="glass-card">
+    <div class="action-row">
+      <div class="tab-container" id="tabs">
+        <button class="tab-btn active" onclick="switchTab('all', this)">All Contacts</button>
+        <button class="tab-btn" onclick="switchTab('Pulkit', this)">Pulkit</button>
+        <button class="tab-btn" onclick="switchTab('Brother', this)">Brother</button>
+        <button class="tab-btn" onclick="switchTab('Unassigned', this)">Unassigned</button>
+      </div>
+
+      <div class="search-wrap">
+        <input type="text" id="search" placeholder="Search by name, company, notes..." oninput="filterList()">
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button class="btn btn-premium-outline" onclick="openBulkModal()">🚀 Bulk Import</button>
+        <button class="btn btn-premium" onclick="openAddModal()">+ Add Lead</button>
+        <button class="btn btn-premium-outline" style="background:#ffd54f;border-color:#f5b041;color:#512e5f;" onclick="triggerAutoSplit()">⚡ Auto Split 50/50</button>
+      </div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="ex-card-grid" id="contacts-grid"></div>
+    <div id="empty-msg" style="display:none;text-align:center;padding:50px 20px;color:#94a3b8;font-size:1.1rem;font-weight:600;">
+      No exhibition contacts found. Import some or create one!
+    </div>
+  </div>
+
+</div>
+
+<!-- BULK IMPORT MODAL -->
+<div class="modal" id="bulk-modal">
+  <div class="modal-box" style="max-width:700px;">
+    <h2>🚀 Bulk Import Exhibition Leads</h2>
+    <div class="bulk-info-text">
+      Paste your list of exhibition contacts. We support flexible separators like <strong>Pipe (|)</strong>, <strong>Tab</strong>, or <strong>Comma (,)</strong>.
+      <br><strong>Format structure:</strong> <code>Company | Name | Phone | Notes</code>
+      <br><em>If a line has no separator, the whole text will be treated as the Contact Name.</em>
+    </div>
+    <textarea id="bulk-text" rows="12" placeholder="e.g.&#10;Blue Star Ltd | Amit Sharma | 9876543210 | Needs 3-core SWA cable&#10;Voltas | Rajesh Kumar | 9988776655 | Sent catalogue&#10;Kaiser Appliances | Amit Goel | 9112233445" style="font-family:monospace;font-size:0.85rem;padding:12px;"></textarea>
+    <div id="bulk-msg" style="margin-bottom:8px;font-size:0.85rem;color:#ef4444;font-weight:600;"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-premium" onclick="saveBulkImport()" id="btn-save-bulk">Import Contacts</button>
+      <button class="btn btn-premium-outline" onclick="closeBulkModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD SINGLE CONTACT MODAL -->
+<div class="modal" id="add-modal">
+  <div class="modal-box">
+    <h2 id="add-modal-title">Add Exhibition Contact</h2>
+    <div class="row">
+      <div class="col">
+        <label>Contact Name *</label>
+        <input type="text" id="a-name" placeholder="Person name">
+      </div>
+      <div class="col">
+        <label>Company Name</label>
+        <input type="text" id="a-company" placeholder="Company Ltd">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label>Phone Number</label>
+        <input type="text" id="a-phone" placeholder="e.g. +919876543210">
+      </div>
+      <div class="col">
+        <label>Email Address</label>
+        <input type="email" id="a-email" placeholder="name@company.com">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label>Assigned To</label>
+        <select id="a-assigned">
+          <option value="Unassigned">Unassigned</option>
+          <option value="Pulkit">Pulkit</option>
+          <option value="Brother">Brother</option>
+        </select>
+      </div>
+      <div class="col">
+        <label>Status</label>
+        <select id="a-status">
+          <option value="Pending">Pending</option>
+          <option value="Completed">Completed (Met)</option>
+        </select>
+      </div>
+    </div>
+    <label>Notes</label>
+    <textarea id="a-notes" rows="3" placeholder="What they manufacture, product interest, etc..."></textarea>
+    <div id="add-msg" style="margin-bottom:8px;font-size:0.85rem;color:#ef4444;font-weight:600;"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-premium" onclick="saveSingleContact()">Save Lead</button>
+      <button class="btn btn-premium-outline" onclick="closeAddModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT CONTACT MODAL -->
+<div class="modal" id="edit-modal">
+  <div class="modal-box">
+    <h2>Edit Lead Details</h2>
+    <input type="hidden" id="e-id">
+    <div class="row">
+      <div class="col">
+        <label>Contact Name *</label>
+        <input type="text" id="e-name">
+      </div>
+      <div class="col">
+        <label>Company Name</label>
+        <input type="text" id="e-company">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label>Phone Number</label>
+        <input type="text" id="e-phone">
+      </div>
+      <div class="col">
+        <label>Email Address</label>
+        <input type="email" id="e-email">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label>Assigned To</label>
+        <select id="e-assigned">
+          <option value="Unassigned">Unassigned</option>
+          <option value="Pulkit">Pulkit</option>
+          <option value="Brother">Brother</option>
+        </select>
+      </div>
+      <div class="col">
+        <label>Status</label>
+        <select id="e-status">
+          <option value="Pending">Pending</option>
+          <option value="Completed">Completed (Met)</option>
+        </select>
+      </div>
+    </div>
+    <label>Notes</label>
+    <textarea id="e-notes" rows="3"></textarea>
+    <div id="edit-msg" style="margin-bottom:8px;font-size:0.85rem;color:#ef4444;font-weight:600;"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-premium" onclick="saveEdit()">Save Changes</button>
+      <button class="btn btn-premium-outline" onclick="closeEditModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentTab = 'all';
+let allLeads = [];
+
+async function loadStats() {
+  const s = await fetch('/api/exhibition/stats').then(r => r.json());
+  
+  // Update KPI counters
+  document.getElementById('kpi-total').textContent = s.total;
+  document.getElementById('kpi-completed-text').textContent = `${s.completed} Met`;
+  
+  const pct = s.total ? Math.round(s.completed / s.total * 100) : 0;
+  document.getElementById('kpi-progress').style.width = `${pct}%`;
+  
+  document.getElementById('kpi-pulkit-pending').textContent = s.pulkit.pending;
+  document.getElementById('kpi-pulkit-total').textContent = `${s.pulkit.total} assigned`;
+  
+  document.getElementById('kpi-brother-pending').textContent = s.brother.pending;
+  document.getElementById('kpi-brother-total').textContent = `${s.brother.total} assigned`;
+  
+  document.getElementById('kpi-unassigned').textContent = s.unassigned;
+}
+
+async function loadLeads() {
+  const searchVal = document.getElementById('search').value.trim();
+  let url = `/api/exhibition?q=${encodeURIComponent(searchVal)}`;
+  
+  if (currentTab !== 'all') {
+    url += `&assigned_to=${encodeURIComponent(currentTab)}`;
+  }
+  
+  allLeads = await fetch(url).then(r => r.json());
+  renderGrid(allLeads);
+}
+
+function renderGrid(leads) {
+  const grid = document.getElementById('contacts-grid');
+  const empty = document.getElementById('empty-msg');
+  
+  if (!leads.length) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  
+  empty.style.display = 'none';
+  grid.innerHTML = leads.map(l => {
+    // Determine WhatsApp link
+    let phoneClean = (l.phone || '').replace(/[^0-9]/g, '');
+    if (phoneClean.length === 10) {
+      phoneClean = '91' + phoneClean; // default to India code
+    }
+    const waLink = phoneClean ? `https://wa.me/${phoneClean}` : '#';
+    const telLink = l.phone ? `tel:${l.phone}` : '#';
+    
+    // Status text
+    const statusText = l.status === 'Completed' ? 'Completed' : 'Pending';
+    const checkedAttr = l.status === 'Completed' ? 'checked' : '';
+    
+    // Assignment label
+    const assignText = l.assigned_to === 'Unassigned' ? 'Unassigned' : l.assigned_to;
+    
+    // Create prefill URL for Convert to CRM
+    const crmUrl = `index.html?add=1&name=${encodeURIComponent(l.name)}&company=${encodeURIComponent(l.company || '')}&phone=${encodeURIComponent(l.phone || '')}&notes=${encodeURIComponent(l.notes || '')}`;
+    
+    return `
+      <div class="ex-card ${l.status} ${l.assigned_to}">
+        <span class="status-badge ${l.status.toLowerCase()}">${statusText}</span>
+        
+        <div>
+          <div class="contact-name-main">${l.name}</div>
+          <div class="contact-company">${l.company || 'No Company'}</div>
+          
+          ${l.phone ? `
+            <div class="contact-detail">
+              📞 <a href="${telLink}">${l.phone}</a> 
+              ${phoneClean ? `<a href="${waLink}" target="_blank" style="margin-left: 8px; color: #10b981; font-weight: bold;">💬 WhatsApp</a>` : ''}
+            </div>` : ''
+          }
+          
+          ${l.email ? `
+            <div class="contact-detail">
+              ✉️ <a href="mailto:${l.email}">${l.email}</a>
+            </div>` : ''
+          }
+          
+          ${l.notes ? `<div class="contact-notes">${l.notes}</div>` : ''}
+        </div>
+        
+        <div class="contact-actions">
+          <select class="select-assign" onchange="updateAssignment(${l.id}, this.value)">
+            <option value="Unassigned" ${l.assigned_to === 'Unassigned' ? 'selected' : ''}>Unassigned</option>
+            <option value="Pulkit" ${l.assigned_to === 'Pulkit' ? 'selected' : ''}>Pulkit</option>
+            <option value="Brother" ${l.assigned_to === 'Brother' ? 'selected' : ''}>Brother</option>
+          </select>
+          
+          <label style="display:flex;align-items:center;gap:6px;font-size:0.8rem;font-weight:700;margin-bottom:0;cursor:pointer;flex-grow:1;justify-content:center;">
+            <input type="checkbox" ${checkedAttr} onchange="toggleStatus(${l.id}, this.checked)" style="width:auto;margin-bottom:0;cursor:pointer;"> Met
+          </label>
+          
+          <button class="btn-premium btn-sm" style="font-size:0.75rem;padding:4px 8px;box-shadow:none;background:#6366f1;" onclick="location.href='${crmUrl}'" title="Convert to CRM Customer">➕ CRM</button>
+          
+          <button class="btn-circle" onclick="openEditModal(${l.id})" title="Edit Lead">✏️</button>
+          <button class="btn-circle" style="color:#ef4444;" onclick="deleteLead(${l.id})" title="Delete Lead">🗑️</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function switchTab(tab, btn) {
+  currentTab = tab;
+  
+  // Update active button styling
+  const buttons = document.querySelectorAll('#tabs .tab-btn');
+  buttons.forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  loadLeads();
+}
+
+function filterList() {
+  loadLeads();
+}
+
+async function updateAssignment(id, value) {
+  await fetch(`/api/exhibition/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ assigned_to: value })
+  });
+  loadStats();
+  loadLeads();
+}
+
+async function toggleStatus(id, isCompleted) {
+  const status = isCompleted ? 'Completed' : 'Pending';
+  await fetch(`/api/exhibition/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status })
+  });
+  loadStats();
+  loadLeads();
+}
+
+async function triggerAutoSplit() {
+  const res = await fetch('/api/exhibition/split', { method: 'POST' }).then(r => r.json());
+  alert(`⚡ Auto-Split complete! Assigned ${res.count} leads 50/50 between you and your brother.`);
+  loadStats();
+  loadLeads();
+}
+
+// ── SINGLE CONTACT MODALS ──
+function openAddModal() {
+  document.getElementById('add-msg').textContent = '';
+  document.getElementById('a-name').value = '';
+  document.getElementById('a-company').value = '';
+  document.getElementById('a-phone').value = '';
+  document.getElementById('a-email').value = '';
+  document.getElementById('a-assigned').value = 'Unassigned';
+  document.getElementById('a-status').value = 'Pending';
+  document.getElementById('a-notes').value = '';
+  document.getElementById('add-modal').classList.add('open');
+}
+
+function closeAddModal() {
+  document.getElementById('add-modal').classList.remove('open');
+}
+
+async function saveSingleContact() {
+  const name = document.getElementById('a-name').value.trim();
+  const company = document.getElementById('a-company').value.trim();
+  const phone = document.getElementById('a-phone').value.trim();
+  const email = document.getElementById('a-email').value.trim();
+  const assigned_to = document.getElementById('a-assigned').value;
+  const status = document.getElementById('a-status').value;
+  const notes = document.getElementById('a-notes').value.trim();
+  
+  if (!name) {
+    document.getElementById('add-msg').textContent = 'Contact Name is required.';
+    return;
+  }
+  
+  const body = { name, company, phone, email, assigned_to, status, notes };
+  const res = await fetch('/api/exhibition', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  
+  if (res.ok) {
+    closeAddModal();
+    loadStats();
+    loadLeads();
+  } else {
+    const err = await res.json();
+    document.getElementById('add-msg').textContent = err.error || 'Error saving.';
+  }
+}
+
+// ── EDIT MODAL ──
+async function openEditModal(id) {
+  document.getElementById('edit-msg').textContent = '';
+  const lead = allLeads.find(l => l.id === id);
+  if (!lead) return;
+  
+  document.getElementById('e-id').value = lead.id;
+  document.getElementById('e-name').value = lead.name;
+  document.getElementById('e-company').value = lead.company || '';
+  document.getElementById('e-phone').value = lead.phone || '';
+  document.getElementById('e-email').value = lead.email || '';
+  document.getElementById('e-assigned').value = lead.assigned_to;
+  document.getElementById('e-status').value = lead.status;
+  document.getElementById('e-notes').value = lead.notes || '';
+  
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+}
+
+async function saveEdit() {
+  const id = document.getElementById('e-id').value;
+  const name = document.getElementById('e-name').value.trim();
+  const company = document.getElementById('e-company').value.trim();
+  const phone = document.getElementById('e-phone').value.trim();
+  const email = document.getElementById('e-email').value.trim();
+  const assigned_to = document.getElementById('e-assigned').value;
+  const status = document.getElementById('e-status').value;
+  const notes = document.getElementById('e-notes').value.trim();
+  
+  if (!name) {
+    document.getElementById('edit-msg').textContent = 'Name is required.';
+    return;
+  }
+  
+  const body = { name, company, phone, email, assigned_to, status, notes };
+  const res = await fetch(`/api/exhibition/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  
+  if (res.ok) {
+    closeEditModal();
+    loadStats();
+    loadLeads();
+  } else {
+    const err = await res.json();
+    document.getElementById('edit-msg').textContent = err.error || 'Error updating.';
+  }
+}
+
+async function deleteLead(id) {
+  if (!confirm('Are you sure you want to delete this exhibition lead?')) return;
+  await fetch(`/api/exhibition/${id}`, { method: 'DELETE' });
+  loadStats();
+  loadLeads();
+}
+
+// ── BULK IMPORT MODAL ──
+function openBulkModal() {
+  document.getElementById('bulk-msg').textContent = '';
+  document.getElementById('bulk-text').value = '';
+  document.getElementById('bulk-modal').classList.add('open');
+}
+
+function closeBulkModal() {
+  document.getElementById('bulk-modal').classList.remove('open');
+}
+
+async function saveBulkImport() {
+  const text = document.getElementById('bulk-text').value.trim();
+  if (!text) {
+    document.getElementById('bulk-msg').textContent = 'Please paste some text to import.';
+    return;
+  }
+  
+  const btn = document.getElementById('btn-save-bulk');
+  btn.disabled = true;
+  btn.innerHTML = `<span class="loader"></span> Importing...`;
+  
+  const lines = text.split('\n');
+  const contacts = [];
+  
+  for (let line of lines) {
+    line = line.trim();
+    if (!line) continue;
+    
+    let parts = [];
+    if (line.includes('|')) {
+      parts = line.split('|');
+    } else if (line.includes('\t')) {
+      parts = line.split('\t');
+    } else if (line.includes(',')) {
+      parts = line.split(',');
+    } else {
+      parts = [line];
+    }
+    
+    // clean up parts
+    parts = parts.map(p => p.trim());
+    
+    let company = '';
+    let name = '';
+    let phone = '';
+    let notes = '';
+    
+    if (parts.length >= 4) {
+      company = parts[0];
+      name = parts[1];
+      phone = parts[2];
+      notes = parts.slice(3).join(' | ');
+    } else if (parts.length === 3) {
+      company = parts[0];
+      name = parts[1];
+      phone = parts[2];
+    } else if (parts.length === 2) {
+      company = parts[0];
+      name = parts[1];
+    } else {
+      name = parts[0];
+    }
+    
+    contacts.push({ name, company, phone, notes });
+  }
+  
+  if (contacts.length === 0) {
+    document.getElementById('bulk-msg').textContent = 'Could not parse any valid contacts.';
+    btn.disabled = false;
+    btn.textContent = 'Import Contacts';
+    return;
+  }
+  
+  try {
+    const res = await fetch('/api/exhibition/bulk', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contacts })
+    });
+    
+    if (res.ok) {
+      closeBulkModal();
+      loadStats();
+      loadLeads();
+    } else {
+      const err = await res.json();
+      document.getElementById('bulk-msg').textContent = err.error || 'Import failed.';
+    }
+  } catch(e) {
+    document.getElementById('bulk-msg').textContent = 'An error occurred during import.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Import Contacts';
+  }
+}
+
+// ── INITIAL LOAD ──
+loadStats();
+loadLeads();
+</script>
+</body>
+</html>
