@@ -439,6 +439,34 @@ app.get('/api/exhibition/whatsapp-query', (req, res) => {
   const parts = cleanMsg.split(/\s+/);
   const cmd = parts[0].toLowerCase();
   const subCmd = parts.length > 1 ? parts[1].toLowerCase() : '';
+  const isDataQuery = subCmd === 'data' || (parts.length > 2 && parts[2].toLowerCase() === 'data');
+  
+  if (isDataQuery) {
+    try {
+      const total = db.prepare('SELECT COUNT(*) as n FROM exhibition_contacts').get().n;
+      const completed = db.prepare("SELECT COUNT(*) as n FROM exhibition_contacts WHERE status = 'Completed'").get().n;
+      const pulkitPending = db.prepare("SELECT name FROM exhibition_contacts WHERE assigned_to = 'Pulkit' AND status = 'Pending'").all();
+      const garvPending = db.prepare("SELECT name FROM exhibition_contacts WHERE assigned_to = 'Garv' AND status = 'Pending'").all();
+      const unassigned = db.prepare("SELECT name FROM exhibition_contacts WHERE assigned_to = 'Unassigned' AND status = 'Pending'").all();
+      
+      let reply = `📊 *Exhibition Leads Summary*\n\n`;
+      reply += `✅ *Completed (Met)*: ${completed} / ${total} (${total ? Math.round(completed/total*100) : 0}%)\n`;
+      reply += `⏱️ *Unassigned pending*: ${unassigned.length}\n\n`;
+      
+      reply += `📋 *Pulkit (${pulkitPending.length} pending)*:\n`;
+      reply += pulkitPending.length > 0 ? pulkitPending.map(p => p.name).join(', ') : 'None';
+      reply += `\n\n`;
+      
+      reply += `📋 *Garv (${garvPending.length} pending)*:\n`;
+      reply += garvPending.length > 0 ? garvPending.map(g => g.name).join(', ') : 'None';
+      reply += `\n\n`;
+      
+      reply += `🌐 Manage: https://willett-crm-production.up.railway.app/exhibition.html`;
+      return res.send(reply);
+    } catch (e) {
+      return res.send(`⚠️ Error formatting summary: ${e.message}`);
+    }
+  }
   
   const pulkitPhone = (process.env.PULKIT_PHONE || '').trim();
   const brotherPhone = (process.env.BROTHER_PHONE || '').trim();
@@ -605,6 +633,11 @@ app.post('/api/summer-targets/delete', (req, res) => {
 });
 
 app.get('/api/summer-target/whatsapp-query', (req, res) => {
+  const messageBody = (req.query.body || '').trim();
+  const cleanMsg = messageBody.replace(/^\//, '').trim();
+  const parts = cleanMsg.split(/\s+/);
+  const isDataQuery = parts.some(p => p.toLowerCase() === 'data');
+  
   try {
     const rows = db.prepare('SELECT * FROM summer_targets').all();
     
@@ -613,6 +646,42 @@ app.get('/api/summer-target/whatsapp-query', (req, res) => {
       if (!sections[r.section]) sections[r.section] = [];
       sections[r.section].push(r);
     });
+    
+    if (isDataQuery) {
+      let reply = `☀️ *Summer Targets Summary* 📊\n\n`;
+      
+      const formatCrisp = (secKey, title) => {
+        const list = sections[secKey] || [];
+        if (list.length === 0) return '';
+        const items = list.map(item => {
+          const star = item.star ? '★' : '';
+          return `${item.name}${star}`;
+        }).join(', ');
+        return `🎯 *${title}*: ${items}\n`;
+      };
+      
+      reply += formatCrisp('ac_oem', 'AC OEMs');
+      reply += formatCrisp('fridge_tgt', 'Fridge');
+      
+      const invs = (sections['inv'] || []).map(i => i.name).join(', ');
+      const stabs = (sections['stab'] || []).map(s => s.name).join(', ');
+      if (invs) reply += `🎯 *Inverters*: ${invs}\n`;
+      if (stabs) reply += `🎯 *Stabilisers*: ${stabs}\n`;
+      
+      reply += formatCrisp('fan_tgt', 'Fans');
+      reply += formatCrisp('cooler_tgt', 'Coolers');
+      
+      const fanConf = sections['fan_conf'] || [];
+      const coolerConf = sections['cooler_conf'] || [];
+      let totalBase = 0;
+      const parseVal = val => parseInt((val || '').replace(/[^0-9]/g, '')) || 0;
+      fanConf.forEach(f => totalBase += parseVal(f.volume));
+      coolerConf.forEach(c => totalBase += parseVal(c.volume));
+      
+      reply += `\n📈 *Confirmed Base*: ${totalBase > 0 ? totalBase.toLocaleString('en-IN') + ' pcs' : 'TBD'}\n`;
+      reply += `🌐 View: https://willett-crm-production.up.railway.app/summer.html`;
+      return res.send(reply);
+    }
     
     const formatSec = (secKey, title) => {
       const list = sections[secKey] || [];
