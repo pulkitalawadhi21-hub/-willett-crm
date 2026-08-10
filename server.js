@@ -445,21 +445,28 @@ app.get('/api/exhibition/whatsapp-query', (req, res) => {
     try {
       const total = db.prepare('SELECT COUNT(*) as n FROM exhibition_contacts').get().n;
       const completed = db.prepare("SELECT COUNT(*) as n FROM exhibition_contacts WHERE status = 'Completed'").get().n;
-      const pulkitPending = db.prepare("SELECT name FROM exhibition_contacts WHERE assigned_to = 'Pulkit' AND status = 'Pending'").all();
-      const garvPending = db.prepare("SELECT name FROM exhibition_contacts WHERE assigned_to = 'Garv' AND status = 'Pending'").all();
-      const unassigned = db.prepare("SELECT name FROM exhibition_contacts WHERE assigned_to = 'Unassigned' AND status = 'Pending'").all();
+      const pulkitPending = db.prepare("SELECT * FROM exhibition_contacts WHERE assigned_to = 'Pulkit' AND status = 'Pending' ORDER BY id ASC").all();
+      const garvPending = db.prepare("SELECT * FROM exhibition_contacts WHERE assigned_to = 'Garv' AND status = 'Pending' ORDER BY id ASC").all();
+      const unassigned = db.prepare("SELECT * FROM exhibition_contacts WHERE assigned_to = 'Unassigned' AND status = 'Pending' ORDER BY id ASC").all();
       
-      let reply = `📊 *Exhibition Leads Summary*\n\n`;
-      reply += `✅ *Completed (Met)*: ${completed} / ${total} (${total ? Math.round(completed/total*100) : 0}%)\n`;
-      reply += `⏱️ *Unassigned pending*: ${unassigned.length}\n\n`;
+      let reply = `📊 *Exhibition Assignment Report*\n`;
+      reply += `Met (Completed): ${completed} / ${total} (${total ? Math.round(completed/total*100) : 0}%)\n\n`;
       
-      reply += `📋 *Pulkit (${pulkitPending.length} pending)*:\n`;
-      reply += pulkitPending.length > 0 ? pulkitPending.map(p => p.name).join(', ') : 'None';
-      reply += `\n\n`;
+      const formatGroup = (title, list) => {
+        if (list.length === 0) return `👤 *${title}* (0 pending):\n_No pending leads!_\n\n`;
+        let text = `👤 *${title} (${list.length} pending)*:\n`;
+        list.forEach((l, idx) => {
+          const companyStr = l.company ? ` @ *${l.company}*` : '';
+          const phoneStr = l.phone ? ` (📞 ${l.phone})` : '';
+          const notesStr = l.notes ? `\n   _Notes: ${l.notes}_` : '';
+          text += `${idx + 1}. *${l.name}*${companyStr}${phoneStr}${notesStr}\n`;
+        });
+        return text + `\n`;
+      };
       
-      reply += `📋 *Garv (${garvPending.length} pending)*:\n`;
-      reply += garvPending.length > 0 ? garvPending.map(g => g.name).join(', ') : 'None';
-      reply += `\n\n`;
+      reply += formatGroup('Pulkit', pulkitPending);
+      reply += formatGroup('Garv', garvPending);
+      reply += formatGroup('Unassigned', unassigned);
       
       reply += `🌐 Manage: https://leads.willettcables.in/exhibition.html`;
       return res.send(reply);
