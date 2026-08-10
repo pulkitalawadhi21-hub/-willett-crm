@@ -461,7 +461,7 @@ app.get('/api/exhibition/whatsapp-query', (req, res) => {
       reply += garvPending.length > 0 ? garvPending.map(g => g.name).join(', ') : 'None';
       reply += `\n\n`;
       
-      reply += `🌐 Manage: https://willett-crm-production.up.railway.app/exhibition.html`;
+      reply += `🌐 Manage: https://leads.willettcables.in/exhibition.html`;
       return res.send(reply);
     } catch (e) {
       return res.send(`⚠️ Error formatting summary: ${e.message}`);
@@ -538,7 +538,7 @@ app.get('/api/exhibition/whatsapp-query', (req, res) => {
       reply += `- \`exhibition all\`\n`;
       reply += `- \`exhibition met <id>\` : Mark as met\n\n`;
       reply += `🔍 For Summer target lists, write: \`summerappliance\`\n\n`;
-      reply += `🌐 Manage: https://willett-crm-production.up.railway.app/exhibition.html`;
+      reply += `🌐 Manage: https://leads.willettcables.in/exhibition.html`;
       
       return res.send(reply);
     }
@@ -679,7 +679,7 @@ app.get('/api/summer-target/whatsapp-query', (req, res) => {
       coolerConf.forEach(c => totalBase += parseVal(c.volume));
       
       reply += `\n📈 *Confirmed Base*: ${totalBase > 0 ? totalBase.toLocaleString('en-IN') + ' pcs' : 'TBD'}\n`;
-      reply += `🌐 View: https://willett-crm-production.up.railway.app/summer.html`;
+      reply += `🌐 View: https://leads.willettcables.in/summer.html`;
       return res.send(reply);
     }
     
@@ -737,7 +737,7 @@ app.get('/api/summer-target/whatsapp-query', (req, res) => {
       reply += `\n`;
     }
     
-    reply += `🌐 Manage: https://willett-crm-production.up.railway.app/summer.html`;
+    reply += `🌐 Manage: https://leads.willettcables.in/summer.html`;
     return res.send(reply);
   } catch (e) {
     return res.send(`⚠️ Error querying summer targets: ${e.message}`);
