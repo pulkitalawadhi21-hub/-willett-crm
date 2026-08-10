@@ -1,6 +1,6 @@
 const https = require('https');
 
-const BASE = 'https://willett-crm-production.up.railway.app';
+const BASE = 'https://leads.willettcables.in';
 
 // ── SENJU (143 customers, Jan–Feb data in ₹) ──
 const SENJU_INDUSTRY_MAP = {

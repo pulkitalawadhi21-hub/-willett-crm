@@ -1,7 +1,7 @@
 const https = require('https');
 const fs = require('fs');
 
-const BASE = 'https://willett-crm-production.up.railway.app';
+const BASE = 'https://leads.willettcables.in';
 const CSV_PATH = 'C:\\Users\\pulki\\Downloads\\master_final_clean_1 NEW.csv';
 
 const INDUSTRY_MAP = {
