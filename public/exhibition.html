@@ -805,36 +805,52 @@ function closeAddModal() {
 }
 
 async function saveSingleContact() {
-  const name = document.getElementById('a-name').value.trim();
-  const company = document.getElementById('a-company').value.trim();
-  const phone = document.getElementById('a-phone').value.trim();
-  const email = document.getElementById('a-email').value.trim();
-  const assigned_to = document.getElementById('a-assigned').value;
-  const status = document.getElementById('a-status').value;
-  const action_tag = document.getElementById('a-action').value;
-  const schedule_week = document.getElementById('a-week').value.trim();
-  const notes = document.getElementById('a-notes').value.trim();
-  
-  if (!name) {
-    document.getElementById('add-msg').textContent = 'Contact Name is required.';
-    return;
-  }
-  
-  const body = { name, company, phone, email, assigned_to, status, notes, action_tag, schedule_week };
-  const res = await fetch('/api/exhibition', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-  
-  if (res.ok) {
-    closeAddModal();
-    loadStats();
-    loadWeeks();
-    loadLeads();
-  } else {
-    const err = await res.json();
-    document.getElementById('add-msg').textContent = err.error || 'Error saving.';
+  try {
+    const name = document.getElementById('a-name').value.trim();
+    const company = document.getElementById('a-company').value.trim();
+    const phone = document.getElementById('a-phone').value.trim();
+    const email = document.getElementById('a-email').value.trim();
+    const assigned_to = document.getElementById('a-assigned').value;
+    const status = document.getElementById('a-status').value;
+    const action_tag = document.getElementById('a-action').value;
+    const schedule_week = document.getElementById('a-week').value.trim();
+    const notes = document.getElementById('a-notes').value.trim();
+    
+    if (!name) {
+      document.getElementById('add-msg').textContent = 'Contact Name is required.';
+      return;
+    }
+    
+    const body = { name, company, phone, email, assigned_to, status, notes, action_tag, schedule_week };
+    const res = await fetch('/api/exhibition', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    
+    if (res.ok) {
+      closeAddModal();
+      loadStats();
+      if (typeof loadWeeks === 'function') {
+        await loadWeeks();
+      }
+      await loadLeads();
+    } else {
+      let errorMsg = 'Error saving.';
+      try {
+        const err = await res.json();
+        errorMsg = err.error || errorMsg;
+      } catch (jsonErr) {
+        try {
+          const text = await res.text();
+          if (text) errorMsg = text;
+        } catch (textErr) {}
+      }
+      document.getElementById('add-msg').textContent = errorMsg;
+    }
+  } catch (err) {
+    console.error("Save Contact Error:", err);
+    document.getElementById('add-msg').textContent = 'JS Error: ' + err.message;
   }
 }
 
@@ -863,37 +879,53 @@ function closeEditModal() {
 }
 
 async function saveEdit() {
-  const id = document.getElementById('e-id').value;
-  const name = document.getElementById('e-name').value.trim();
-  const company = document.getElementById('e-company').value.trim();
-  const phone = document.getElementById('e-phone').value.trim();
-  const email = document.getElementById('e-email').value.trim();
-  const assigned_to = document.getElementById('e-assigned').value;
-  const status = document.getElementById('e-status').value;
-  const action_tag = document.getElementById('e-action').value;
-  const schedule_week = document.getElementById('e-week').value.trim();
-  const notes = document.getElementById('e-notes').value.trim();
-  
-  if (!name) {
-    document.getElementById('edit-msg').textContent = 'Name is required.';
-    return;
-  }
-  
-  const body = { name, company, phone, email, assigned_to, status, notes, action_tag, schedule_week };
-  const res = await fetch(`/api/exhibition/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-  
-  if (res.ok) {
-    closeEditModal();
-    loadStats();
-    loadWeeks();
-    loadLeads();
-  } else {
-    const err = await res.json();
-    document.getElementById('edit-msg').textContent = err.error || 'Error updating.';
+  try {
+    const id = document.getElementById('e-id').value;
+    const name = document.getElementById('e-name').value.trim();
+    const company = document.getElementById('e-company').value.trim();
+    const phone = document.getElementById('e-phone').value.trim();
+    const email = document.getElementById('e-email').value.trim();
+    const assigned_to = document.getElementById('e-assigned').value;
+    const status = document.getElementById('e-status').value;
+    const action_tag = document.getElementById('e-action').value;
+    const schedule_week = document.getElementById('e-week').value.trim();
+    const notes = document.getElementById('e-notes').value.trim();
+    
+    if (!name) {
+      document.getElementById('edit-msg').textContent = 'Name is required.';
+      return;
+    }
+    
+    const body = { name, company, phone, email, assigned_to, status, notes, action_tag, schedule_week };
+    const res = await fetch(`/api/exhibition/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    
+    if (res.ok) {
+      closeEditModal();
+      loadStats();
+      if (typeof loadWeeks === 'function') {
+        await loadWeeks();
+      }
+      await loadLeads();
+    } else {
+      let errorMsg = 'Error updating.';
+      try {
+        const err = await res.json();
+        errorMsg = err.error || errorMsg;
+      } catch (jsonErr) {
+        try {
+          const text = await res.text();
+          if (text) errorMsg = text;
+        } catch (textErr) {}
+      }
+      document.getElementById('edit-msg').textContent = errorMsg;
+    }
+  } catch (err) {
+    console.error("Save Edit Error:", err);
+    document.getElementById('edit-msg').textContent = 'JS Error: ' + err.message;
   }
 }
 
