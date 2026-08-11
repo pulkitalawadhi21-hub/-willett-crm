@@ -495,8 +495,8 @@ app.get('/api/exhibition/whatsapp-query', (req, res) => {
         return text + `-----------------------------------\n\n`;
       };
       
-      reply += formatGroup('Pulkit', pulkitPending);
       reply += formatGroup('Garv', garvPending);
+      reply += formatGroup('Pulkit', pulkitPending);
       reply += formatGroup('Unassigned', unassigned);
       
       reply += `🌐 Manage: https://leads.willettcables.in/exhibition.html`;
