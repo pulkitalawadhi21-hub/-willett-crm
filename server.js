@@ -454,14 +454,45 @@ app.get('/api/exhibition/whatsapp-query', (req, res) => {
       
       const formatGroup = (title, list) => {
         if (list.length === 0) return `👤 *${title}* (0 pending):\n_No pending leads!_\n\n`;
-        let text = `👤 *${title} (${list.length} pending)*:\n`;
-        list.forEach((l, idx) => {
-          const companyStr = l.company ? ` @ *${l.company}*` : '';
-          const phoneStr = l.phone ? ` (📞 ${l.phone})` : '';
-          const notesStr = l.notes ? `\n   _Notes: ${l.notes}_` : '';
-          text += `${idx + 1}. *${l.name}*${companyStr}${phoneStr}${notesStr}\n`;
+        
+        const yetToCall = [];
+        const alreadyCalled = [];
+        
+        list.forEach((l) => {
+          const notesClean = (l.notes || '').toLowerCase().trim();
+          const isYetToCall = !notesClean || notesClean.indexOf('yet to call') > -1;
+          
+          const contactName = l.company ? `Contact: ${l.company}` : '';
+          const phoneNum = l.phone ? `Phone: ${l.phone}` : 'Phone: Not Provided';
+          
+          let line = `• *${l.name}*`;
+          
+          if (isYetToCall) {
+            const details = [contactName, phoneNum].filter(Boolean).join(', ');
+            if (details) {
+              line += ` (${details})`;
+            }
+            yetToCall.push(line);
+          } else {
+            const contactStr = l.company ? ` (Contact: ${l.company})` : ' (No Contact Name)';
+            line += `${contactStr}: ${l.notes}`;
+            alreadyCalled.push(line);
+          }
         });
-        return text + `\n`;
+        
+        let text = `👦 *${title.toUpperCase()}'S LEADS*\n\n`;
+        
+        if (yetToCall.length > 0) {
+          text += `⚠️ *YET TO CALL (New Leads)*\n`;
+          text += yetToCall.join('\n') + `\n\n`;
+        }
+        
+        if (alreadyCalled.length > 0) {
+          text += `🔄 *ALREADY CALLED (Next Steps)*\n`;
+          text += alreadyCalled.join('\n') + `\n\n`;
+        }
+        
+        return text + `-----------------------------------\n\n`;
       };
       
       reply += formatGroup('Pulkit', pulkitPending);
