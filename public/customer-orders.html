@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Willett Cables — Customer Order Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --primary: #ffd54f;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --gradient: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-color);
+      background-image: var(--gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      background: linear-gradient(to right, #ffd54f, #ffb300);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header p {
+      font-size: 1rem;
+      color: var(--text-sub);
+      margin-top: 5px;
+    }
+
+    .grid-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 600px) {
+      .grid-stats { grid-template-columns: 1fr; }
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .stat-card.warning-border {
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+
+    .stat-card.success-border {
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    .stat-subtext {
+      font-size: 0.8rem;
+      margin-top: 6px;
+    }
+
+    .alert {
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .alert-danger {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+    }
+
+    .alert-success {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #a7f3d0;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      border-left: 3px solid var(--primary);
+      padding-left: 10px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      padding: 12px 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-sub);
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    td {
+      padding: 16px;
+      font-size: 0.9rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-primary { background: rgba(255, 213, 79, 0.15); color: var(--primary); }
+    .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+
+    .loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 0;
+      color: var(--text-sub);
+    }
+
+    .spinner {
+      border: 4px solid rgba(255,255,255,0.1);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border-left-color: var(--primary);
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error-container {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--danger);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1 id="customer-title">Live Order Tracker</h1>
+    <p>Real-time booking and dispatch status</p>
+  </header>
+
+  <div id="loader" class="loader">
+    <div class="spinner"></div>
+    <p>Connecting to production database...</p>
+  </div>
+
+  <div id="error" class="error-container" style="display: none;"></div>
+
+  <div id="content" style="display: none;">
+    <!-- STATS -->
+    <div class="grid-stats">
+      <div class="stat-card">
+        <div class="stat-label">Today's Copper Rate</div>
+        <div class="stat-value" id="copper-rate">₹0.00 <span style="font-size: 0.9rem; color: var(--text-sub);">/ kg</span></div>
+        <div class="stat-subtext" style="color: var(--text-sub);">MCX Spot Price Reference</div>
+      </div>
+      <div class="stat-card" id="value-card">
+        <div class="stat-label">Pending Order Value</div>
+        <div class="stat-value" id="pending-value">₹0.00</div>
+        <div class="stat-subtext" id="value-status">Checking minimum limit...</div>
+      </div>
+    </div>
+
+    <!-- WARNING BANNER -->
+    <div id="alert-banner" style="display: none;"></div>
+
+    <!-- ORDERS CARD -->
+    <div class="card">
+      <div class="card-title">Pending & Dispatched Items</div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Order Code</th>
+              <th>Item details</th>
+              <th>Booked Price</th>
+              <th>Ordered</th>
+              <th>Dispatched</th>
+              <th>Pending Balance</th>
+            </tr>
+          </thead>
+          <tbody id="orders-body">
+            <!-- Dynamic rows here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxM4o0r9ld-NHX0hGuKT7-Jf2-43TJzuZKePgBGp9S9iaWvnKsJ0c1yWdR6oylFEfjT0g/exec';
+
+  async function loadDashboard() {
+    const params = new URLSearchParams(window.location.search);
+    const customer = params.get('customer');
+
+    if (!customer) {
+      showError('❌ Error: No customer specified in the URL. (e.g. ?customer=VARGO)');
+      return;
+    }
+
+    try {
+      const response = await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'get_production_status',
+          customer: customer,
+          isDashboardQuery: true
+        })
+      });
+
+      const resText = await response.text();
+      const res = JSON.parse(resText);
+
+      if (res.success && res.customerName) {
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+
+        // Update headers and rates
+        document.getElementById('customer-title').innerText = res.customerName.toUpperCase();
+        document.getElementById('copper-rate').innerHTML = `₹${res.copperRate.toLocaleString()} <span style="font-size: 0.9rem; color: var(--text-sub);">/ kg</span>`;
+        document.getElementById('pending-value').innerText = `₹${res.totalPendingValue.toLocaleString()}`;
+
+        // Minimum order value check
+        const valueCard = document.getElementById('value-card');
+        const valueStatus = document.getElementById('value-status');
+        const alertBanner = document.getElementById('alert-banner');
+
+        if (res.isBelowMinLimit) {
+          valueCard.className = 'stat-card warning-border';
+          valueStatus.innerText = '⚠️ Below Minimum limit';
+          valueStatus.style.color = 'var(--danger)';
+          
+          alertBanner.style.display = 'flex';
+          alertBanner.className = 'alert alert-danger';
+          alertBanner.innerHTML = `
+            <div>
+              <strong>⚠️ Low Pending Order Value Warning:</strong><br>
+              Your current pending order value is <strong>₹${res.totalPendingValue.toLocaleString()}</strong>, which is below our minimum order threshold of <strong>₹10,000</strong>. Additional shipping/freight charges may apply to your next delivery.
+            </div>
+          `;
+        } else {
+          valueCard.className = 'stat-card success-border';
+          valueStatus.innerText = '✅ Minimum limit met';
+          valueStatus.style.color = 'var(--success)';
+          alertBanner.style.display = 'none';
+        }
+
+        // Populate table
+        const tbody = document.getElementById('orders-body');
+        tbody.innerHTML = '';
+
+        if (res.orders && res.orders.length > 0) {
+          res.orders.forEach(o => {
+            const tr = document.createElement('tr');
+            
+            const isCompleted = o.pendingQty <= 0;
+            const balanceCell = isCompleted 
+              ? `<span class="badge badge-success">Completed 🎉</span>` 
+              : `<strong>${o.pendingQty.toLocaleString()} m</strong>`;
+
+            tr.innerHTML = `
+              <td>${o.date || '—'}</td>
+              <td><span class="badge badge-primary">${o.orderCode || '—'}</span></td>
+              <td>${o.item}</td>
+              <td>₹${o.bookedPrice.toFixed(2)}</td>
+              <td>${o.orderedQty.toLocaleString()} m</td>
+              <td>${o.dispatchedQty.toLocaleString()} m</td>
+              <td>${balanceCell}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        } else {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-sub);">No active orders found.</td></tr>`;
+        }
+      } else {
+        showError(res.error || '❌ No customer records found matching: ' + customer);
+      }
+    } catch (err) {
+      console.error(err);
+      showError('⚠️ Failed to connect to the production database. Please check your internet connection.');
+    }
+  }
+
+  function showError(msg) {
+    document.getElementById('loader').style.display = 'none';
+    const errDiv = document.getElementById('error');
+    errDiv.style.display = 'block';
+    errDiv.innerHTML = `<h3>${msg}</h3>`;
+  }
+
+  loadDashboard();
+</script>
+</body>
+</html>
